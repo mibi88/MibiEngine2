@@ -53,6 +53,8 @@
 
 #include <obj.h>
 
+#include <framebuffer.h>
+
 #define PRINT_MS 1
 
 #define ARRAY_NUM 4
@@ -89,6 +91,8 @@ GEModel model;
 GEImage image;
 GETexture texture;
 
+GEFramebuffer framebuffer;
+
 char *load_text(char *file, size_t *size_ptr) {
     FILE *fp;
     char *data;
@@ -114,10 +118,14 @@ char *load_text(char *file, size_t *size_ptr) {
     return data;
 }
 
-void init_gl(void) {
+void init(void) {
     char *vertex_shader;
     char *fragment_shader;
     char *log;
+    
+    GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
+    GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
+    char linear[2] = {1, 0};
     
     vertex_shader = load_text("shaders/vertex_3d.vert", NULL);
     fragment_shader = load_text("shaders/fragment_3d.frag", NULL);
@@ -144,6 +152,8 @@ void init_gl(void) {
     ge_shader_use(&shader);
     
     ge_mat4_identity(&view_mat);
+    
+    ge_frambuffer_init(&framebuffer, 640, 480, 2, colors, tex_types, linear);
 }
 
 void load_texture(void) {
@@ -263,6 +273,7 @@ void free_on_exit(void) {
     ge_obj_free(&obj);
     ge_texture_free(&texture);
     ge_shader_free(&shader);
+    ge_framebuffer_free(&framebuffer);
     ge_window_free(&window);
     puts("Successfully freed everything!");
 }
@@ -280,7 +291,7 @@ int main(int argc, char **argv) {
         return rc;
     }
     
-    init_gl();
+    init();
     load_texture();
     load_model();
     
