@@ -37,6 +37,10 @@
 
 #include <image.h>
 
+#include <stddef.h>
+
+#include <shader.h>
+
 #include <mat.h>
 
 typedef struct {
@@ -48,7 +52,7 @@ typedef struct {
 } GETexture;
 
 int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip);
-void ge_texture_use(GETexture *texture);
+void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
 void ge_texture_free(GETexture *texture);
 
 #endif

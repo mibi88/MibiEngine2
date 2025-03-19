@@ -42,12 +42,14 @@
 
 typedef struct {
     GETexture *texture;
+    GEShaderPos *tex_pos;
 } GETexturedModel;
 
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
-                          size_t vertex_num, size_t item_size, void *extra);
+                          size_t vertex_num, size_t item_size,
+                          GEShaderPos *tex_pos, void *extra);
 
 #endif
 

@@ -32,39 +32,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_WINDOW_H
-#define GE_WINDOW_H
+#version 100
+precision highp float;
 
-#define GE_WINDOW_DEBUG 0
+attribute vec2 vertex;
+attribute vec2 uv;
 
-typedef struct {
-    /* Not sure if it's a good idea to use a whole bunch of void pointers like
-     * this */
-    /* Platform independant EGL stuff */
-    struct {
-        void *display;
-        void *surface;
-        void *config;
-        void *context;
-    } egl;
-    /* Platform dependant stuff */
-    struct {
-        void *display;
-        void *window;
-        void *wm_delete_window;
-    } platform;
-    /* Callbacks to handle various events */
-    void (*draw)(void *data);
-    void (*resize)(void *data, int w, int h);
-    /* Data to pass to the callbacks when they are called */
-    void *data;
-} GEWindow;
+varying vec2 frag_pos;
+varying vec2 frag_uv;
 
-int ge_window_create(GEWindow *window, char *title);
-void ge_window_mainloop(GEWindow *window);
-void ge_window_clear(GEWindow *window, float r, float g, float b, float a);
-void ge_window_view(GEWindow *window, int w, int h);
-void ge_window_free(GEWindow *window);
-
-#endif
+void main() {
+    frag_uv = uv;
+    frag_pos = vertex;
+    gl_Position = vec4(vertex, 1.0, 1.0);
+}
 

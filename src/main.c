@@ -59,6 +59,8 @@
 
 #define ARRAY_NUM 4
 
+#define POSTPROCESSING 1
+
 /*
  * Useful links:
  * https://www.saschawillems.de/blog/2015/04/19/using-opengl-es-on-windows-desk
@@ -77,6 +79,7 @@ unsigned long get_ms(void) {
 GEShaderPos projection_mat_pos, view_mat_pos, model_mat_pos;
 GEShaderPos normal_mat_pos;
 GEShaderPos uv_max_pos;
+GEShaderPos model_tex;
 
 GEMat4 projection_mat, view_mat, model_mat;
 GEMat3 normal_mat;
@@ -86,6 +89,7 @@ unsigned long last_time = 0;
 GEWindow window;
 GEObj obj;
 GEShader shader;
+GEShader fb_shader;
 GEModel model;
 
 GEImage image;
@@ -118,17 +122,12 @@ char *load_text(char *file, size_t *size_ptr) {
     return data;
 }
 
-void init(void) {
+void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
     char *vertex_shader;
     char *fragment_shader;
     char *log;
-    
-    GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
-    GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
-    char linear[2] = {1, 0};
-    
-    vertex_shader = load_text("shaders/vertex_3d.vert", NULL);
-    fragment_shader = load_text("shaders/fragment_3d.frag", NULL);
+    vertex_shader = load_text(vertex_file, NULL);
+    fragment_shader = load_text(fragment_file, NULL);
     if(vertex_shader == NULL || fragment_shader == NULL){
         fputs("Shaders not found!\n", stderr);
         free(vertex_shader);
@@ -136,28 +135,54 @@ void init(void) {
         exit(EXIT_FAILURE);
     }
     
-    last_time = get_ms();
-    
-    if((log = ge_shader_load(&shader, vertex_shader, fragment_shader))){
+    if((log = ge_shader_load(shader, vertex_shader, fragment_shader))){
         fputs("Failed to load shaders:\n", stderr);
         fputs(log, stderr);
         exit(EXIT_FAILURE);
     }
+}
+
+void init(void) {
+    GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
+    GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
+    char linear[2] = {1, 0};
+    char *attr_names[] = {
+        "vertex",
+        NULL,
+        "uv",
+        NULL
+    };
+    char *tex_names[] = {
+        "color",
+        "depth"
+    };
+    last_time = get_ms();
+    
+    load_shader(&shader, "shaders/vertex_3d.vert", "shaders/fragment_3d.frag");
+    load_shader(&fb_shader, "shaders/vertex_fb.vert",
+                "shaders/fragment_fb.frag");
     projection_mat_pos = ge_shader_get_pos(&shader, "projection_mat");
     view_mat_pos = ge_shader_get_pos(&shader, "view_mat");
     model_mat_pos = ge_shader_get_pos(&shader, "model_mat");
     normal_mat_pos = ge_shader_get_pos(&shader, "normal_mat");
     uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
-    
-    ge_shader_use(&shader);
+    model_tex = ge_shader_get_pos(&shader, "tex");
     
     ge_mat4_identity(&view_mat);
+    
+    ge_shader_use(&fb_shader);
     
     if(ge_frambuffer_init(&framebuffer, 640, 480, 2, colors, tex_types,
                           linear)){
         fputs("Failed to initialize framebuffer!\n", stderr);
         exit(EXIT_FAILURE);
     }
+    if(ge_framebuffer_attr(&framebuffer, &fb_shader, attr_names, tex_names)){
+        fputs("Failed to initialize framebuffer attr!\n", stderr);
+        exit(EXIT_FAILURE);
+    }
+    
+    ge_shader_use(&shader);
 }
 
 void load_texture(void) {
@@ -195,7 +220,7 @@ void load_model(void) {
     
     if(ge_texturedmodel_init(&model, &texture, obj.indices, obj.vertices,
                              GE_T_UINT, GE_T_FLOAT, obj.index_num,
-                             obj.vertex_num, 4, NULL)){
+                             obj.vertex_num, 4, &model_tex, NULL)){
         fputs("Failed to init model!\n", stderr);
         exit(EXIT_FAILURE);
     }
@@ -223,12 +248,16 @@ void draw(void *data) {
     (void)data;
     
     /* Render everything */
+    ge_shader_use(&shader);
+#if POSTPROCESSING
+    ge_framebuffer_use(&framebuffer);
+#endif
     ge_window_clear(&window, 0, 0, 0, 1);
     
 #if PRINT_MS
     printf("%ld      \r", get_ms()-last_time);
-    delta = (get_ms()-last_time)*0.001;
 #endif
+    delta = (get_ms()-last_time)*0.001;
     last_time = get_ms();
     
     ge_mat4_translate3d(&tmp1, 0, 0, -2.2);
@@ -260,6 +289,13 @@ void draw(void *data) {
     
     ge_model_render(&model);
     
+#if POSTPROCESSING
+    ge_framebuffer_default();
+    ge_shader_use(&fb_shader);
+    
+    ge_framebuffer_render(&framebuffer);
+#endif
+    
     x += 2.5*delta;
     if(x > 360) x -= 360;
 }
@@ -277,6 +313,7 @@ void free_on_exit(void) {
     ge_obj_free(&obj);
     ge_texture_free(&texture);
     ge_shader_free(&shader);
+    ge_shader_free(&fb_shader);
     ge_framebuffer_free(&framebuffer);
     ge_window_free(&window);
     puts("Successfully freed everything!");

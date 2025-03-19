@@ -41,13 +41,14 @@ void _ge_texturedmodel_before_rendering(void *model, GEModelAttr *attr,
     GETexturedModel *texturedmodel = extra;
     (void)model;
     (void)attr;
-    ge_texture_use(texturedmodel->texture);
+    ge_texture_use(texturedmodel->texture, texturedmodel->tex_pos, 0);
 }
 
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
-                          size_t vertex_num, size_t item_size, void *extra) {
+                          size_t vertex_num, size_t item_size,
+                          GEShaderPos *tex_pos, void *extra) {
     GETexturedModel *texturedmodel = malloc(sizeof(GETexturedModel));
     if(texturedmodel == NULL){
         return 1;
@@ -68,6 +69,7 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
 #endif
     model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL+1] = extra;
     texturedmodel->texture = texture;
+    texturedmodel->tex_pos = tex_pos;
     return 0;
 }
 

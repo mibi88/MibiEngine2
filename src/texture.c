@@ -93,8 +93,9 @@ int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
     return 0;
 }
 
-void ge_texture_use(GETexture *texture) {
+void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
     glBindTexture(GL_TEXTURE_2D, texture->id);
+    glUniform1i(pos->pos, n);
 }
 
 void ge_texture_free(GETexture *texture) {

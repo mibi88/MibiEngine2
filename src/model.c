@@ -189,6 +189,7 @@ int ge_model_attr_init(GEModelAttr *attr, GEShader *shader,
     attr->array_pos = array_attr;
     attr->array_num = num;
     for(i=0;i<num;i++){
+        if(!names[i]) continue;
         attr->array_pos[i]->pos = glGetAttribLocation(shader->shader_program,
                                                       names[i]);
     }

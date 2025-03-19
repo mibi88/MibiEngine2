@@ -48,6 +48,24 @@ int _ge_framebuffer_get_size(int size) {
 int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
                        char *linear) {
+    /* Model data */
+    float vertices[4*2] = {
+        -1,  1,
+        -1, -1,
+         1, -1,
+         1,  1
+    };
+    unsigned short int indices[6] = {
+        0, 1, 3,
+        3, 1, 2
+    };
+    float uv_coords[4*2] = {
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1
+    };
+    /* Framebuffer related variables */
     size_t i;
     int attachments[GE_FRAMEBUFFER_COLOR_TEX_MAX] = {
         GL_COLOR_ATTACHMENT0
@@ -68,6 +86,18 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
     size_t depth_attachments = 0;
     size_t stencil_attachments = 0;
     size_t tex_pos = 0;
+    /* Initialize the model used to render the framebuffer */
+    if(ge_stdmodel_init(&framebuffer->model, indices, vertices, GE_T_USHORT,
+                        GE_T_FLOAT, 6, 4*2, 2, NULL)){
+        return 1;
+    }
+    if(ge_stdmodel_add_uv_coords(&framebuffer->model, uv_coords, GE_T_FLOAT,
+                                 4*2, 2)){
+        ge_model_free(&framebuffer->model);
+        return 2;
+    }
+    
+    /* Create the framebuffer */
     framebuffer->tex_num = tex_count;
     framebuffer->width = w;
     framebuffer->height = h;
@@ -100,7 +130,8 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                 /* Attach the texture to the framebuffer */
                 glFramebufferTexture2D(GL_FRAMEBUFFER,
                                        attachments[color_attachments],
-                                       GL_TEXTURE_2D, framebuffer->tex[i], 0);
+                                       GL_TEXTURE_2D,
+                                       framebuffer->tex[tex_pos], 0);
                 color_attachments++;
                 tex_pos++;
                 break;
@@ -117,6 +148,9 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                                 linear[i] ? GL_LINEAR : GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                                 GL_NEAREST);
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                       GL_TEXTURE_2D,
+                                       framebuffer->tex[tex_pos], 0);
                 depth_attachments++;
                 tex_pos++;
                 break;
@@ -132,17 +166,61 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                 break;
         }
     }
+    framebuffer->tex_num = tex_pos;
     
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
         glDeleteFramebuffers(1, &framebuffer->fbo);
         glDeleteTextures(1, framebuffer->tex);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        return 1;
+        return 3;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     return 0;
+}
+
+int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
+                        char **attr_names, char **tex_names) {
+    size_t i;
+    for(i=0;i<framebuffer->tex_num;i++){
+        framebuffer->tex_pos[i] = glGetUniformLocation(shader->shader_program,
+                                                       tex_names[i]);
+    }
+    if(ge_stdmodel_shader_attr(&framebuffer->model, shader, attr_names)){
+        return 1;
+    }
+    return 0;
+}
+
+void ge_framebuffer_render(GEFramebuffer *framebuffer) {
+    size_t i;
+    int textures[GE_FRAMEBUFFER_TEX_MAX] = {
+        GL_TEXTURE0,
+        GL_TEXTURE1,
+        GL_TEXTURE2
+    };
+    for(i=0;i<framebuffer->tex_num;i++){
+        glActiveTexture(textures[i]);
+        glBindTexture(GL_TEXTURE_2D, framebuffer->tex[i]);
+        glUniform1i(framebuffer->tex_pos[i], i);
+    }
+    glDisable(GL_DEPTH_TEST);
+    ge_model_render(&framebuffer->model);
+    glEnable(GL_DEPTH_TEST);
+    for(i=0;i<framebuffer->tex_num;i++){
+        glActiveTexture(textures[i]);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glActiveTexture(GL_TEXTURE0);
+}
+
+void ge_framebuffer_use(GEFramebuffer *framebuffer) {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
+}
+
+void ge_framebuffer_default(void) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void ge_framebuffer_free(GEFramebuffer *framebuffer) {

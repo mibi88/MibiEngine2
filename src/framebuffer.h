@@ -38,6 +38,8 @@
 #include <color.h>
 #include <stddef.h>
 
+#include <stdmodel.h>
+
 typedef enum {
     GE_TEX_COLOR,
     GE_TEX_DEPTH,
@@ -58,13 +60,20 @@ typedef struct {
     int size;
     unsigned int fbo;
     unsigned int tex[GE_FRAMEBUFFER_TEX_MAX];
+    int tex_pos[GE_FRAMEBUFFER_TEX_MAX];
     size_t tex_num;
+    GEModel model;
 } GEFramebuffer;
 
 /* TODO: Test all of this... */
 int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
                        char *linear);
+int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
+                        char **attr_names, char **tex_names);
+void ge_framebuffer_render(GEFramebuffer *framebuffer);
+void ge_framebuffer_use(GEFramebuffer *framebuffer);
+void ge_framebuffer_default(void);
 void ge_framebuffer_free(GEFramebuffer *framebuffer);
 
 #endif
