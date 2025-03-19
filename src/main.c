@@ -81,6 +81,8 @@ GEShaderPos normal_mat_pos;
 GEShaderPos uv_max_pos;
 GEShaderPos model_tex_pos;
 
+GEShaderPos fb_size_pos;
+
 GEMat4 projection_mat, view_mat, model_mat;
 GEMat3 normal_mat;
 
@@ -168,16 +170,19 @@ void init(void) {
     uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
     model_tex_pos = ge_shader_get_pos(&shader, "tex");
     
+    fb_size_pos = ge_shader_get_pos(&fb_shader, "size");
+    
     ge_mat4_identity(&view_mat);
     
     ge_shader_use(&fb_shader);
     
-    if(ge_frambuffer_init(&framebuffer, 640, 480, 2, colors, tex_types,
+    if(ge_frambuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
                           linear)){
         fputs("Failed to initialize framebuffer!\n", stderr);
         exit(EXIT_FAILURE);
     }
-    if(ge_framebuffer_attr(&framebuffer, &fb_shader, attr_names, tex_names)){
+    if(ge_framebuffer_attr(&framebuffer, &fb_shader, attr_names, tex_names,
+                           &fb_size_pos)){
         fputs("Failed to initialize framebuffer attr!\n", stderr);
         exit(EXIT_FAILURE);
     }
@@ -307,6 +312,9 @@ void resize(void *data, int w, int h) {
     (void)data;
     ge_window_view(&window, w, h);
     ge_mat4_projection3d(&projection_mat, 72, w/(float)h, 1000, 1);
+    if(ge_framebuffer_resize(&framebuffer, w, h)){
+        fputs("Failed to resize framebuffer!\n", stderr);
+    }
     printf("Window resized to %dx%d\n", w, h);
 }
 

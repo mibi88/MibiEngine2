@@ -41,8 +41,11 @@ attribute vec2 uv;
 varying vec2 frag_pos;
 varying vec2 frag_uv;
 
+uniform vec2 size;
+
 void main() {
-    frag_uv = uv;
+    frag_uv = uv*size;
+    frag_uv.y = size.y-frag_uv.y;
     frag_pos = vertex;
     gl_Position = vec4(vertex, 1.0, 1.0);
 }

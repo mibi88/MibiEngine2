@@ -60,10 +60,10 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
         3, 1, 2
     };
     float uv_coords[4*2] = {
-        0, 1,
         0, 0,
-        1, 0,
-        1, 1
+        0, 1,
+        1, 1,
+        1, 0
     };
     /* Framebuffer related variables */
     size_t i;
@@ -120,6 +120,11 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                              gl_colors[formats[i]], gl_color_type[formats[i]],
                              NULL);
                 
+                framebuffer->tex_internal[tex_pos] =
+                                              gl_colors_internal[formats[i]];
+                framebuffer->tex_format[tex_pos] = gl_colors[formats[i]];
+                framebuffer->tex_type[tex_pos] = gl_color_type[formats[i]];
+                
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
@@ -141,6 +146,10 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                              framebuffer->size, framebuffer->size, 0,
                              GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
                              NULL);
+                
+                framebuffer->tex_internal[tex_pos] = GL_DEPTH_COMPONENT;
+                framebuffer->tex_format[tex_pos] = GL_DEPTH_COMPONENT;
+                framebuffer->tex_type[tex_pos] = GL_UNSIGNED_INT;
                 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -177,11 +186,35 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    framebuffer->tex_size.x = w/(float)framebuffer->size;
+    framebuffer->tex_size.y = h/(float)framebuffer->size;
+    return 0;
+}
+
+int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
+    /*size_t i;*/
+    framebuffer->width = w;
+    framebuffer->height = h;
+    framebuffer->size = _ge_framebuffer_get_size(w > h ? w : h);
+    
+    /*for(i=0;i<framebuffer->tex_num;i++){
+        glBindTexture(GL_TEXTURE_2D, i);
+        glTexImage2D(GL_TEXTURE_2D, 0, framebuffer->tex_internal[i],
+                     framebuffer->size, framebuffer->size, 0,
+                     framebuffer->tex_format[i], framebuffer->tex_type[i],
+                     NULL);
+    }*/
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    framebuffer->tex_size.x = w/(float)framebuffer->size;
+    framebuffer->tex_size.y = h/(float)framebuffer->size;
     return 0;
 }
 
 int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
-                        char **attr_names, char **tex_names) {
+                        char **attr_names, char **tex_names,
+                        GEShaderPos *size_pos) {
     size_t i;
     for(i=0;i<framebuffer->tex_num;i++){
         framebuffer->tex_pos[i] = glGetUniformLocation(shader->shader_program,
@@ -190,6 +223,7 @@ int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
     if(ge_stdmodel_shader_attr(&framebuffer->model, shader, attr_names)){
         return 1;
     }
+    framebuffer->size_pos = size_pos;
     return 0;
 }
 
@@ -200,6 +234,7 @@ void ge_framebuffer_render(GEFramebuffer *framebuffer) {
         GL_TEXTURE1,
         GL_TEXTURE2
     };
+    ge_shader_load_vec2(framebuffer->size_pos, &framebuffer->tex_size);
     for(i=0;i<framebuffer->tex_num;i++){
         glActiveTexture(textures[i]);
         glBindTexture(GL_TEXTURE_2D, framebuffer->tex[i]);

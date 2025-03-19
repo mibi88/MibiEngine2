@@ -61,16 +61,23 @@ typedef struct {
     unsigned int fbo;
     unsigned int tex[GE_FRAMEBUFFER_TEX_MAX];
     int tex_pos[GE_FRAMEBUFFER_TEX_MAX];
+    int tex_format[GE_FRAMEBUFFER_TEX_MAX];
+    int tex_internal[GE_FRAMEBUFFER_TEX_MAX];
+    int tex_type[GE_FRAMEBUFFER_TEX_MAX];
     size_t tex_num;
     GEModel model;
+    GEVec2 tex_size;
+    GEShaderPos *size_pos;
 } GEFramebuffer;
 
 /* TODO: Test all of this... */
 int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
                        char *linear);
+int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h);
 int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
-                        char **attr_names, char **tex_names);
+                        char **attr_names, char **tex_names,
+                        GEShaderPos *size_pos);
 void ge_framebuffer_render(GEFramebuffer *framebuffer);
 void ge_framebuffer_use(GEFramebuffer *framebuffer);
 void ge_framebuffer_default(void);
