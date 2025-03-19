@@ -79,7 +79,7 @@ unsigned long get_ms(void) {
 GEShaderPos projection_mat_pos, view_mat_pos, model_mat_pos;
 GEShaderPos normal_mat_pos;
 GEShaderPos uv_max_pos;
-GEShaderPos model_tex;
+GEShaderPos model_tex_pos;
 
 GEMat4 projection_mat, view_mat, model_mat;
 GEMat3 normal_mat;
@@ -166,7 +166,7 @@ void init(void) {
     model_mat_pos = ge_shader_get_pos(&shader, "model_mat");
     normal_mat_pos = ge_shader_get_pos(&shader, "normal_mat");
     uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
-    model_tex = ge_shader_get_pos(&shader, "tex");
+    model_tex_pos = ge_shader_get_pos(&shader, "tex");
     
     ge_mat4_identity(&view_mat);
     
@@ -220,7 +220,7 @@ void load_model(void) {
     
     if(ge_texturedmodel_init(&model, &texture, obj.indices, obj.vertices,
                              GE_T_UINT, GE_T_FLOAT, obj.index_num,
-                             obj.vertex_num, 4, &model_tex, NULL)){
+                             obj.vertex_num, 4, NULL)){
         fputs("Failed to init model!\n", stderr);
         exit(EXIT_FAILURE);
     }
@@ -237,6 +237,9 @@ void load_model(void) {
     }
     if(ge_stdmodel_shader_attr(&model, &shader, attr_names)){
         fputs("Failed to get array shader pos!\n", stderr);
+    }
+    if(ge_texturedmodel_set_texture(&model, &model_tex_pos)){
+        fputs("Failed to set model texture!\n", stderr);
     }
 }
 

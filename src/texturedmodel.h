@@ -48,8 +48,8 @@ typedef struct {
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
-                          size_t vertex_num, size_t item_size,
-                          GEShaderPos *tex_pos, void *extra);
+                          size_t vertex_num, size_t item_size, void *extra);
+int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
 
 #endif
 
