@@ -137,6 +137,7 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                                        attachments[color_attachments],
                                        GL_TEXTURE_2D,
                                        framebuffer->tex[tex_pos], 0);
+                framebuffer->tex_attachment[tex_pos] = attachments[color_attachments];
                 color_attachments++;
                 tex_pos++;
                 break;
@@ -160,6 +161,7 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                        GL_TEXTURE_2D,
                                        framebuffer->tex[tex_pos], 0);
+                framebuffer->tex_attachment[tex_pos] = GL_DEPTH_ATTACHMENT;
                 depth_attachments++;
                 tex_pos++;
                 break;
@@ -192,18 +194,23 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
 }
 
 int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
-    /*size_t i;*/
+    /* TODO: Clean this up */
+    size_t i;
     framebuffer->width = w;
     framebuffer->height = h;
     framebuffer->size = _ge_framebuffer_get_size(w > h ? w : h);
     
-    /*for(i=0;i<framebuffer->tex_num;i++){
-        glBindTexture(GL_TEXTURE_2D, i);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
+    for(i=0;i<framebuffer->tex_num;i++){
+        glBindTexture(GL_TEXTURE_2D, framebuffer->tex[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, framebuffer->tex_internal[i],
                      framebuffer->size, framebuffer->size, 0,
                      framebuffer->tex_format[i], framebuffer->tex_type[i],
                      NULL);
-    }*/
+        glFramebufferTexture2D(GL_FRAMEBUFFER, framebuffer->tex_attachment[i],
+                               GL_TEXTURE_2D, framebuffer->tex[i], 0);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
     glBindTexture(GL_TEXTURE_2D, 0);
     

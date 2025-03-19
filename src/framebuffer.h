@@ -60,10 +60,12 @@ typedef struct {
     int size;
     unsigned int fbo;
     unsigned int tex[GE_FRAMEBUFFER_TEX_MAX];
+    /* TODO: Clean this up */
     int tex_pos[GE_FRAMEBUFFER_TEX_MAX];
     int tex_format[GE_FRAMEBUFFER_TEX_MAX];
     int tex_internal[GE_FRAMEBUFFER_TEX_MAX];
     int tex_type[GE_FRAMEBUFFER_TEX_MAX];
+    int tex_attachment[GE_FRAMEBUFFER_TEX_MAX];
     size_t tex_num;
     GEModel model;
     GEVec2 tex_size;
