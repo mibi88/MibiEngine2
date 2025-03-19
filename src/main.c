@@ -153,7 +153,11 @@ void init(void) {
     
     ge_mat4_identity(&view_mat);
     
-    ge_frambuffer_init(&framebuffer, 640, 480, 2, colors, tex_types, linear);
+    if(ge_frambuffer_init(&framebuffer, 640, 480, 2, colors, tex_types,
+                          linear)){
+        fputs("Failed to initialize framebuffer!\n", stderr);
+        exit(EXIT_FAILURE);
+    }
 }
 
 void load_texture(void) {

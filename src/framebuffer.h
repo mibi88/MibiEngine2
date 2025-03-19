@@ -46,7 +46,12 @@ typedef enum {
 } GETexType;
 
 /* GL_MAX_COLOR_ATTACHMENTS is 1 with OpenGL ES 2 */
-#define GE_FRAMEBUFFER_TEX_MAX 1
+#define GE_FRAMEBUFFER_COLOR_TEX_MAX 1
+#define GE_FRAMEBUFFER_DEPTH_TEX_MAX 1
+#define GE_FRAMEBUFFER_STENCIL_TEX_MAX 1
+#define GE_FRAMEBUFFER_TEX_MAX (GE_FRAMEBUFFER_COLOR_TEX_MAX+ \
+                                GE_FRAMEBUFFER_DEPTH_TEX_MAX+ \
+                                GE_FRAMEBUFFER_STENCIL_TEX_MAX)
 
 typedef struct {
     int width, height;

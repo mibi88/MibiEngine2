@@ -49,7 +49,7 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
                        char *linear) {
     size_t i;
-    int attachments[GE_FRAMEBUFFER_TEX_MAX] = {
+    int attachments[GE_FRAMEBUFFER_COLOR_TEX_MAX] = {
         GL_COLOR_ATTACHMENT0
     };
     int gl_colors[GE_C_AMOUNT] = {
@@ -64,7 +64,10 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
         GL_UNSIGNED_BYTE,
         GL_UNSIGNED_BYTE
     };
-    if(tex_count > GE_FRAMEBUFFER_TEX_MAX) tex_count = GE_FRAMEBUFFER_TEX_MAX;
+    size_t color_attachments = 0;
+    size_t depth_attachments = 0;
+    size_t stencil_attachments = 0;
+    size_t tex_pos = 0;
     framebuffer->tex_num = tex_count;
     framebuffer->width = w;
     framebuffer->height = h;
@@ -76,10 +79,12 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
     
     for(i=0;i<tex_count;i++){
         /* Create the texture which will hold the data */
-        glBindTexture(GL_TEXTURE_2D, framebuffer->tex[i]);
+        glGenTextures(1, framebuffer->tex+tex_pos);
+        glBindTexture(GL_TEXTURE_2D, framebuffer->tex[tex_pos]);
         
         switch(type[i]){
             case GE_TEX_COLOR:
+                if(color_attachments >= GE_FRAMEBUFFER_COLOR_TEX_MAX) break;
                 glTexImage2D(GL_TEXTURE_2D, 0, gl_colors_internal[formats[i]],
                              framebuffer->size, framebuffer->size, 0,
                              gl_colors[formats[i]], gl_color_type[formats[i]],
@@ -93,10 +98,14 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                                 linear[i] ? GL_LINEAR : GL_NEAREST);
                 
                 /* Attach the texture to the framebuffer */
-                glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i],
+                glFramebufferTexture2D(GL_FRAMEBUFFER,
+                                       attachments[color_attachments],
                                        GL_TEXTURE_2D, framebuffer->tex[i], 0);
+                color_attachments++;
+                tex_pos++;
                 break;
             case GE_TEX_DEPTH:
+                if(depth_attachments >= GE_FRAMEBUFFER_DEPTH_TEX_MAX) break;
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
                              framebuffer->size, framebuffer->size, 0,
                              GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
@@ -105,12 +114,19 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                GL_NEAREST);
+                                linear[i] ? GL_LINEAR : GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                                 GL_NEAREST);
+                depth_attachments++;
+                tex_pos++;
                 break;
             case GE_TEX_STENCIL:
+                if(stencil_attachments >= GE_FRAMEBUFFER_STENCIL_TEX_MAX){
+                    break;
+                }
                 /* TODO: Implement this */
+                stencil_attachments++;
+                tex_pos++;
                 break;
             default:
                 break;
