@@ -140,8 +140,12 @@ void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
     if((log = ge_shader_load(shader, vertex_shader, fragment_shader))){
         fputs("Failed to load shaders:\n", stderr);
         fputs(log, stderr);
+        free(vertex_shader);
+        free(fragment_shader);
         exit(EXIT_FAILURE);
     }
+    free(vertex_shader);
+    free(fragment_shader);
 }
 
 void init(void) {
@@ -227,6 +231,8 @@ void load_model(void) {
                              GE_T_UINT, GE_T_FLOAT, obj.index_num,
                              obj.vertex_num, 4, NULL)){
         fputs("Failed to init model!\n", stderr);
+        free(colors);
+        free(data);
         exit(EXIT_FAILURE);
     }
     if(ge_stdmodel_add_color(&model, colors, GE_T_FLOAT, obj.vertex_num, 4)){
@@ -246,6 +252,8 @@ void load_model(void) {
     if(ge_texturedmodel_set_texture(&model, &model_tex_pos)){
         fputs("Failed to set model texture!\n", stderr);
     }
+    free(colors);
+    free(data);
 }
 
 float x = 0;
@@ -323,6 +331,7 @@ void free_on_exit(void) {
     ge_model_free(&model);
     ge_obj_free(&obj);
     ge_texture_free(&texture);
+    ge_image_free(&image);
     ge_shader_free(&shader);
     ge_shader_free(&fb_shader);
     ge_framebuffer_free(&framebuffer);

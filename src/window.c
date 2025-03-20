@@ -284,7 +284,25 @@ void ge_window_view(GEWindow *window, int w, int h) {
 
 void ge_window_free(GEWindow *window) {
     /* Delete all the EGL and Xlib stuff */
-    /* TODO */
+    if(eglMakeCurrent(*(EGLDisplay*)window->egl.display, EGL_NO_SURFACE,
+                      EGL_NO_SURFACE, EGL_NO_CONTEXT) == EGL_FALSE){
+        fputs("Failed to make surface and context not current anymore!\n",
+              stderr);
+    }
+    if(eglDestroySurface(*(EGLDisplay*)window->egl.display,
+                         *(EGLSurface*)window->egl.surface) == EGL_FALSE){
+        fputs("Failed to destroy surface!\n", stderr);
+    }
+    if(eglDestroyContext(*(EGLDisplay*)window->egl.display,
+                         *(EGLContext*)window->egl.context) == EGL_FALSE){
+        fputs("Failed to destroy context!\n", stderr);
+    }
+    XDestroyWindow(window->platform.display,
+                   *(Window*)window->platform.window);
+    XCloseDisplay(window->platform.display);
+    if(eglTerminate(*(EGLDisplay*)window->egl.display) == EGL_FALSE){
+        fputs("Failed to terminate EGL!\n", stderr);
+    }
     /* Free all the allocated variables */
     free(window->egl.display);
     window->egl.display = NULL;

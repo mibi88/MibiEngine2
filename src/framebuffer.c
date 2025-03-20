@@ -268,5 +268,6 @@ void ge_framebuffer_default(void) {
 void ge_framebuffer_free(GEFramebuffer *framebuffer) {
     glDeleteFramebuffers(1, &framebuffer->fbo);
     glDeleteTextures(framebuffer->tex_num, framebuffer->tex);
+    ge_model_free(&framebuffer->model);
 }
 
