@@ -108,7 +108,10 @@ void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
 
 void ge_shader_free(GEShader *shader) {
     glDeleteShader(shader->vertex_shader);
+    shader->vertex_shader = 0;
     glDeleteShader(shader->fragment_shader);
+    shader->fragment_shader = 0;
     glDeleteProgram(shader->shader_program);
+    shader->shader_program = 0;
 }
 

@@ -85,5 +85,6 @@ int ge_modelarray_disable(GEModelArray *array) {
 
 void ge_modelarray_free(GEModelArray *array) {
     glDeleteBuffers(1, &array->vbo);
+    array->vbo = 0;
 }
 

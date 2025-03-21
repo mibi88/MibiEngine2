@@ -102,5 +102,6 @@ void ge_texture_free(GETexture *texture) {
     free(texture->data);
     texture->data = NULL;
     glDeleteTextures(1, &texture->id);
+    texture->id = 0;
 }
 
