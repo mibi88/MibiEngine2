@@ -35,6 +35,8 @@
 #ifndef GE_COLOR_H
 #define GE_COLOR_H
 
+/* TODO: Support GL_HALF_FLOAT_OES defined in GLES2/gl2ext.h
+ * if available for HDR rendering. */
 typedef enum {
     GE_C_RGB,
     GE_C_RGBA,

@@ -35,13 +35,60 @@
 #version 100
 precision lowp float;
 
+/* TODO: This blur is quite messy, I should render it in two passes */
+
+/* Got it from python:
+ * import math as m; print(m.pi)
+ */
+#define PI 3.141592653589793
+
+/* Kernel generated with the following python code:
+ * import math as m; s=3; r=16;
+ * print([1/m.sqrt(2*m.pi*s*s)*m.exp(-0.5*(x/2)*(x/2)/(2*s*s))
+ *       for x in range(-r, r+1)])
+ */
+
+#define STEP (1.0/2000.0)
+#define KERNEL_RADIUS 4
 varying vec2 frag_pos;
 varying vec2 frag_uv;
 
 uniform sampler2D color;
 uniform sampler2D depth;
 
+float gauss(float x, float s) {
+    return 1.0/sqrt(2.0*PI*s*s)*exp(-x*x/(2.0*s*s));
+}
+
 void main() {
-    gl_FragColor = texture2D(color, frag_uv);
+    float kernel[2*KERNEL_RADIUS*2*KERNEL_RADIUS];
+    float m = 0.0;
+    float v;
+    vec4 c;
+    vec2 pos;
+    gl_FragColor = vec4(0.0);
+    for(int y=-KERNEL_RADIUS;y<KERNEL_RADIUS;y++){
+        for(int x=-KERNEL_RADIUS;x<KERNEL_RADIUS;x++){
+            kernel[(y+KERNEL_RADIUS)*2*KERNEL_RADIUS+(x+KERNEL_RADIUS)] =
+                gauss(float(x)/(3.0*float(KERNEL_RADIUS)),
+                      float(KERNEL_RADIUS))*
+                gauss(float(y)/(3.0*float(KERNEL_RADIUS)),
+                      float(KERNEL_RADIUS));
+        }
+    }
+    for(int i=0;i<2*KERNEL_RADIUS*2*KERNEL_RADIUS;i++){
+        m += kernel[i];
+    }
+    for(int i=0;i<2*KERNEL_RADIUS*2*KERNEL_RADIUS;i++){
+        kernel[i] /= m;
+    }
+    for(int y=-KERNEL_RADIUS;y<KERNEL_RADIUS;y++){
+        for(int x=-KERNEL_RADIUS;x<KERNEL_RADIUS;x++){
+            v = kernel[(y+KERNEL_RADIUS)*2*KERNEL_RADIUS+(x+KERNEL_RADIUS)];
+            pos = vec2(frag_uv.x+float(x)*STEP, frag_uv.y+float(y)*STEP);
+            c = texture2D(color, pos);
+            gl_FragColor += c*v;
+        }
+    }
 }
 
