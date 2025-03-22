@@ -61,6 +61,8 @@
 
 #define POSTPROCESSING 1
 
+#define EXIT(rc) {free_on_exit(); exit(rc);}
+
 /*
  * Useful links:
  * https://www.saschawillems.de/blog/2015/04/19/using-opengl-es-on-windows-desk
@@ -99,6 +101,19 @@ GETexture texture;
 
 GEFramebuffer framebuffer;
 
+void free_on_exit(void) {
+    puts("Free everything!");
+    ge_model_free(&model);
+    ge_obj_free(&obj);
+    ge_texture_free(&texture);
+    ge_image_free(&image);
+    ge_shader_free(&shader);
+    ge_shader_free(&fb_shader);
+    ge_framebuffer_free(&framebuffer);
+    ge_window_free(&window);
+    puts("Successfully freed everything!");
+}
+
 char *load_text(char *file, size_t *size_ptr) {
     FILE *fp;
     char *data;
@@ -134,7 +149,7 @@ void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
         fputs("Shaders not found!\n", stderr);
         free(vertex_shader);
         free(fragment_shader);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     
     if((log = ge_shader_load(shader, vertex_shader, fragment_shader))){
@@ -142,7 +157,7 @@ void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
         fputs(log, stderr);
         free(vertex_shader);
         free(fragment_shader);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     free(vertex_shader);
     free(fragment_shader);
@@ -183,12 +198,12 @@ void init(void) {
     if(ge_frambuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
                           linear)){
         fputs("Failed to initialize framebuffer!\n", stderr);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     if(ge_framebuffer_attr(&framebuffer, &fb_shader, attr_names, tex_names,
                            &fb_size_pos)){
         fputs("Failed to initialize framebuffer attr!\n", stderr);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     
     ge_shader_use(&shader);
@@ -197,11 +212,11 @@ void init(void) {
 void load_texture(void) {
     if(ge_image_load(&image, "bunny_texture.png")){
         fputs("Failed to read image!\n", stderr);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     if(ge_texture_init(&texture, &image, 1, 0)){
         fputs("Failed to load texture!\n", stderr);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
 }
 
@@ -218,7 +233,7 @@ void load_model(void) {
     };
     
     data = load_text("bunny_uv.obj", &size);
-    if(data == NULL) exit(EXIT_FAILURE);
+    if(data == NULL) EXIT(EXIT_FAILURE);
     
     ge_obj_load(&obj, data, size);
     colors = malloc(obj.vertex_num*sizeof(float));
@@ -233,7 +248,7 @@ void load_model(void) {
         fputs("Failed to init model!\n", stderr);
         free(colors);
         free(data);
-        exit(EXIT_FAILURE);
+        EXIT(EXIT_FAILURE);
     }
     if(ge_stdmodel_add_color(&model, colors, GE_T_FLOAT, obj.vertex_num, 4)){
         fputs("Failed to add colors!\n", stderr);
@@ -326,27 +341,10 @@ void resize(void *data, int w, int h) {
     printf("Window resized to %dx%d\n", w, h);
 }
 
-void free_on_exit(void) {
-    puts("Free everything!");
-    ge_model_free(&model);
-    ge_obj_free(&obj);
-    ge_texture_free(&texture);
-    ge_image_free(&image);
-    ge_shader_free(&shader);
-    ge_shader_free(&fb_shader);
-    ge_framebuffer_free(&framebuffer);
-    ge_window_free(&window);
-    puts("Successfully freed everything!");
-}
-
 int main(int argc, char **argv) {
     int rc;
     (void)argc;
     (void)argv;
-    
-    if(atexit(free_on_exit)){
-        fputs("atexit failed!\n", stderr);
-    }
     
     if((rc = ge_window_create(&window, "MibiEngine2 demo"))){
         return rc;
@@ -360,6 +358,8 @@ int main(int argc, char **argv) {
     window.resize = resize;
     window.data = &window;
     ge_window_mainloop(&window);
+    
+    free_on_exit();
     
     return EXIT_SUCCESS;
 }
