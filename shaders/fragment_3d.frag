@@ -64,7 +64,9 @@ float lighting(vec3 light) {
 }
 
 void main() {
-    gl_FragColor = texture2D(tex, mod((frag_uv.xy*uv_max), uv_max))*
+    vec2 pos = mod((frag_uv.xy*uv_max), uv_max);
+    pos.y = uv_max.y-pos.y;
+    gl_FragColor = texture2D(tex, pos)*
                    lighting(light);
 }
 

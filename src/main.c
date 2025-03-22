@@ -210,7 +210,7 @@ void init(void) {
 }
 
 void load_texture(void) {
-    if(ge_image_load(&image, "bunny_texture.png")){
+    if(ge_image_load(&image, "spot_texture.png")){
         fputs("Failed to read image!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -232,7 +232,7 @@ void load_model(void) {
         "normal"
     };
     
-    data = load_text("bunny_uv.obj", &size);
+    data = load_text("spot.obj", &size);
     if(data == NULL) EXIT(EXIT_FAILURE);
     
     ge_obj_load(&obj, data, size);

@@ -49,7 +49,7 @@ precision lowp float;
  */
 
 #define STEP (1.0/2000.0)
-#define KERNEL_RADIUS 4
+#define KERNEL_RADIUS 0
 varying vec2 frag_pos;
 varying vec2 frag_uv;
 
@@ -61,6 +61,7 @@ float gauss(float x, float s) {
 }
 
 void main() {
+#if KERNEL_RADIUS
     float kernel[2*KERNEL_RADIUS*2*KERNEL_RADIUS];
     float m = 0.0;
     float v;
@@ -90,5 +91,8 @@ void main() {
             gl_FragColor += c*v;
         }
     }
+#else
+    gl_FragColor = texture2D(color, frag_uv);
+#endif
 }
 

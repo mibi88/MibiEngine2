@@ -2,4 +2,5 @@
 *.png
 *.xcf
 main
-
+*.blend
+*.blend1

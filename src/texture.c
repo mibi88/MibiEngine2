@@ -44,7 +44,9 @@ int _ge_texture_get_size(int size) {
      * multiple files */
     /* Find the closest power of two */
     int c;
+    int s = size;
     for(c=1;size>>=1;c++);
+    if(!(s&(s-1))) c--;
     return 1<<c;
 }
 
