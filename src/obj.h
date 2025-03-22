@@ -35,7 +35,7 @@
 #ifndef GE_OBJ_H
 #define GE_OBJ_H
 
-#define GE_OBJ_DEBUG 0
+#define GE_OBJ_DEBUG 1
 
 #define GE_OBJ_ALLOC_STEP (1<<16)
 #define GE_OBJ_TOK_SZ 32

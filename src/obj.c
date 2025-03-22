@@ -58,6 +58,22 @@ typedef struct {
         indices = NULL; \
     }
 
+#define _GE_OBJ_FREE_LOCAL() \
+    { \
+        free(vertices); \
+        vertices = NULL; \
+        free(uv); \
+        uv = NULL; \
+        free(normals); \
+        normals = NULL; \
+        free(indices); \
+        indices = NULL; \
+        free(vertices_used); \
+        vertices_used = NULL; \
+        free(new_index); \
+        new_index = NULL; \
+    }
+
 #define _GE_OBJ_RESIZE(ptr, sz, max, type, err) \
     { \
         new = realloc(ptr, max*sizeof(type)); \
@@ -90,6 +106,9 @@ typedef struct {
         g.uv = 0; \
         g.normal = 0; \
         sscanf(s, "%ld/%ld/%ld", &g.vertex, &g.uv, &g.normal); \
+        g.vertex--; \
+        g.uv--; \
+        g.normal--; \
     }
 
 #define _GE_OBJ_ADD(ptr, sz, max, type, x) \
@@ -97,14 +116,7 @@ typedef struct {
         ptr[sz] = x; \
         _GE_OBJ_GROW(ptr, sz, max, type, { \
             _GE_OBJ_FREE(); \
-            free(vertices); \
-            vertices = NULL; \
-            free(uv); \
-            uv = NULL; \
-            free(normals); \
-            normals = NULL; \
-            free(indices); \
-            indices = NULL; \
+            _GE_OBJ_FREE_LOCAL(); \
             return 1; \
         }); \
     }
@@ -134,15 +146,20 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
     float *normals;
     GEObjIndexGroup *indices;
     
+    char *vertices_used = NULL;
+    size_t *new_index = NULL;
+    
     size_t vertex_num = 0;
     size_t uv_num = 0;
     size_t normal_num = 0;
-    size_t index_num;
+    size_t index_num = 0;
     
     size_t vertex_max_num = GE_OBJ_ALLOC_STEP;
     size_t uv_max_num = GE_OBJ_ALLOC_STEP;
     size_t normal_max_num = GE_OBJ_ALLOC_STEP;
     size_t index_max_num = GE_OBJ_ALLOC_STEP;
+    
+    int found;
     
     vertices = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
     uv = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
@@ -203,7 +220,8 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
-                        printf("Invalid vertex: length: %ld\n", line_len);
+                        fprintf(stderr, "Invalid vertex: length: %ld\n",
+                                line_len);
 #endif
                     }
                 }else if(!strcmp(line[0], "vt")){
@@ -228,8 +246,8 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
-                        printf("Invalid uv coordinate: length: %ld\n",
-                               line_len);
+                        fprintf(stderr, "Invalid uv coordinate: length: %ld\n",
+                                line_len);
 #endif
                     }
                 }else if(!strcmp(line[0], "vn")){
@@ -246,21 +264,22 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
-                        printf("Invalid normal: length: %ld\n", line_len);
+                        fprintf(stderr, "Invalid normal: length: %ld\n",
+                                line_len);
 #endif
                     }
                 }else if(!strcmp(line[0], "vp")){
                     /* TODO */
 #if GE_OBJ_DEBUG
-                    puts("Parameter space vertices are currently "
-                         "unsupported!");
+                    fputs("Parameter space vertices are currently "
+                          "unsupported!", stderr);
 #endif
                 }else if(!strcmp(line[0], "f")){
                     /* TODO: Support other shapes than triangles */
 #if GE_OBJ_DEBUG
                     if(line_len > 4){
-                        puts("Other shapes than triangles are currently "
-                             "unsupported!");
+                        fputs("Other shapes than triangles are currently "
+                              "unsupported!", stderr);
                     }else if(line_len == 4){
 #else
                     if(line_len == 4){
@@ -279,11 +298,12 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                 }else if(!strcmp(line[0], "l")){
                     /* TODO */
 #if GE_OBJ_DEBUG
-                    puts("Lines are currently unsupported!");
+                    fputs("Lines are currently unsupported!", stderr);
 #endif
                 }else{
 #if GE_OBJ_DEBUG
-                    printf("Unknown line starting with \"%s\"!\n", line[0]);
+                    fprintf(stderr, "Unknown line starting with \"%s\"!\n",
+                            line[0]);
 #endif
                 }
             }
@@ -316,28 +336,134 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
             in_data = 1;
         }
     }
+    /* Normalize the normals */
+    n = normal_num/3;
+    if(normal_num%3) n--;
+    for(i=0;i<normal_num*3;i+=3){
+        len = sqrt(normals[i]*normals[i]+normals[i+1]*normals[i+1]+
+                   normals[i+2]*normals[i+2]);
+        normals[i] = normals[i]/len;
+        normals[i+1] = normals[i+1]/len;
+        normals[i+2] = normals[i+2]/len;
+    }
+    /* Generate the arrays in the GEObj struct */
+    /* TODO: Optimize this! */
+    vertices_used = calloc(vertex_num/4, 1);
+    new_index = calloc(index_num, sizeof(size_t));
+    if(vertices_used == NULL || new_index == NULL){
+        _GE_OBJ_FREE();
+        _GE_OBJ_FREE_LOCAL();
+        return 2;
+    }
+    for(i=0;i<index_num;i++){
+        /* Fix the indices if they are incorrect */
+        if((size_t)indices[i].vertex >= vertex_num/4){
+#if GE_OBJ_DEBUG
+            fprintf(stderr, "Bad vertex index %ld!\n", indices[i].vertex);
+#endif
+            indices[i].vertex = 0;
+        }
+        if((size_t)indices[i].uv >= uv_num/3){
+#if GE_OBJ_DEBUG
+            fprintf(stderr, "Bad uv coord index %ld!\n", indices[i].uv);
+#endif
+            indices[i].uv = 0;
+        }
+        if((size_t)indices[i].normal >= normal_num/3){
+#if GE_OBJ_DEBUG
+            fprintf(stderr, "Bad normal index %ld!\n", indices[i].normal);
+#endif
+            indices[i].normal = 0;
+        }
+        /* If this vertice was already used, check if it must be added because
+         * it is using different normal or uv indices than the previous one */
+        if(vertices_used[indices[i].vertex]){
+            /* Search the previously added vertex or vertices with the same
+             * vertex index */
+            found = 0;
+            for(n=0;n<i;n++){
+                if(indices[n].vertex == indices[i].vertex &&
+                   indices[n].uv == indices[i].uv &&
+                   indices[n].normal == indices[i].normal){
+                    found = 1;
+                    break;
+                }
+            }
+            if(found){
+                _GE_OBJ_ADD(obj->indices, obj->index_num, obj->index_max_num,
+                            float, new_index[n]);
+                new_index[i] = new_index[n];
+            }else{
+                /* Add the vertex and its index */
+                _GE_OBJ_ADD(obj->indices, obj->index_num, obj->index_max_num,
+                            float, obj->vertex_num/4);
+                new_index[i] = obj->vertex_num/4;
+                _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                            obj->vertex_max_num, float,
+                            vertices[indices[i].vertex*4]);
+                _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                            obj->vertex_max_num, float,
+                            vertices[indices[i].vertex*4+1]);
+                _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                            obj->vertex_max_num, float,
+                            vertices[indices[i].vertex*4+2]);
+                _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                            obj->vertex_max_num, float,
+                            vertices[indices[i].vertex*4+3]);
+                _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                            uv[indices[i].uv*3]);
+                _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                            uv[indices[i].uv*3+1]);
+                _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                            uv[indices[i].uv*3+2]);
+                _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                            float, normals[indices[i].normal*3]);
+                _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                            float, normals[indices[i].normal*3+1]);
+                _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                            float, normals[indices[i].normal*3+2]);
+            }
+        }else{
+            /* Add the vertex and its index */
+            _GE_OBJ_ADD(obj->indices, obj->index_num, obj->index_max_num,
+                        float, obj->vertex_num/4);
+            new_index[i] = obj->vertex_num/4;
+            _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                        obj->vertex_max_num, float,
+                        vertices[indices[i].vertex*4]);
+            _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                        obj->vertex_max_num, float,
+                        vertices[indices[i].vertex*4+1]);
+            _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                        obj->vertex_max_num, float,
+                        vertices[indices[i].vertex*4+2]);
+            _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
+                        obj->vertex_max_num, float,
+                        vertices[indices[i].vertex*4+3]);
+            _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                        uv[indices[i].uv*3]);
+            _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                        uv[indices[i].uv*3+1]);
+            _GE_OBJ_ADD(obj->uv_coords, obj->uv_num, obj->uv_max_num, float,
+                        uv[indices[i].uv*3+2]);
+            _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                        float, normals[indices[i].normal*3]);
+            _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                        float, normals[indices[i].normal*3+1]);
+            _GE_OBJ_ADD(obj->normals, obj->normal_num, obj->normal_max_num,
+                        float, normals[indices[i].normal*3+2]);
+            /* The vertex has been used */
+            vertices_used[indices[i].vertex] = 1;
+        }
+    }
 #if GE_OBJ_DEBUG
     printf("-- INDICES LOADED: %ld\n", obj->index_num);
     printf("-- VERTICES LOADED: %ld\n", obj->vertex_num);
     printf("-- UV COORDINATES LOADED: %ld\n", obj->uv_num);
     printf("-- NORMALS LOADED: %ld\n", obj->normal_num);
 #endif
-    /* Normalize the normals */
-    n = obj->normal_num/3;
-    if(obj->normal_num%3) n--;
-    for(i=0;i<obj->normal_num*3;i+=3){
-        len = sqrt(obj->normals[i]*obj->normals[i]+
-                   obj->normals[i+1]*obj->normals[i+1]+
-                   obj->normals[i+2]*obj->normals[i+2]);
-        obj->normals[i] = obj->normals[i]/len;
-        obj->normals[i+1] = obj->normals[i+1]/len;
-        obj->normals[i+2] = obj->normals[i+2]/len;
-    }
     /* Free all the variables */
-    free(vertices);
-    free(uv);
-    free(normals);
-    free(indices);
+    _GE_OBJ_FREE_LOCAL();
 #if GE_OBJ_DEBUG
     puts("-- MODEL LOADED SUCCESSFULLY");
 #endif
