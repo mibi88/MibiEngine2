@@ -125,16 +125,12 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
     /* TODO: Support relative indices */
     size_t i;
     size_t n;
-    char *last;
-    size_t count;
     char line[GE_OBJ_TOK_MAX][GE_OBJ_TOK_SZ];
     int in_comment = 0;
     size_t line_len = 0;
     int in_data = 1;
     size_t token_pos = 0;
     char c;
-    unsigned int *uv_indices;
-    unsigned int *normal_indices;
     void *new;
     float len;
     
@@ -338,13 +334,12 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
     }
     /* Normalize the normals */
     n = normal_num/3;
-    if(normal_num%3) n--;
-    for(i=0;i<normal_num*3;i+=3){
+    for(i=0;i<n*3;i+=3){
         len = sqrt(normals[i]*normals[i]+normals[i+1]*normals[i+1]+
                    normals[i+2]*normals[i+2]);
-        normals[i] = normals[i]/len;
-        normals[i+1] = normals[i+1]/len;
-        normals[i+2] = normals[i+2]/len;
+        normals[i] /= len;
+        normals[i+1] /= len;
+        normals[i+2] /= len;
     }
     /* Generate the arrays in the GEObj struct */
     /* TODO: Optimize this! */
