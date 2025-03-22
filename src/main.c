@@ -298,13 +298,13 @@ void draw(void *data) {
     ge_mat4_rot3d(&tmp2, A_Y, x);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, A_X, x);
+    ge_mat4_rot3d(&tmp2, A_X, 0);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, A_Z, x);
+    ge_mat4_rot3d(&tmp2, A_Z, 0);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_translate3d(&tmp2, 0, -0.75, 0);
+    ge_mat4_translate3d(&tmp2, 0, 0, 0);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     
     /* ge_mat4_inverse(&tmp1, &model_mat);

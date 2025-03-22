@@ -39,150 +39,75 @@
 #include <stdio.h>
 #include <math.h>
 
-/* TODO: Clean this up! */
+typedef struct {
+    long vertex;
+    long uv;
+    long normal;
+} GEObjIndexGroup;
 
-#if GE_OBJ_DEBUG_TRIANGLES
-#define _GE_OBJ_DISPLAY_STR(str, len) \
-    fwrite(str, 1, len, stdout); \
-    puts("")
-#else
-#define _GE_OBJ_DISPLAY_STR(str, len)
-#endif
-
-#if GE_OBJ_DEBUG
-#define _GE_OBJ_PRINT_DEBUG(s) puts(s)
-#else
-#define _GE_OBJ_PRINT_DEBUG(s)
-#endif
-
-#if GE_OBJ_DEBUG_INDICES
-#define _GE_OBJ_PRINT_MOVE(ptr) \
-    printf("Moved %d to %d\n", ptr[i], obj->indices[i]);
-#else
-#define _GE_OBJ_PRINT_MOVE(ptr)
-#endif
-
-#define _GE_OBJ_RESIZE(ptr, sz, max, t, err) \
-    new = realloc(ptr, max*sizeof(t)); \
-    if(new == NULL){ \
-        _GE_OBJ_FREEALL(); \
-        return err; \
-    } \
-    ptr = new
-
-#define _GE_OBJ_GROW_IF_NEEDED(ptr, sz, max, t, err) \
-    if(sz >= max){ \
-        max += GE_OBJ_ALLOC_STEP; \
-        _GE_OBJ_RESIZE(ptr, sz, max, t, err); \
+#define _GE_OBJ_FREE() \
+    { \
+        ge_obj_free(obj); \
+        free(vertices); \
+        vertices = NULL; \
+        free(uv); \
+        uv = NULL; \
+        free(normals); \
+        normals = NULL; \
+        free(indices); \
+        indices = NULL; \
     }
 
-#define _GE_OBJ_GROW(ptr, sz, max, t, err) \
-    sz++; \
-    _GE_OBJ_GROW_IF_NEEDED(ptr, sz, max, t, err);
-
-#define _GE_OBJ_FREEOBJ() \
-    free(obj->vertices); \
-    free(obj->uv_coords); \
-    free(obj->normals); \
-    free(obj->indices); \
-    obj->vertices = NULL; \
-    obj->uv_coords = NULL; \
-    obj->normals = NULL; \
-    obj->indices = NULL
-
-#define _GE_OBJ_FREEALL() \
-    free(uv_indices); \
-    free(normal_indices); \
-    uv_indices = NULL; \
-    normal_indices = NULL; \
-    _GE_OBJ_FREEOBJ();
-
-#define _GE_OBJ_LOAD_SHAPE(x) \
-    count = 0; \
-    last = line[x]; \
-    for(n=0;n<strlen(line[x])+1;n++) { \
-        if(line[x][n] == '/' || line[x][n] == '\0'){ \
-            _GE_OBJ_DISPLAY_STR(last, line[x]+n-last); \
-            switch(count){ \
-                case 0: \
-                    /* It's a vertex index */ \
-                    obj->indices[obj->index_num] = \
-                            _ge_atoi(last, line[x]+n-last)-1; \
-                    break; \
-                case 1: \
-                    /* It's a uv coordinate index */ \
-                    uv_indices[obj->index_num] = \
-                            _ge_atoi(last, line[x]+n-last)-1; \
-                    break; \
-                case 2: \
-                    /* It's a uv coordinate index */ \
-                    normal_indices[obj->index_num] = \
-                            _ge_atoi(last, line[x]+n-last)-1; \
-                    break; \
-            } \
-            last = line[x]+n+1; \
-            count++; \
+#define _GE_OBJ_RESIZE(ptr, sz, max, type, err) \
+    { \
+        new = realloc(ptr, max*sizeof(type)); \
+        if(new == NULL){ \
+            err; \
         } \
-    } \
-    if(count < 3) normal_indices[obj->index_num] = 0; \
-    if(count < 2) uv_indices[obj->index_num] = 0; \
-    obj->index_num++; \
-    if(obj->index_num >= obj->index_max_num){ \
-        obj->index_max_num += GE_OBJ_ALLOC_STEP; \
-        _GE_OBJ_RESIZE(obj->indices, obj->index_num, \
-                       obj->index_max_num, unsigned int, 1); \
-        _GE_OBJ_RESIZE(uv_indices, obj->index_num, \
-                       obj->index_max_num, unsigned int, 1); \
-        _GE_OBJ_RESIZE(normal_indices, obj->index_num, \
-                       obj->index_max_num, unsigned int, 1); \
+        ptr = new; \
     }
 
-#define _GE_OBJ_LOAD(ptr, sz, max, x) \
-    sscanf(line[x], "%f", ptr+sz); \
-    _GE_OBJ_GROW(ptr, sz, max, float, 2);
-
-#define _GE_OBJ_ADD(ptr, sz, max, x) \
-    ptr[sz] = x; \
-    _GE_OBJ_GROW(ptr, sz, max, float, 2);
-
-#define _GE_OBJ_SORT_INDICES(ptr, data, sz, num, t, err) \
-    new = malloc(num*sz*sizeof(t)); \
-    if(new == NULL){ \
-        _GE_OBJ_FREEALL(); \
-        return err; \
-    } \
-    memset(new, 0, num*sz*sizeof(t)); \
-    for(i=0;i<obj->index_num;i++){ \
-        if(ptr[i] >= num/sz || obj->indices[i] >= num/sz){ \
-            _GE_OBJ_PRINT_DEBUG("Bad index!"); \
-            continue; \
+#define _GE_OBJ_GROW_IF_NEEDED(ptr, sz, max, type, err) \
+    { \
+        if(sz >= max){ \
+            max += GE_OBJ_ALLOC_STEP; \
+            _GE_OBJ_RESIZE(ptr, sz, max, type, err); \
         } \
-        _GE_OBJ_PRINT_MOVE(ptr) \
-        memcpy(((float*)new)+obj->indices[i]*sz, data+ptr[i]*sz, \
-               sz*sizeof(t)); \
-    } \
-    free(data); \
-    data = new;
-
-int _ge_atoi(char *str, size_t size) {
-    size_t i;
-    int n = 0;
-#if GE_OBJ_DEBUG_ATOI
-    fputs("STR: ", stdout);
-    fwrite(str, 1, size, stdout);
-    puts("");
-#endif
-    for(i=0;i<size;i++){
-        if(str[i] >= '0' && str[i] <= '9'){
-            n *= 10;
-            n += str[i]-'0';
-        }
     }
-#if GE_OBJ_DEBUG_ATOI
-    printf("NUM: %d\n", n);
-#endif
-    return n;
-}
+
+#define _GE_OBJ_GROW(ptr, sz, max, type, err) \
+    { \
+        sz++; \
+        _GE_OBJ_GROW_IF_NEEDED(ptr, sz, max, type, err); \
+    }
+
+#define _GE_OBJ_ATOI(s, n) sscanf(s, "%ld", &n)
+#define _GE_OBJ_FTOI(s, n) sscanf(s, "%f", &n)
+/* Convert vertex indices to GEObjIndexGroup */
+#define _GE_OBJ_VTOG(s, g) \
+    { \
+        g.vertex = 0; \
+        g.uv = 0; \
+        g.normal = 0; \
+        sscanf(s, "%ld/%ld/%ld", &g.vertex, &g.uv, &g.normal); \
+    }
+
+#define _GE_OBJ_ADD(ptr, sz, max, type, x) \
+    { \
+        ptr[sz] = x; \
+        _GE_OBJ_GROW(ptr, sz, max, type, { \
+            _GE_OBJ_FREE(); \
+            free(vertices); \
+            vertices = NULL; \
+            free(uv); \
+            uv = NULL; \
+            free(normals); \
+            normals = NULL; \
+            free(indices); \
+            indices = NULL; \
+            return 1; \
+        }); \
+    }
 
 int ge_obj_load(GEObj *obj, char *data, size_t size) {
     /* TODO: Support relative indices */
@@ -201,8 +126,28 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
     void *new;
     float len;
     
-    uv_indices = malloc(GE_OBJ_ALLOC_STEP*sizeof(unsigned int));
-    normal_indices = malloc(GE_OBJ_ALLOC_STEP*sizeof(unsigned int));
+    float tmp;
+    GEObjIndexGroup gtmp;
+    
+    float *vertices;
+    float *uv;
+    float *normals;
+    GEObjIndexGroup *indices;
+    
+    size_t vertex_num = 0;
+    size_t uv_num = 0;
+    size_t normal_num = 0;
+    size_t index_num;
+    
+    size_t vertex_max_num = GE_OBJ_ALLOC_STEP;
+    size_t uv_max_num = GE_OBJ_ALLOC_STEP;
+    size_t normal_max_num = GE_OBJ_ALLOC_STEP;
+    size_t index_max_num = GE_OBJ_ALLOC_STEP;
+    
+    vertices = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
+    uv = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
+    normals = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
+    indices = malloc(GE_OBJ_ALLOC_STEP*sizeof(GEObjIndexGroup));
     
     obj->vertices = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
     obj->uv_coords = malloc(GE_OBJ_ALLOC_STEP*sizeof(float));
@@ -229,30 +174,32 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     if(line_len >= GE_OBJ_TOK_MAX) line_len = GE_OBJ_TOK_MAX-1;
                 }
                 /* Decode the line */
-#if GE_OBJ_DEBUG_LINES
-                printf("-- LINE: %ld\n", line_len);
-                for(n=0;n<line_len;n++) printf("%s ", line[n]);
-                puts("");
-#endif
                 if(!strcmp(line[0], "v")){
                     if(line_len == 4){
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 1);
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 2);
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 3);
-                        _GE_OBJ_ADD(obj->vertices, obj->vertex_num,
-                                        obj->vertex_max_num, 1.0);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[2], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[3], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, 1.0);
                     }else if(line_len == 5){
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 1);
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 2);
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 3);
-                        _GE_OBJ_LOAD(obj->vertices, obj->vertex_num,
-                                     obj->vertex_max_num, 4);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[2], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[3], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[4], tmp);
+                        _GE_OBJ_ADD(vertices, vertex_num, vertex_max_num,
+                                    float, tmp);
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
@@ -261,26 +208,23 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     }
                 }else if(!strcmp(line[0], "vt")){
                     if(line_len == 2){
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 1);
-                        _GE_OBJ_ADD(obj->uv_coords, obj->uv_num,
-                                    obj->uv_max_num, 0.0);
-                        _GE_OBJ_ADD(obj->uv_coords, obj->uv_num,
-                                    obj->uv_max_num, 0.0);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, 1.0);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, 1.0);
                     }else if(line_len == 3){
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 1);
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 2);
-                        _GE_OBJ_ADD(obj->uv_coords, obj->uv_num,
-                                    obj->uv_max_num, 0.0);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
+                        _GE_OBJ_FTOI(line[2], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, 1.0);
                     }else if(line_len == 4){
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 1);
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 2);
-                        _GE_OBJ_LOAD(obj->uv_coords, obj->uv_num,
-                                     obj->uv_max_num, 3);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
+                        _GE_OBJ_FTOI(line[2], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
+                        _GE_OBJ_FTOI(line[3], tmp);
+                        _GE_OBJ_ADD(uv, uv_num, uv_max_num, float, tmp);
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
@@ -290,12 +234,15 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
                     }
                 }else if(!strcmp(line[0], "vn")){
                     if(line_len == 4){
-                        _GE_OBJ_LOAD(obj->normals, obj->normal_num,
-                                     obj->normal_max_num, 1);
-                        _GE_OBJ_LOAD(obj->normals, obj->normal_num,
-                                     obj->normal_max_num, 2);
-                        _GE_OBJ_LOAD(obj->normals, obj->normal_num,
-                                     obj->normal_max_num, 3);
+                        _GE_OBJ_FTOI(line[1], tmp);
+                        _GE_OBJ_ADD(normals, normal_num, normal_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[2], tmp);
+                        _GE_OBJ_ADD(normals, normal_num, normal_max_num,
+                                    float, tmp);
+                        _GE_OBJ_FTOI(line[3], tmp);
+                        _GE_OBJ_ADD(normals, normal_num, normal_max_num,
+                                    float, tmp);
                     }else{
                         /* Invalid data */
 #if GE_OBJ_DEBUG
@@ -318,12 +265,16 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
 #else
                     if(line_len == 4){
 #endif
-#if GE_OBJ_DEBUG_TRIANGLES
-                        puts("-- TRIANGLE");
-#endif
-                        _GE_OBJ_LOAD_SHAPE(1);
-                        _GE_OBJ_LOAD_SHAPE(2);
-                        _GE_OBJ_LOAD_SHAPE(3);
+                        /* Load the triangle */
+                        _GE_OBJ_VTOG(line[1], gtmp);
+                        _GE_OBJ_ADD(indices, index_num, index_max_num,
+                                    GEObjIndexGroup, gtmp);
+                        _GE_OBJ_VTOG(line[2], gtmp);
+                        _GE_OBJ_ADD(indices, index_num, index_max_num,
+                                    GEObjIndexGroup, gtmp);
+                        _GE_OBJ_VTOG(line[3], gtmp);
+                        _GE_OBJ_ADD(indices, index_num, index_max_num,
+                                    GEObjIndexGroup, gtmp);
                     }
                 }else if(!strcmp(line[0], "l")){
                     /* TODO */
@@ -371,13 +322,6 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
     printf("-- UV COORDINATES LOADED: %ld\n", obj->uv_num);
     printf("-- NORMALS LOADED: %ld\n", obj->normal_num);
 #endif
-    /* Sort the normals and uv coordinates depending on the indices and the
-     * uv coordinates indices. */
-    /* for(i=0;i<obj->index_num;i++) printf("%d ", normal_indices[i]);
-    puts(""); */
-    _GE_OBJ_SORT_INDICES(uv_indices, obj->uv_coords, 3, obj->uv_num, float, 3);
-    _GE_OBJ_SORT_INDICES(normal_indices, obj->normals, 3, obj->normal_num,
-                         float, 3);
     /* Normalize the normals */
     n = obj->normal_num/3;
     if(obj->normal_num%3) n--;
@@ -385,16 +329,15 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
         len = sqrt(obj->normals[i]*obj->normals[i]+
                    obj->normals[i+1]*obj->normals[i+1]+
                    obj->normals[i+2]*obj->normals[i+2]);
-#if GE_OBJ_DEBUG_NORMALIZE
-        printf("Length of the normal: %f\n", len);
-#endif
         obj->normals[i] = obj->normals[i]/len;
         obj->normals[i+1] = obj->normals[i+1]/len;
         obj->normals[i+2] = obj->normals[i+2]/len;
     }
-    /* Free the uv and normal indices */
-    free(uv_indices);
-    free(normal_indices);
+    /* Free all the variables */
+    free(vertices);
+    free(uv);
+    free(normals);
+    free(indices);
 #if GE_OBJ_DEBUG
     puts("-- MODEL LOADED SUCCESSFULLY");
 #endif
@@ -402,6 +345,13 @@ int ge_obj_load(GEObj *obj, char *data, size_t size) {
 }
 
 void ge_obj_free(GEObj *obj) {
-    _GE_OBJ_FREEOBJ();
+    free(obj->vertices);
+    free(obj->uv_coords);
+    free(obj->normals);
+    free(obj->indices);
+    obj->vertices = NULL;
+    obj->uv_coords = NULL;
+    obj->normals = NULL;
+    obj->indices = NULL;
 }
 

@@ -36,11 +36,6 @@
 #define GE_OBJ_H
 
 #define GE_OBJ_DEBUG 0
-#define GE_OBJ_DEBUG_LINES 0
-#define GE_OBJ_DEBUG_TRIANGLES 0
-#define GE_OBJ_DEBUG_ATOI 0
-#define GE_OBJ_DEBUG_INDICES 0
-#define GE_OBJ_DEBUG_NORMALIZE 0
 
 #define GE_OBJ_ALLOC_STEP (1<<16)
 #define GE_OBJ_TOK_SZ 32
