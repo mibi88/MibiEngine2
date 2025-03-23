@@ -60,7 +60,23 @@ typedef struct {
     size_t index_max_num;
 } GEObj;
 
-int ge_obj_load(GEObj *obj, char *data, size_t size);
+/* ge_obj_init
+ *
+ * Load model data from an .obj file.
+ *
+ * obj:  The struct that will contain the model data.
+ * data: The content of the .obj file.
+ * size: The size of the data.
+ * Returns 0 on success or an error code on failure.
+ */
+int ge_obj_init(GEObj *obj, char *data, size_t size);
+
+/* ge_obj_free
+ *
+ * Free the obj model data.
+ *
+ * obj: The obj model data to free.
+ */
 void ge_obj_free(GEObj *obj);
 
 #endif

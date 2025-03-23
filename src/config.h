@@ -35,6 +35,11 @@
 #ifndef GE_CONFIG_H
 #define GE_CONFIG_H
 
+/* config.h
+ *
+ * Contains the features of the engine that will be included in this build.
+ */
+
 #define DEBUG_GLES 0
 
 #endif

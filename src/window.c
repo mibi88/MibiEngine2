@@ -81,7 +81,7 @@ char *_ge_window_egl_error_str(EGLint error) {
     }
 }
 
-int ge_window_create(GEWindow *window, char *title) {
+int ge_window_init(GEWindow *window, char *title) {
     EGLDisplay *display;
     EGLSurface *surface;
     EGLConfig *config;

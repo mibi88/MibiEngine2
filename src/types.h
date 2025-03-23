@@ -35,6 +35,12 @@
 #ifndef GE_TYPES_H
 #define GE_TYPES_H
 
+/* type.h
+ *
+ * Defines all the data types that can be used in GEType and their size in
+ * ge_type_size.
+ */
+
 #include <stddef.h>
 
 typedef enum {

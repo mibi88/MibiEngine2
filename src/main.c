@@ -152,7 +152,7 @@ void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
         EXIT(EXIT_FAILURE);
     }
     
-    if((log = ge_shader_load(shader, vertex_shader, fragment_shader))){
+    if((log = ge_shader_init(shader, vertex_shader, fragment_shader))){
         fputs("Failed to load shaders:\n", stderr);
         fputs(log, stderr);
         free(vertex_shader);
@@ -210,7 +210,7 @@ void init(void) {
 }
 
 void load_texture(void) {
-    if(ge_image_load(&image, "spot_texture.png")){
+    if(ge_image_init(&image, "spot_texture.png")){
         fputs("Failed to read image!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -235,7 +235,7 @@ void load_model(void) {
     data = load_text("spot.obj", &size);
     if(data == NULL) EXIT(EXIT_FAILURE);
     
-    ge_obj_load(&obj, data, size);
+    ge_obj_init(&obj, data, size);
     colors = malloc(obj.vertex_num*sizeof(float));
     for(i=0;i<obj.vertex_num;i++){
         if((i&3) == 3) colors[i] = 1;
@@ -295,13 +295,13 @@ void draw(void *data) {
     ge_mat4_scale3d(&tmp2, 1, 1, 1);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, A_Y, x);
+    ge_mat4_rot3d(&tmp2, GE_A_Y, x);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, A_X, 0);
+    ge_mat4_rot3d(&tmp2, GE_A_X, 0);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, A_Z, 0);
+    ge_mat4_rot3d(&tmp2, GE_A_Z, 0);
     ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
     tmp1 = model_mat;
     ge_mat4_translate3d(&tmp2, 0, 0, 0);
@@ -346,7 +346,7 @@ int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
     
-    if((rc = ge_window_create(&window, "MibiEngine2 demo"))){
+    if((rc = ge_window_init(&window, "MibiEngine2 demo"))){
         return rc;
     }
     

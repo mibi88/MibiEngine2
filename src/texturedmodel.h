@@ -45,10 +45,36 @@ typedef struct {
     GEShaderPos *tex_pos;
 } GETexturedModel;
 
+/* ge_texturedmodel_init
+ *
+ * Create a textured model. It is the same as a standard model (see
+ * stdmodel.h), it has just a texture attached to it.
+ *
+ * model:       The model to initialize.
+ * texture:     The texture to use with this model.
+ * indices:     The model indices (see model.h).
+ * vertices:    The position of the vertices of the model.
+ * index_type:  The type of the index data (see type.h).
+ * vertex_type: The type of the vertex data (see type.h).
+ * index_num:   The number of indices.
+ * vertex_num:  The number of vertex positions.
+ * item_size:   The size of a single vertex position.
+ * extra:       Extra data (see model.h and base.h).
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
                           size_t vertex_num, size_t item_size, void *extra);
+
+/* ge_texturedmodel_set_texture
+ *
+ * Set the position of the texture sampler in the shader used with this model.
+ *
+ * model:   The model to set the texture position to.
+ * tex_pos: The texture sampler position.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
 
 #endif

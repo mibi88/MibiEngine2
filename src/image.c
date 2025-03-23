@@ -40,7 +40,7 @@
 
 #define CHECK_NUM 8
 
-int ge_image_load(GEImage *image, char *file) {
+int ge_image_init(GEImage *image, char *file) {
     png_byte header[CHECK_NUM];
     int is_png;
 

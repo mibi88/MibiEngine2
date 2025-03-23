@@ -37,7 +37,7 @@
 #include <GLES2/gl2.h>
 #include <stddef.h>
 
-char *ge_shader_load(GEShader *shader, char *vertex_source,
+char *ge_shader_init(GEShader *shader, char *vertex_source,
                      char *fragment_source) {
     static char log[SHADER_LOG_SIZE];
     int success;

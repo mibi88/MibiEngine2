@@ -96,8 +96,12 @@ int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
 }
 
 void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
+    /* OpenGL requires at least support for 16 texture units per stage */
+    if(n >= 16) n = 15;
+    glActiveTexture(GL_TEXTURE0+n);
     glBindTexture(GL_TEXTURE_2D, texture->id);
     glUniform1i(pos->pos, n);
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void ge_texture_free(GETexture *texture) {

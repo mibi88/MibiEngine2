@@ -35,6 +35,49 @@
 #ifndef GE_BASE_H
 #define GE_BASE_H
 
+/* base.h
+ *
+ * base.h contains macros to help the creation of structs that can be extended
+ * similarly to the GEModel struct (see model.h).
+ *
+ * Such types should be defined as following:
+ * GE_<type>_INHERIT_MAX should be defined to the max. number of times that
+ * this struct can be extended.
+ * GE_<type>_INHERIT_LEVEL should be defined to -1, because the struct just got
+ * defined here so it needs no extra data.
+ * It should also contain callbacks to make it possible to extend (see
+ * BASE_DATA).
+ *
+ * The function that initializes it should take an extra argument to set the
+ * extra value of the struct stored in the extra[0] field.
+ *
+ * When extending this struct, a new GE_<new type>_INHERIT_LEVEL should be
+ * defined for the extended version. Its initialization function should also
+ * take an extra argument in it's initialization function to allow it to be
+ * extended further. It should have its own struct, which is allocated in its
+ * intialization function and put into extra.
+ * it can then get its data in extra[GE_<new type>_INHERIT_LEVEL].
+ * At the en of the initialization function the extra data should be set as
+ * following:
+ *
+ * #if GE_<new type>_INHERIT_LEVEL+1 >= GE_<type>_INHERIT_MAX
+ *     Stop compiling right now!
+ * #endif
+ *     model->extra[GE_<new type>_INHERIT_LEVEL+1] = extra;
+ *
+ * if the inherit level of the extended type is too high the compiler will
+ * crash because of the plain text inside of the code, which will avoid buffer
+ * overflows if a type got extended too often.
+ */
+
+/* BASE_DATA
+ *
+ * Define the callbacks in an extendable struct (see base.h).
+ *
+ * type:      The type name of the struct (in all caps, the same as in
+ *            GE_<type>_INHERIT_MAX and GE_<type>_INHERIT_LEVEL).
+ * callbacks: All the callbacks between two braces.
+ */
 #define BASE_DATA(type, callbacks) \
     struct callbacks calls[GE_##type##_INHERIT_MAX]; \
     size_t call_ptr; \

@@ -51,8 +51,35 @@ typedef struct {
     GEVec2 uv_max;
 } GETexture;
 
+/* ge_texture_init
+ *
+ * Load a texture from an image.
+ *
+ * texture: The texture data.
+ * image:   The image to load as a texture.
+ * linear:  Use linear filtering instead of nearest neighbour filtering.
+ * flip:    Flip the texture (textures are loaded as vertically flipped by
+ *          default.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip);
+
+/* ge_texture_use
+ *
+ * Use a texture.
+ *
+ * texture: The texture to use.
+ * pos:     The position of the sampler in the shader.
+ * n:       The texture unit to use.
+ */
 void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
+
+/* ge_texture_free
+ *
+ * Free a texture.
+ *
+ * texture: The texture to free.
+ */
 void ge_texture_free(GETexture *texture);
 
 #endif

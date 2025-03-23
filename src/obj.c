@@ -121,7 +121,7 @@ typedef struct {
         }); \
     }
 
-int ge_obj_load(GEObj *obj, char *data, size_t size) {
+int ge_obj_init(GEObj *obj, char *data, size_t size) {
     /* TODO: Support relative indices */
     size_t i;
     size_t n;

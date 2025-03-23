@@ -58,15 +58,79 @@ typedef struct {
     GEModelAttr attr;
 } GEStdModel;
 
+/* ge_stdmodel_init
+ *
+ * Create a standard model. In comparison to GEModel, stdmodels are made to
+ * store common 3D models, with vertices, uv coordinates, colors and/or
+ * normals.
+ * Creating raw GEModels should be only needed in very, very specific usecases.
+ *
+ * model:       The model to initialize.
+ * indices:     The model indices (see model.h).
+ * vertices:    The position of the vertices of the model.
+ * index_type:  The type of the index data (see type.h).
+ * vertex_type: The type of the vertex data (see type.h).
+ * index_num:   The number of indices.
+ * vertex_num:  The number of vertex positions.
+ * item_size:   The size of a single vertex position.
+ * extra:       Extra data (see model.h and base.h).
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
                      GEType index_type, GEType vertex_type, size_t index_num,
                      size_t vertex_num, size_t item_size, void *extra);
+
+/* ge_stdmodel_shader_attr
+ *
+ * Generate the model attributes.
+ *
+ * model:      The model to generate the model attributes of.
+ * shader:     The shader that will be used to render this model.
+ * attr_names: The names of the attributes. They should be in the following
+ *             order: the vertex position attribute name, followed by the color
+ *             attribute name, the UV coordinate attribute name and the normal
+ *             attribute name.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
                             char **attr_names);
+
+/* ge_stdmodel_add_color
+ *
+ * Add color data to the model.
+ *
+ * model:     The model to add the color data to.
+ * data:      The color data.
+ * num:       The size of the data.
+ * item_size: The size of a single color.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
                           size_t item_size);
+
+/* ge_stdmodel_add_uv_coords
+ *
+ * Add UV coordinate data to the model.
+ *
+ * model:     The model to add the uv coordinate data to.
+ * data:      The UV coordinate data.
+ * num:       The size of the data.
+ * item_size: The size of a single uv coordinate.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
                               size_t num, size_t item_size);
+
+/* ge_stdmodel_add_normals
+ *
+ * Add normal data to the model.
+ *
+ * model:     The model to add the normal data to.
+ * data:      The normal data.
+ * num:       The size of the data.
+ * item_size: The size of a single normal.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
                             size_t num, size_t item_size);
 

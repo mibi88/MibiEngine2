@@ -72,17 +72,87 @@ typedef struct {
     GEShaderPos *size_pos;
 } GEFramebuffer;
 
-/* TODO: Test all of this... */
+/* ge_frambuffer_init
+ *
+ * Create a framebuffer.
+ * To always use square power of two textures framebuffer textures are created
+ * with the closest power of two sized square texture size.
+ *
+ * framebuffer: The framebuffer to initialize.
+ * w:           The width of the framebuffer.
+ * h:           The height of the framebuffer.
+ * tex_count:   The number of textures that will be bound to the framebuffer.
+ * formats:     The format of the texture data.
+ * type:        The type of the textures bound to the framebuffer (see
+ *              GETexType).
+ * linear:      Enable or disable linear filtering for each texture. 0 if
+ *              disabled and any non zero value is enabled.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
                        char *linear);
+
+/* ge_framebuffer_resize
+ *
+ * Resize the framebuffer. The textures will be resized to the closest power
+ * of two sized square texture.
+ *
+ * framebuffer: The framebuffer to resize.
+ * w:           The new width of the framebuffer.
+ * h:           The new height of the framebuffer.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h);
+
+/* ge_framebuffer_attr
+ *
+ * Set the frambuffer attributes for the model data used to render a square
+ * filling the screen. A 2D vector will also be loaded which contains the
+ * aspect ratio.
+ *
+ * framebuffer: The framebuffer to set the attributes to.
+ * shader:      The shader that will be used to render the framebuffer.
+ * attr_names:  Framebuffers use a GEStdModel for rendering so attr_names
+ *              should contain the vertex attribute name, followed by NULL, the
+ *              name of UV coordinate attribute and NULL.
+ * tex_names:   The name of the texture samplers.
+ * size_pos:    The position of the unform (a 2D vector) that will contain the
+ *              aspect ratio.
+ * Returns 0 on success or an error code on failure.
+ */
 int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
                         char **attr_names, char **tex_names,
                         GEShaderPos *size_pos);
+
+/* ge_framebuffer_render
+ *
+ * Render a framebuffer.
+ *
+ * framebuffer: The framebuffer to render.
+ */
 void ge_framebuffer_render(GEFramebuffer *framebuffer);
+
+/* ge_framebuffer_use
+ *
+ * Render to a framebuffer.
+ *
+ * framebuffer: The framebuffer to render to.
+ */
 void ge_framebuffer_use(GEFramebuffer *framebuffer);
+
+/* ge_framebuffer_default
+ *
+ * Render to the default framebuffer (to display stuff on screen).
+ */
 void ge_framebuffer_default(void);
+
+/* ge_framebuffer_free
+ *
+ * Free a framebuffer.
+ *
+ * framebuffer: The framebuffer to free.
+ */
 void ge_framebuffer_free(GEFramebuffer *framebuffer);
 
 #endif

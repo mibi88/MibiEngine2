@@ -60,10 +60,52 @@ typedef struct {
     void *data;
 } GEWindow;
 
-int ge_window_create(GEWindow *window, char *title);
+/* ge_window_init
+ *
+ * Create a window with a rendering context for the right backend.
+ * Currently only a single window should be opened at once.
+ *
+ * window: The window struct containing all the data related to this window.
+ * title:  The title of the window.
+ * Returns 0 on success or an error code on failure.
+ */
+int ge_window_init(GEWindow *window, char *title);
+
+/* ge_window_mainloop
+ *
+ * Run the window mainloop.
+ * This blocks the program until the window is closed. Callbacks are called for
+ * rendering or when the window got resized.
+ */
 void ge_window_mainloop(GEWindow *window);
+
+/* ge_window_clear
+ *
+ * Clear the window contents.
+ *
+ * window: The window to clear.
+ * r: The red intensity (between 0 and 1) of the clear color.
+ * g: The green intensity (between 0 and 1) of the clear color.
+ * b: The blue intensity (between 0 and 1) of the clear color.
+ */
 void ge_window_clear(GEWindow *window, float r, float g, float b, float a);
+
+/* ge_window_view
+ *
+ * Resize the window viewport.
+ *
+ * window: The window to resize the viewport of.
+ * w:      The new width of the window.
+ * h:      The new height of the window.
+ */
 void ge_window_view(GEWindow *window, int w, int h);
+
+/* ge_window_free
+ *
+ * Destroy a window and free the context associed with it.
+ *
+ * window: The window to destroy.
+ */
 void ge_window_free(GEWindow *window);
 
 #endif

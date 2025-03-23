@@ -48,13 +48,71 @@ typedef struct {
     int pos;
 } GEShaderPos;
 
-char *ge_shader_load(GEShader *shader, char *vertex_source,
+/* ge_shader_init
+ *
+ * Create a shader program made up of a vertex shader and a fragment shader.
+ *
+ * shader:          The shader program data.
+ * vertex_source:   The vertex shader source code.
+ * fragment_source: The fragment shader source code.
+ * Returns NULL on success or a pointer to the error log (a null terminated
+ * string). Its size is SHADER_LOG_SIZE.
+ */
+char *ge_shader_init(GEShader *shader, char *vertex_source,
                      char *fragment_source);
+
+/* ge_shader_use
+ *
+ * Use a shader.
+ *
+ * shader: The shader to use.
+ */
 void ge_shader_use(GEShader *shader);
+
+/* ge_shader_get_pos
+ *
+ * Get the position of a uniform variable in a shader.
+ *
+ * shader: The shader to get the position of the uniform variable from.
+ * name:   The name of the uniform variable.
+ * Returns the position of the uniform variable.
+ */
 GEShaderPos ge_shader_get_pos(GEShader *shader, char *name);
+
+/* ge_shader_load_mat4
+ *
+ * Load a 4x4 matrix (see mat.h) to the currently used shader.
+ *
+ * pos: The position of the uniform variable.
+ * mat: The matrix to load.
+ */
 void ge_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat);
+
+/* ge_shader_load_mat3
+ *
+ * Load a 3x3 matrix (see mat.h) to the currently used shader.
+ *
+ * pos: The position of the uniform variable.
+ * mat: The matrix to load.
+ */
 void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat);
+
+
+/* ge_shader_load_vec2
+ *
+ * Load a 2D vector (see mat.h) to the currently used shader.
+ *
+ * pos: The position of the uniform variable.
+ * vec: The vector to load.
+ */
 void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec);
+
+/* ge_shader_free
+ *
+ * Delete a shader.
+ *
+ * shader: The shader to delete.
+ */
 void ge_shader_free(GEShader *shader);
 
 #endif

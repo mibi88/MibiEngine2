@@ -35,6 +35,11 @@
 #ifndef GE_COLOR_H
 #define GE_COLOR_H
 
+/* colors.h
+ *
+ * colors.h defines all the color formats that can be used.
+ */
+
 /* TODO: Support GL_HALF_FLOAT_OES defined in GLES2/gl2ext.h
  * if available for HDR rendering. */
 typedef enum {

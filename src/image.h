@@ -52,7 +52,23 @@ enum {
     GE_IMAGE_ERROR_UNKNOWN
 };
 
-int ge_image_load(GEImage *image, char *file);
+/* ge_image_init
+ *
+ * Load an image.
+ *
+ * image: The image data.
+ * file:  The file name of the image.
+ * Returns GE_IMAGE_SUCCESS (0) on success or any other of the GE_IMAGE_* error
+ * codes on failure.
+ */
+int ge_image_init(GEImage *image, char *file);
+
+/* ge_image_free
+ *
+ * Free an image.
+ *
+ * image: The image to free.
+ */
 void ge_image_free(GEImage *image);
 
 #endif

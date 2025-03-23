@@ -128,7 +128,7 @@ void ge_mat4_inverse(GEMat4 *dest, GEMat4 *src) {
 
 void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
     switch(axis){
-        case A_X:
+        case GE_A_X:
             mat->mat[0*4+0] = 1;
             mat->mat[0*4+1] = 0;
             mat->mat[0*4+2] = 0;
@@ -149,7 +149,7 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[3*4+2] = 0;
             mat->mat[3*4+3] = 1;
             break;
-        case A_Y:
+        case GE_A_Y:
             mat->mat[0*4+0] = cos(angle);
             mat->mat[0*4+1] = 0;
             mat->mat[0*4+2] = sin(angle);
@@ -170,7 +170,7 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[3*4+2] = 0;
             mat->mat[3*4+3] = 1;
             break;
-        case A_Z:
+        case GE_A_Z:
             mat->mat[0*4+0] = cos(angle);
             mat->mat[0*4+1] = -sin(angle);
             mat->mat[0*4+2] = 0;
