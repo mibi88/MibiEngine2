@@ -84,30 +84,10 @@ void _ge_gles_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat);
 void _ge_gles_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec);
 void _ge_gles_shader_free(GEShader *shader);
 
-int _ge_gles_stdmodel_init(GEModel *model, void *indices, void *vertices,
-                           GEType index_type, GEType vertex_type,
-                           size_t index_num, size_t vertex_num,
-                           size_t item_size, void *extra);
-int _ge_gles_stdmodel_shader_attr(GEModel *model, GEShader *shader,
-                                  char **attr_names);
-int _ge_gles_stdmodel_add_color(GEModel *model, void *data, GEType type,
-                                size_t num, size_t item_size);
-int _ge_gles_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
-                                    size_t num, size_t item_size);
-int _ge_gles_stdmodel_add_normals(GEModel *model, void *data, GEType type,
-                                  size_t num, size_t item_size);
-
 int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
                           int flip);
 void _ge_gles_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
 void _ge_gles_texture_free(GETexture *texture);
-
-int _ge_gles_texturedmodel_init(GEModel *model, GETexture *texture,
-                                void *indices, void *vertices,
-                                GEType index_type, GEType vertex_type,
-                                size_t index_num, size_t vertex_num,
-                                size_t item_size, void *extra);
-int _ge_gles_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
 
 int _ge_gles_window_init(GEWindow *window, char *title);
 void _ge_gles_window_mainloop(GEWindow *window);
@@ -115,7 +95,5 @@ void _ge_gles_window_clear(GEWindow *window, float r, float g, float b,
                            float a);
 void _ge_gles_window_view(GEWindow *window, int w, int h);
 void _ge_gles_window_free(GEWindow *window);
-
-extern size_t _ge_gles_type_size[GE_T_AMOUNT];
 
 #endif
