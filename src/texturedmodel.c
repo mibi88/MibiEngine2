@@ -34,51 +34,20 @@
 
 #include <texturedmodel.h>
 
-#include <stdlib.h>
+#include <gles.h>
 
-void _ge_texturedmodel_before_rendering(void *model, GEModelAttr *attr,
-                                        void *extra) {
-    GETexturedModel *texturedmodel = extra;
-    (void)model;
-    (void)attr;
-    if(texturedmodel->tex_pos){
-        /* Use the first texture unit */
-        ge_texture_use(texturedmodel->texture, texturedmodel->tex_pos, 0);
-    }
-}
+#include <stdlib.h>
 
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
                           size_t vertex_num, size_t item_size, void *extra) {
-    GETexturedModel *texturedmodel = malloc(sizeof(GETexturedModel));
-    if(texturedmodel == NULL){
-        return 1;
-    }
-    if(ge_stdmodel_init(model, indices, vertices, index_type, vertex_type,
-                        index_num, vertex_num, item_size, texturedmodel)){
-        free(texturedmodel);
-        return 2;
-    }
-    if(ge_model_set_callbacks(model, _ge_texturedmodel_before_rendering, NULL,
-                              NULL, NULL, 1)){
-        ge_model_free(model);
-        free(texturedmodel);
-        return 3;
-    }
-#if GE_TEXTUREDMODEL_INHERIT_LEVEL+1 >= GE_MODEL_INHERIT_MAX
-    Stop compiling right now!
-#endif
-    model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL+1] = extra;
-    texturedmodel->texture = texture;
-    texturedmodel->tex_pos = NULL;
-    return 0;
+    return _ge_gles_texturedmodel_init(model, texture, indices, vertices,
+                                       index_type, vertex_type, index_num,
+                                       vertex_num, item_size, extra);
 }
 
 int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos) {
-    GETexturedModel *texturedmodel =
-                                  model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL];
-    texturedmodel->tex_pos = tex_pos;
-    return 0;
+    return _ge_gles_texturedmodel_set_texture(model, tex_pos);
 }
 

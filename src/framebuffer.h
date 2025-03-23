@@ -89,9 +89,9 @@ typedef struct {
  *              disabled and any non zero value is enabled.
  * Returns 0 on success or an error code on failure.
  */
-int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
-                       size_t tex_count, GEColor *formats, GETexType *type,
-                       char *linear);
+int ge_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
+                        size_t tex_count, GEColor *formats, GETexType *type,
+                        char *linear);
 
 /* ge_framebuffer_resize
  *

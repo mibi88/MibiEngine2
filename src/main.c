@@ -39,8 +39,6 @@
 #include <string.h>
 #include <time.h>
 
-#include <GLES2/gl2.h>
-
 #include <mat.h>
 #include <window.h>
 #include <texturedmodel.h>
@@ -195,8 +193,8 @@ void init(void) {
     
     ge_shader_use(&fb_shader);
     
-    if(ge_frambuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
-                          linear)){
+    if(ge_framebuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
+                           linear)){
         fputs("Failed to initialize framebuffer!\n", stderr);
         EXIT(EXIT_FAILURE);
     }

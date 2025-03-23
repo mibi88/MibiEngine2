@@ -32,33 +32,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <window.h>
+#include <modelarray.h>
 
-#define _POSIX_C_SOURCE 199309L
+#include <GLES2/gl2.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gles.h>
-
-#include <config.h>
-
-int ge_window_init(GEWindow *window, char *title) {
-    return _ge_gles_window_init(window, title);
+int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
+                             size_t size, size_t item_size) {
+    /* TODO: Support updating the buffer */
+    array->data = data;
+    array->type = type;
+    array->size = size;
+    array->item_size = item_size;
+    array->current_attr = NULL;
+    
+    glGenBuffers(1, &array->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
+    glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[type],
+                 data, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
 }
 
-void ge_window_mainloop(GEWindow *window) {
-    _ge_gles_window_mainloop(window);
+int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
+    int gl_types[GE_T_AMOUNT] = {
+        0,
+        GL_BYTE,
+        GL_UNSIGNED_BYTE,
+        GL_SHORT,
+        GL_UNSIGNED_SHORT,
+        GL_INT,
+        GL_UNSIGNED_INT,
+        GL_INT,
+        GL_UNSIGNED_INT,
+        GL_FLOAT,
+        GL_FLOAT
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
+    glEnableVertexAttribArray(attr->pos);
+    glVertexAttribPointer(attr->pos, array->item_size, gl_types[array->type],
+                          GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    array->current_attr = attr;
+    return 0;
 }
 
-void ge_window_clear(GEWindow *window, float r, float g, float b, float a) {
-    _ge_gles_window_clear(window, r, g, b, a);
+int _ge_gles_modelarray_disable(GEModelArray *array) {
+    if(array->current_attr == NULL) return 1;
+    glDisableVertexAttribArray(array->current_attr->pos);
+    array->current_attr = NULL;
+    return 0;
 }
 
-void ge_window_view(GEWindow *window, int w, int h) {
-    _ge_gles_window_view(window, w, h);
-}
-
-void ge_window_free(GEWindow *window) {
-    _ge_gles_window_free(window);
+void _ge_gles_modelarray_free(GEModelArray *array) {
+    glDeleteBuffers(1, &array->vbo);
+    array->vbo = 0;
 }
 
