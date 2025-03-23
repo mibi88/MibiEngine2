@@ -76,6 +76,8 @@ int ge_window_init(GEWindow *window, char *title);
  * Run the window mainloop.
  * This blocks the program until the window is closed. Callbacks are called for
  * rendering or when the window got resized.
+ *
+ * window: The window to run the mainloop of.
  */
 void ge_window_mainloop(GEWindow *window);
 
@@ -84,9 +86,9 @@ void ge_window_mainloop(GEWindow *window);
  * Clear the window contents.
  *
  * window: The window to clear.
- * r: The red intensity (between 0 and 1) of the clear color.
- * g: The green intensity (between 0 and 1) of the clear color.
- * b: The blue intensity (between 0 and 1) of the clear color.
+ * r:      The red intensity (between 0 and 1) of the clear color.
+ * g:      The green intensity (between 0 and 1) of the clear color.
+ * b:      The blue intensity (between 0 and 1) of the clear color.
  */
 void ge_window_clear(GEWindow *window, float r, float g, float b, float a);
 

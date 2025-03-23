@@ -34,21 +34,12 @@
 
 #include <texture.h>
 
+#include <utils.h>
+
 #include <GLES2/gl2.h>
 
 #include <stdlib.h>
 #include <string.h>
-
-int _ge_texture_get_size(int size) {
-    /* TODO: Provide such a function in a different file, to share it between
-     * multiple files */
-    /* Find the closest power of two */
-    int c;
-    int s = size;
-    for(c=1;size>>=1;c++);
-    if(!(s&(s-1))) c--;
-    return 1<<c;
-}
 
 int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
     size_t x, y;
@@ -56,8 +47,8 @@ int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
     int bytes;
     unsigned char color[4];
     /* Make a copy of the texture in RGBA color format as a square texture */
-    texture->size = _ge_texture_get_size(image->width > image->height ?
-                                         image->width : image->height);
+    texture->size = ge_utils_power_of_two(image->width > image->height ?
+                                          image->width : image->height);
     texture->width = image->width;
     texture->height = image->height;
     texture->uv_max.x = image->width/(float)texture->size;

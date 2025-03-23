@@ -34,16 +34,9 @@
 
 #include <framebuffer.h>
 
-#include <GLES2/gl2.h>
+#include <utils.h>
 
-int _ge_framebuffer_get_size(int size) {
-    /* TODO: Provide such a function in a different file, to share it between
-     * multiple files */
-    /* Find the closest power of two */
-    int c;
-    for(c=1;size>>=1;c++);
-    return 1<<c;
-}
+#include <GLES2/gl2.h>
 
 int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
                        size_t tex_count, GEColor *formats, GETexType *type,
@@ -101,7 +94,7 @@ int ge_frambuffer_init(GEFramebuffer *framebuffer, int w, int h,
     framebuffer->tex_num = tex_count;
     framebuffer->width = w;
     framebuffer->height = h;
-    framebuffer->size = _ge_framebuffer_get_size(w > h ? w : h);
+    framebuffer->size = ge_utils_power_of_two(w > h ? w : h);
     /* XXX: Is it better that I create a square power of two texture for the
      * FBO? */
     glGenFramebuffers(1, &framebuffer->fbo);
@@ -198,7 +191,7 @@ int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
     size_t i;
     framebuffer->width = w;
     framebuffer->height = h;
-    framebuffer->size = _ge_framebuffer_get_size(w > h ? w : h);
+    framebuffer->size = ge_utils_power_of_two(w > h ? w : h);
     
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     for(i=0;i<framebuffer->tex_num;i++){
