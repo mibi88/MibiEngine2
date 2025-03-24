@@ -262,6 +262,7 @@ void _ge_gles_window_mainloop(GEWindow *window) {
             }
         }else{
             if(window->draw != NULL) window->draw(window->data);
+            glFlush();
             if(eglSwapBuffers(*(EGLDisplay*)window->egl.display,
                               *(EGLSurface*)window->egl.surface) == EGL_FALSE){
                 fprintf(stderr, "Failed to swap buffers!\n    Error: %s\n",

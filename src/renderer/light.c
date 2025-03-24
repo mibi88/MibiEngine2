@@ -32,24 +32,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/renderer/scene.h>
-
 #include <mibiengine2/renderer/light.h>
 
-int ge_scene_init(GEScene *scene, GEModel *models, size_t model_num,
-                  GELight *lights, size_t light_num, size_t light_max) {
-    (void)scene;
-    (void)models;
-    (void)model_num;
-    (void)lights;
-    (void)light_num;
-    (void)light_max;
-    /* TODO */
+int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color,
+                  float strength) {
+    light->pos = pos;
+    light->color = color;
+    light->strength = strength;
+    light->type = type;
     return 0;
 }
 
-void ge_scene_free(GEScene *scene) {
-    (void)scene;
-    /* TODO */
+void ge_light_free(GELight *light) {
+    (void)light;
+    /* Nothing to do */
 }
 

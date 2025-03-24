@@ -102,6 +102,14 @@ void _ge_gles_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat) {
     glUniformMatrix3fv(pos->pos, 1, 0, mat->mat);
 }
 
+void _ge_gles_shader_load_vec4(GEShaderPos *pos, GEVec4 *vec) {
+    glUniform4f(pos->pos, vec->x, vec->y, vec->z, vec->w);
+}
+
+void _ge_gles_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec) {
+    glUniform3f(pos->pos, vec->x, vec->y, vec->z);
+}
+
 void _ge_gles_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
     glUniform2f(pos->pos, vec->x, vec->y);
 }

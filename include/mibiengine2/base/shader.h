@@ -97,6 +97,23 @@ void ge_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat);
  */
 void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat);
 
+/* ge_shader_load_vec4
+ *
+ * Load a 4D vector (see mat.h) to the currently used shader.
+ *
+ * pos: The position of the uniform variable.
+ * vec: The vector to load.
+ */
+void ge_shader_load_vec4(GEShaderPos *pos, GEVec4 *vec);
+
+/* ge_shader_load_vec3
+ *
+ * Load a 3D vector (see mat.h) to the currently used shader.
+ *
+ * pos: The position of the uniform variable.
+ * vec: The vector to load.
+ */
+void ge_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec);
 
 /* ge_shader_load_vec2
  *

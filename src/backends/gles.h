@@ -81,6 +81,8 @@ void _ge_gles_shader_use(GEShader *shader);
 GEShaderPos _ge_gles_shader_get_pos(GEShader *shader, char *name);
 void _ge_gles_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat);
 void _ge_gles_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat);
+void _ge_gles_shader_load_vec4(GEShaderPos *pos, GEVec4 *vec);
+void _ge_gles_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec);
 void _ge_gles_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec);
 void _ge_gles_shader_free(GEShader *shader);
 

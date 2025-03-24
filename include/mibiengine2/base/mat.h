@@ -48,6 +48,10 @@ typedef struct {
 } GEVec4;
 
 typedef struct {
+    float x, y, z;
+} GEVec3;
+
+typedef struct {
     float x, y;
 } GEVec2;
 

@@ -32,24 +32,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/renderer/scene.h>
+#ifndef GE_LIGHT_H
+#define GE_LIGHT_H
 
-#include <mibiengine2/renderer/light.h>
+#include <mibiengine2/base/mat.h>
 
-int ge_scene_init(GEScene *scene, GEModel *models, size_t model_num,
-                  GELight *lights, size_t light_num, size_t light_max) {
-    (void)scene;
-    (void)models;
-    (void)model_num;
-    (void)lights;
-    (void)light_num;
-    (void)light_max;
-    /* TODO */
-    return 0;
-}
+typedef enum {
+    GE_L_POINT,
+    GE_L_SPOT,
+    GE_L_DIR,
+    GE_L_AMOUNT
+} GELightType;
 
-void ge_scene_free(GEScene *scene) {
-    (void)scene;
-    /* TODO */
-}
+typedef struct {
+    GEVec3 pos;
+    GEVec3 color;
+    float strength;
+    GELightType type;
+} GELight;
+
+int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color,
+                  float strength);
+void ge_light_free(GELight *light);
+
+#endif
 

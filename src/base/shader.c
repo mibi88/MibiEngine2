@@ -58,6 +58,14 @@ void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat) {
     _ge_gles_shader_load_mat3(pos, mat);
 }
 
+void ge_shader_load_vec4(GEShaderPos *pos, GEVec4 *vec) {
+    _ge_gles_shader_load_vec4(pos, vec);
+}
+
+void ge_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec) {
+    _ge_gles_shader_load_vec3(pos, vec);
+}
+
 void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
     _ge_gles_shader_load_vec2(pos, vec);
 }
