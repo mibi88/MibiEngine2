@@ -33,13 +33,64 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-echo "-- Building the engine..."
+NAME=MibiEngine2
+VERSION="v.0.1"
+SRCFILES=(src/backends/gles/*.c
+          src/base/*.c src/renderer/*.c)
+CC=cc
+AR=ar
+DEST=build
+CFLAGS=(-ansi -Wall -Wextra -Wpedantic
+        -Isrc/backends -Iinclude)
 
-./build_engine.sh $1 $2 $3
+rebuild=false
+clean=false
 
-echo "-- Building the example..."
+usage() {
+    echo "Usage: $0 -rch"
+    exit 0
+}
 
-gcc example/*.c \
-    -o main -ansi -Iinclude -lEGL -lm -lX11 -lGL -lpng build/MibiEngine2.a \
-    -Wall -Wextra -Wpedantic -g
+while getopts "rch" flag; do
+    case "${flag}" in
+        r) rebuild=true ;;
+        c) clean=true ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+if $clean; then
+    echo "-- Removing old build files"
+    rm -f $DEST/*.o
+    rm -f $DEST/*.a
+    exit 0
+fi
+
+echo "-- Creating build folder..."
+
+mkdir -p $DEST
+
+objfiles=()
+
+echo "-- Building $NAME..."
+for file in ${SRCFILES[@]}; do
+    base="${file##*/}"
+    obj="$DEST/${base%%.*}.o"
+    if [ $file -nt $obj ] || $rebuild; then
+        echo "-- Compiling $file..."
+        $CC -c -o $obj $file ${CFLAGS[@]}
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            echo "-- Build failed with return code $rc!"
+            exit 1
+        fi
+    else
+        echo "-- Skipping $file: file already compiled..."
+    fi
+    objfiles+=($obj)
+done
+
+echo "-- Archive $NAME.a..."
+$AR rsv $DEST/$NAME.a ${objfiles[@]}
 

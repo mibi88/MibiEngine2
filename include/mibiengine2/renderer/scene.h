@@ -32,19 +32,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <types.h>
+#ifndef GE_SCENE_H
+#define GE_SCENE_H
 
-size_t ge_type_size[GE_T_AMOUNT] = {
-    0,
-    sizeof(char),
-    sizeof(unsigned char),
-    sizeof(short int),
-    sizeof(unsigned short int),
-    sizeof(int),
-    sizeof(unsigned int),
-    sizeof(long int),
-    sizeof(unsigned long int),
-    sizeof(float),
-    sizeof(double)
-};
+#include <mibiengine2/base/model.h>
+
+typedef struct {
+    GEModel *models;
+} GEScene;
+
+#endif
 

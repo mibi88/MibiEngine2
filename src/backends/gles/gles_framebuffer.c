@@ -32,9 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <framebuffer.h>
+#include <mibiengine2/base/framebuffer.h>
 
-#include <utils.h>
+#include <mibiengine2/base/utils.h>
 
 #include <GLES2/gl2.h>
 

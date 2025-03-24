@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mat.h>
+#include <mibiengine2/base/mat.h>
 
 #include <string.h>
 

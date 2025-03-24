@@ -39,19 +39,19 @@
 #include <string.h>
 #include <time.h>
 
-#include <mat.h>
-#include <window.h>
-#include <texturedmodel.h>
+#include <mibiengine2/base/mat.h>
+#include <mibiengine2/base/window.h>
+#include <mibiengine2/base/texturedmodel.h>
 
-#include <shader.h>
-#include <config.h>
+#include <mibiengine2/base/shader.h>
+#include <mibiengine2/base/config.h>
 
-#include <image.h>
-#include <texture.h>
+#include <mibiengine2/base/image.h>
+#include <mibiengine2/base/texture.h>
 
-#include <obj.h>
+#include <mibiengine2/base/obj.h>
 
-#include <framebuffer.h>
+#include <mibiengine2/base/framebuffer.h>
 
 #define PRINT_MS 1
 

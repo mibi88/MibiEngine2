@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <obj.h>
+#include <mibiengine2/base/obj.h>
 
 #include <stdlib.h>
 #include <string.h>

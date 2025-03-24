@@ -32,59 +32,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/modelarray.h>
+#ifndef GE_LOADER_H
+#define GE_LOADER_H
 
-#include <GLES2/gl2.h>
+#include <mibiengine2/base/model.h>
 
-int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
-                             size_t size, size_t item_size) {
-    /* TODO: Support updating the buffer */
-    array->data = data;
-    array->type = type;
-    array->size = size;
-    array->item_size = item_size;
-    array->current_attr = NULL;
-    
-    glGenBuffers(1, &array->vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
-    glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[type],
-                 data, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    return 0;
-}
-
-int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
-    int gl_types[GE_T_AMOUNT] = {
-        0,
-        GL_BYTE,
-        GL_UNSIGNED_BYTE,
-        GL_SHORT,
-        GL_UNSIGNED_SHORT,
-        GL_INT,
-        GL_UNSIGNED_INT,
-        GL_INT,
-        GL_UNSIGNED_INT,
-        GL_FLOAT,
-        GL_FLOAT
-    };
-    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
-    glEnableVertexAttribArray(attr->pos);
-    glVertexAttribPointer(attr->pos, array->item_size, gl_types[array->type],
-                          GL_FALSE, 0, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    array->current_attr = attr;
-    return 0;
-}
-
-int _ge_gles_modelarray_disable(GEModelArray *array) {
-    if(array->current_attr == NULL) return 1;
-    glDisableVertexAttribArray(array->current_attr->pos);
-    array->current_attr = NULL;
-    return 0;
-}
-
-void _ge_gles_modelarray_free(GEModelArray *array) {
-    glDeleteBuffers(1, &array->vbo);
-    array->vbo = 0;
-}
+#endif
 

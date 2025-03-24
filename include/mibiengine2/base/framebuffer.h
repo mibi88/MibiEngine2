@@ -35,10 +35,10 @@
 #ifndef GE_FRAMEBUFFER_H
 #define GE_FRAMEBUFFER_H
 
-#include <color.h>
+#include <mibiengine2/base/color.h>
 #include <stddef.h>
 
-#include <stdmodel.h>
+#include <mibiengine2/base/stdmodel.h>
 
 typedef enum {
     GE_TEX_COLOR,

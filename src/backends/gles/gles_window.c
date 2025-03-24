@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <window.h>
+#include <mibiengine2/base/window.h>
 
 #define _POSIX_C_SOURCE 199309L
 
@@ -45,7 +45,7 @@
 #include <EGL/eglplatform.h>
 #include <X11/Xlib.h>
 
-#include <config.h>
+#include <mibiengine2/base/config.h>
 
 #define DEF_CASE(d) case d: return #d;
 

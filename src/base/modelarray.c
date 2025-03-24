@@ -32,55 +32,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_TEXTURE_H
-#define GE_TEXTURE_H
+#include <mibiengine2/base/modelarray.h>
 
-#include <image.h>
+#include <gles.h>
 
-#include <stddef.h>
+int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
+                       size_t size, size_t item_size) {
+    return _ge_gles_modelarray_init(array, data, type, size, item_size);
+}
 
-#include <shader.h>
+int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
+    return _ge_gles_modelarray_enable(array, attr);
+}
 
-#include <mat.h>
+int ge_modelarray_disable(GEModelArray *array) {
+    return _ge_gles_modelarray_disable(array);
+}
 
-typedef struct {
-    int width, height;
-    int size;
-    unsigned char *data;
-    unsigned int id;
-    GEVec2 uv_max;
-} GETexture;
-
-/* ge_texture_init
- *
- * Load a texture from an image.
- *
- * texture: The texture data.
- * image:   The image to load as a texture.
- * linear:  Use linear filtering instead of nearest neighbour filtering.
- * flip:    Flip the texture (textures are loaded as vertically flipped by
- *          default.
- * Returns 0 on success or an error code on failure.
- */
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip);
-
-/* ge_texture_use
- *
- * Use a texture.
- *
- * texture: The texture to use.
- * pos:     The position of the sampler in the shader.
- * n:       The texture unit to use.
- */
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
-
-/* ge_texture_free
- *
- * Free a texture.
- *
- * texture: The texture to free.
- */
-void ge_texture_free(GETexture *texture);
-
-#endif
+void ge_modelarray_free(GEModelArray *array) {
+    _ge_gles_modelarray_free(array);
+}
 

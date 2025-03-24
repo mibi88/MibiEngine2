@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <shader.h>
+#include <mibiengine2/base/shader.h>
 
 #include <GLES2/gl2.h>
 #include <stddef.h>

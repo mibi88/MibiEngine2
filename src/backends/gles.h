@@ -35,17 +35,17 @@
 #ifndef GE_GLES_H
 #define GE_GLES_H
 
-#include <model.h>
-#include <mat.h>
-#include <window.h>
-#include <types.h>
-#include <shader.h>
-#include <obj.h>
-#include <texture.h>
-#include <image.h>
-#include <stdmodel.h>
-#include <texturedmodel.h>
-#include <framebuffer.h>
+#include <mibiengine2/base/model.h>
+#include <mibiengine2/base/mat.h>
+#include <mibiengine2/base/window.h>
+#include <mibiengine2/base/types.h>
+#include <mibiengine2/base/shader.h>
+#include <mibiengine2/base/obj.h>
+#include <mibiengine2/base/texture.h>
+#include <mibiengine2/base/image.h>
+#include <mibiengine2/base/stdmodel.h>
+#include <mibiengine2/base/texturedmodel.h>
+#include <mibiengine2/base/framebuffer.h>
 
 int _ge_gles_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
                               size_t tex_count, GEColor *formats,

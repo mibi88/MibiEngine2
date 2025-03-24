@@ -38,7 +38,7 @@
 #define GE_STDMODEL_ARRAY_NUM 4
 #define GE_STDMODEL_INHERIT_LEVEL (GE_MODEL_INHERIT_LEVEL+1)
 
-#include <model.h>
+#include <mibiengine2/base/model.h>
 
 /* This struct will be passed as the extra arg when calling ge_model_init to
  * store data about this type of model. */

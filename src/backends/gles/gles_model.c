@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <model.h>
+#include <mibiengine2/base/model.h>
 
 #include <GLES2/gl2.h>
 

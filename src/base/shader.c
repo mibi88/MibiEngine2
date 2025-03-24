@@ -32,24 +32,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <modelarray.h>
+#include <mibiengine2/base/shader.h>
 
 #include <gles.h>
+#include <stddef.h>
 
-int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
-                       size_t size, size_t item_size) {
-    return _ge_gles_modelarray_init(array, data, type, size, item_size);
+char *ge_shader_init(GEShader *shader, char *vertex_source,
+                     char *fragment_source) {
+    return _ge_gles_shader_init(shader, vertex_source, fragment_source);
 }
 
-int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
-    return _ge_gles_modelarray_enable(array, attr);
+void ge_shader_use(GEShader *shader) {
+    _ge_gles_shader_use(shader);
 }
 
-int ge_modelarray_disable(GEModelArray *array) {
-    return _ge_gles_modelarray_disable(array);
+GEShaderPos ge_shader_get_pos(GEShader *shader, char *name) {
+    return _ge_gles_shader_get_pos(shader, name);
 }
 
-void ge_modelarray_free(GEModelArray *array) {
-    _ge_gles_modelarray_free(array);
+void ge_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat) {
+    _ge_gles_shader_load_mat4(pos, mat);
+}
+
+void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat) {
+    _ge_gles_shader_load_mat3(pos, mat);
+}
+
+void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
+    _ge_gles_shader_load_vec2(pos, vec);
+}
+
+void ge_shader_free(GEShader *shader) {
+    _ge_gles_shader_free(shader);
 }
 

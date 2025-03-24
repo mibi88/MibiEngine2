@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <texturedmodel.h>
+#include <mibiengine2/base/texturedmodel.h>
 
 #include <stdlib.h>
 

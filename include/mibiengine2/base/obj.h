@@ -41,7 +41,7 @@
 #define GE_OBJ_TOK_SZ 32
 #define GE_OBJ_TOK_MAX 8
 
-#include <types.h>
+#include <mibiengine2/base/types.h>
 
 typedef struct {
     float *vertices;

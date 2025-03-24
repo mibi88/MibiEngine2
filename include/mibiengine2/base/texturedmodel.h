@@ -32,73 +32,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_MODELARRAY_H
-#define GE_MODELARRAY_H
+#ifndef GE_TEXTUREDMODEL_H
+#define GE_TEXTUREDMODEL_H
 
-#define GE_MODELARRAY_AVAILABLE 1
+#define GE_TEXTUREDMODEL_INHERIT_LEVEL (GE_STDMODEL_INHERIT_LEVEL+1)
 
-#include <types.h>
-
-typedef struct {
-    int pos;
-} GEModelArrayAttr;
+#include <mibiengine2/base/stdmodel.h>
+#include <mibiengine2/base/texture.h>
 
 typedef struct {
-    void *data;
-    GEType type;
-    unsigned int vbo;
-    size_t size;
-    size_t item_size;
-    GEModelArrayAttr *current_attr;
-} GEModelArray;
+    GETexture *texture;
+    GEShaderPos *tex_pos;
+} GETexturedModel;
 
-/* ge_modelarray_init
+/* ge_texturedmodel_init
  *
- * Intialize a model array. They correspond to VBOs in the OpenGL ES backend.
- * Model arrays are used in models to provide data to shaders (see model.h).
- * They may contain the vertices, colors, uv coordinates or normals used in the
- * shaders.
+ * Create a textured model. It is the same as a standard model (see
+ * stdmodel.h), it has just a texture attached to it.
  *
- * array:     The array to initalize.
- * data:      The data to load into the array. It should outlive the array.
- * type:      The type of the data loaded into the array (see type.h).
- * size:      The size of the data.
- * item_size: The number of elements read at once: 2 for a vec2, 3 for a vec3,
- *            4 for a vec4, etc.
+ * model:       The model to initialize.
+ * texture:     The texture to use with this model.
+ * indices:     The model indices (see model.h).
+ * vertices:    The position of the vertices of the model.
+ * index_type:  The type of the index data (see type.h).
+ * vertex_type: The type of the vertex data (see type.h).
+ * index_num:   The number of indices.
+ * vertex_num:  The number of vertex positions.
+ * item_size:   The size of a single vertex position.
+ * extra:       Extra data (see model.h and base.h).
  * Returns 0 on success or an error code on failure.
  */
-int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
-                       size_t size, size_t item_size);
+int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
+                          void *vertices, GEType index_type,
+                          GEType vertex_type, size_t index_num,
+                          size_t vertex_num, size_t item_size, void *extra);
 
-/* ge_modelarray_enable
+/* ge_texturedmodel_set_texture
  *
- * Use this model array with the model attributes in attr.
- * Model attributes share the position where the model array needs to be loaded
- * to for use in a shader.
+ * Set the position of the texture sampler in the shader used with this model.
  *
- * array: The array to use.
- * attr:  The array attributes.
+ * model:   The model to set the texture position to.
+ * tex_pos: The texture sampler position.
  * Returns 0 on success or an error code on failure.
  */
-int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr);
-
-/* ge_modelarray_disable
- *
- * Stop using this array.
- *
- * array: The array to stop using.
- * Returns 0 on success or an error code on failure.
- */
-int ge_modelarray_disable(GEModelArray *array);
-
-/* ge_modelarray_free
- *
- * Free a model array. If it is used by a model it will already be freed by the
- * model that is using it.
- *
- * array: The array to free.
- */
-void ge_modelarray_free(GEModelArray *array);
+int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
 
 #endif
 

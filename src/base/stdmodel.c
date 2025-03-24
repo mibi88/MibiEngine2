@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdmodel.h>
+#include <mibiengine2/base/stdmodel.h>
 
 #include <stdlib.h>
 

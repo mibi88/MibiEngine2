@@ -18,4 +18,8 @@ TODO:
     converting it to the backend specific shader language when loading the
     shaders).
 [ ] Write a custom utility to parse the documentation in the header files.
+[ ] Write a custom build system
+[ ] Code a GUI toolkit
+[ ] Code a scene editor
+[ ] Code a scripting language
 

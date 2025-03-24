@@ -35,12 +35,12 @@
 #ifndef GE_MODEL_H
 #define GE_MODEL_H
 
-#include <mat.h>
-#include <types.h>
-#include <shader.h>
-#include <modelarray.h>
+#include <mibiengine2/base/mat.h>
+#include <mibiengine2/base/types.h>
+#include <mibiengine2/base/shader.h>
+#include <mibiengine2/base/modelarray.h>
 
-#include <base.h>
+#include <mibiengine2/base/base.h>
 
 typedef struct {
     GEModelArrayAttr **array_pos;

@@ -32,33 +32,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <window.h>
+#include <mibiengine2/base/types.h>
 
-#define _POSIX_C_SOURCE 199309L
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <gles.h>
-
-#include <config.h>
-
-int ge_window_init(GEWindow *window, char *title) {
-    return _ge_gles_window_init(window, title);
-}
-
-void ge_window_mainloop(GEWindow *window) {
-    _ge_gles_window_mainloop(window);
-}
-
-void ge_window_clear(GEWindow *window, float r, float g, float b, float a) {
-    _ge_gles_window_clear(window, r, g, b, a);
-}
-
-void ge_window_view(GEWindow *window, int w, int h) {
-    _ge_gles_window_view(window, w, h);
-}
-
-void ge_window_free(GEWindow *window) {
-    _ge_gles_window_free(window);
-}
+size_t ge_type_size[GE_T_AMOUNT] = {
+    0,
+    sizeof(char),
+    sizeof(unsigned char),
+    sizeof(short int),
+    sizeof(unsigned short int),
+    sizeof(int),
+    sizeof(unsigned int),
+    sizeof(long int),
+    sizeof(unsigned long int),
+    sizeof(float),
+    sizeof(double)
+};
 

@@ -32,50 +32,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_TEXTUREDMODEL_H
-#define GE_TEXTUREDMODEL_H
+#include <mibiengine2/base/window.h>
 
-#define GE_TEXTUREDMODEL_INHERIT_LEVEL (GE_STDMODEL_INHERIT_LEVEL+1)
+#define _POSIX_C_SOURCE 199309L
 
-#include <stdmodel.h>
-#include <texture.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <gles.h>
 
-typedef struct {
-    GETexture *texture;
-    GEShaderPos *tex_pos;
-} GETexturedModel;
+#include <mibiengine2/base/config.h>
 
-/* ge_texturedmodel_init
- *
- * Create a textured model. It is the same as a standard model (see
- * stdmodel.h), it has just a texture attached to it.
- *
- * model:       The model to initialize.
- * texture:     The texture to use with this model.
- * indices:     The model indices (see model.h).
- * vertices:    The position of the vertices of the model.
- * index_type:  The type of the index data (see type.h).
- * vertex_type: The type of the vertex data (see type.h).
- * index_num:   The number of indices.
- * vertex_num:  The number of vertex positions.
- * item_size:   The size of a single vertex position.
- * extra:       Extra data (see model.h and base.h).
- * Returns 0 on success or an error code on failure.
- */
-int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
-                          void *vertices, GEType index_type,
-                          GEType vertex_type, size_t index_num,
-                          size_t vertex_num, size_t item_size, void *extra);
+int ge_window_init(GEWindow *window, char *title) {
+    return _ge_gles_window_init(window, title);
+}
 
-/* ge_texturedmodel_set_texture
- *
- * Set the position of the texture sampler in the shader used with this model.
- *
- * model:   The model to set the texture position to.
- * tex_pos: The texture sampler position.
- * Returns 0 on success or an error code on failure.
- */
-int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
+void ge_window_mainloop(GEWindow *window) {
+    _ge_gles_window_mainloop(window);
+}
 
-#endif
+void ge_window_clear(GEWindow *window, float r, float g, float b, float a) {
+    _ge_gles_window_clear(window, r, g, b, a);
+}
+
+void ge_window_view(GEWindow *window, int w, int h) {
+    _ge_gles_window_view(window, w, h);
+}
+
+void ge_window_free(GEWindow *window) {
+    _ge_gles_window_free(window);
+}
 

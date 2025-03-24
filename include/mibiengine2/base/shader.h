@@ -37,7 +37,7 @@
 
 #define SHADER_LOG_SIZE 512
 
-#include <mat.h>
+#include <mibiengine2/base/mat.h>
 
 typedef struct {
     int shader_program;

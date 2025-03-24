@@ -32,16 +32,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <utils.h>
+#include <mibiengine2/renderer/scene.h>
 
-int ge_utils_power_of_two(int size) {
-    /* Find the closest power of two */
-    int c;
-    if(!(size&(size-1))){
-        /* It already is a power of two */
-        return size;
-    }
-    for(c=1;size>>=1;c++);
-    return 1<<c;
-}
 

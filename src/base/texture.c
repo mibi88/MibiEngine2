@@ -32,37 +32,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <shader.h>
+#include <mibiengine2/base/texture.h>
+
+#include <mibiengine2/base/utils.h>
 
 #include <gles.h>
-#include <stddef.h>
 
-char *ge_shader_init(GEShader *shader, char *vertex_source,
-                     char *fragment_source) {
-    return _ge_gles_shader_init(shader, vertex_source, fragment_source);
+#include <stdlib.h>
+#include <string.h>
+
+int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
+    return _ge_gles_texture_init(texture, image, linear, flip);
 }
 
-void ge_shader_use(GEShader *shader) {
-    _ge_gles_shader_use(shader);
+void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
+    _ge_gles_texture_use(texture, pos, n);
 }
 
-GEShaderPos ge_shader_get_pos(GEShader *shader, char *name) {
-    return _ge_gles_shader_get_pos(shader, name);
-}
-
-void ge_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat) {
-    _ge_gles_shader_load_mat4(pos, mat);
-}
-
-void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat) {
-    _ge_gles_shader_load_mat3(pos, mat);
-}
-
-void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
-    _ge_gles_shader_load_vec2(pos, vec);
-}
-
-void ge_shader_free(GEShader *shader) {
-    _ge_gles_shader_free(shader);
+void ge_texture_free(GETexture *texture) {
+    _ge_gles_texture_free(texture);
 }
 

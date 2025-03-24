@@ -32,9 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <texture.h>
+#include <mibiengine2/base/texture.h>
 
-#include <utils.h>
+#include <mibiengine2/base/utils.h>
 
 #include <GLES2/gl2.h>
 
