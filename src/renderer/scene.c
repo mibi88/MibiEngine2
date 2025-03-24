@@ -34,4 +34,14 @@
 
 #include <mibiengine2/renderer/scene.h>
 
+int ge_scene_init(GEScene *scene) {
+    (void)scene;
+    /* TODO */
+    return 0;
+}
+
+void ge_scene_free(GEScene *scene) {
+    (void)scene;
+    /* TODO */
+}
 

@@ -34,9 +34,10 @@
 
 #include <mibiengine2/renderer/loader.h>
 
-int loader_load(GEModel *model, char *file) {
+int ge_loader_load(GEModel *model, char *file) {
     (void)model;
     (void)file;
+    /* TODO */
     return 0;
 }
 
