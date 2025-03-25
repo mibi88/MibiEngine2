@@ -352,8 +352,16 @@ int main(int argc, char **argv) {
     load_texture();
     load_model();
     
-    window.draw = draw;
-    window.resize = resize;
+    if(ge_window_set_callbacks(&window, draw, resize)){
+        fputs("Failed to set callbacks!\n", stderr);
+        free_on_exit();
+        return EXIT_FAILURE;
+    }
+    if(ge_window_set_data(&window, &window)){
+        fputs("Failed to set data!\n", stderr);
+        free_on_exit();
+        return EXIT_FAILURE;
+    }
     window.data = &window;
     ge_window_mainloop(&window);
     

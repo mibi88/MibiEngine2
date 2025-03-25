@@ -92,6 +92,10 @@ void _ge_gles_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
 void _ge_gles_texture_free(GETexture *texture);
 
 int _ge_gles_window_init(GEWindow *window, char *title);
+int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
+                                  void (*resize)(void *data, int w, int h));
+int _ge_gles_window_set_data(GEWindow *window, void *data);
+int _ge_gles_window_cap_framerate(GEWindow *window, int cap);
 void _ge_gles_window_mainloop(GEWindow *window);
 void _ge_gles_window_clear(GEWindow *window, float r, float g, float b,
                            float a);

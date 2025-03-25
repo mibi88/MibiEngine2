@@ -32,46 +32,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/window.h>
+#ifndef GE_ENTITY_H
+#define GE_ENTITY_H
 
-#define _POSIX_C_SOURCE 199309L
+#include <mibiengine2/base/mat.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gles.h>
+typedef struct {
+    GEVec3 position;
+    GEVec3 velocity;
+    GEVec3 rotation;
+    void *data;
+} GEEntity;
 
-#include <mibiengine2/base/config.h>
-
-int ge_window_init(GEWindow *window, char *title) {
-    return _ge_gles_window_init(window, title);
-}
-
-int ge_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
-                            void (*resize)(void *data, int w, int h)){
-    return _ge_gles_window_set_callbacks(window, draw, resize);
-}
-
-int ge_window_set_data(GEWindow *window, void *data) {
-    return _ge_gles_window_set_data(window, data);
-}
-
-int ge_window_cap_framerate(GEWindow *window, int cap) {
-    return _ge_gles_window_cap_framerate(window, cap);
-}
-
-void ge_window_mainloop(GEWindow *window) {
-    _ge_gles_window_mainloop(window);
-}
-
-void ge_window_clear(GEWindow *window, float r, float g, float b, float a) {
-    _ge_gles_window_clear(window, r, g, b, a);
-}
-
-void ge_window_view(GEWindow *window, int w, int h) {
-    _ge_gles_window_view(window, w, h);
-}
-
-void ge_window_free(GEWindow *window) {
-    _ge_gles_window_free(window);
-}
+#endif
 

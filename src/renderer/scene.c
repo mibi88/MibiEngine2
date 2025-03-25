@@ -35,12 +35,13 @@
 #include <mibiengine2/renderer/scene.h>
 
 #include <mibiengine2/renderer/light.h>
+#include <mibiengine2/renderer/entity.h>
 
-int ge_scene_init(GEScene *scene, GEModel *models, size_t model_num,
-                  GELight *lights, size_t light_num, size_t light_max) {
+int ge_scene_init(GEScene *scene, GEEntity **entities, size_t entity_num,
+                  size_t light_max) {
     (void)scene;
-    (void)models;
-    (void)model_num;
+    (void)entities;
+    (void)entity_num;
     (void)lights;
     (void)light_num;
     (void)light_max;

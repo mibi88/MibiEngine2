@@ -34,11 +34,9 @@
 
 #include <mibiengine2/renderer/light.h>
 
-int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color,
-                  float strength) {
+int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color) {
     light->pos = pos;
     light->color = color;
-    light->strength = strength;
     light->type = type;
     return 0;
 }

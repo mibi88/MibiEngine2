@@ -235,7 +235,26 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_TEXTURE_2D);
+    window->draw = NULL;
+    window->resize = NULL;
     return 0;
+}
+
+int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
+                                  void (*resize)(void *data, int w, int h)) {
+    window->draw = draw;
+    window->resize = resize;
+    return 0;
+}
+
+int _ge_gles_window_set_data(GEWindow *window, void *data) {
+    window->data = data;
+    return 0;
+}
+
+int _ge_gles_window_cap_framerate(GEWindow *window, int cap) {
+    return eglSwapInterval(*(EGLDisplay*)window->platform.display,
+                           cap ? 1 : 0) == GL_TRUE;
 }
 
 void _ge_gles_window_mainloop(GEWindow *window) {

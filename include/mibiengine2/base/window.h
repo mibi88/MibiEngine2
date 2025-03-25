@@ -71,6 +71,40 @@ typedef struct {
  */
 int ge_window_init(GEWindow *window, char *title);
 
+/* ge_window_set_callbacks
+ *
+ * Set the window callbacks. They are called when the window is drawn or when
+ * it is resized, for example.
+ *
+ * window: The window struct.
+ * draw:   The callback called when the window's content should be drawn.
+ * resize: The callback called when the window is resized.
+ * Returns 0 on success or an error code on failure.
+ */
+int ge_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
+                            void (*resize)(void *data, int w, int h));
+
+/* ge_window_set_data
+ *
+ * Set the data passed to callbacks.
+ *
+ * window: The window struct.
+ * data:   The data to pass to callbacks.
+ * Returns 0 on success or an error code on failure.
+ */
+int ge_window_set_data(GEWindow *window, void *data);
+
+/* ge_window_cap_framerate
+ *
+ * Set if the framerate should be capped, or if the rendering should be done as
+ * fast as possible.
+ *
+ * window: The window struct.
+ * cap:    0 if the framerate should be capped, else it will be capped.
+ * Returns 0 on success or an error code on failure.
+ */
+int ge_window_cap_framerate(GEWindow *window, int cap);
+
 /* ge_window_mainloop
  *
  * Run the window mainloop.
