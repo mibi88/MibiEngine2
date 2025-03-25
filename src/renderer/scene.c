@@ -42,8 +42,6 @@ int ge_scene_init(GEScene *scene, GEEntity **entities, size_t entity_num,
     (void)scene;
     (void)entities;
     (void)entity_num;
-    (void)lights;
-    (void)light_num;
     (void)light_max;
     /* TODO */
     return 0;
