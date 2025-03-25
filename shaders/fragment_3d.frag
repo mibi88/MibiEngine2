@@ -54,8 +54,8 @@ float diffuse_lighting(vec3 light) {
 }
 
 float specular_lighting(vec3 light) {
-    return pow(max(dot(normalize(camera_pos-frag_pos.xyz),
-                       reflect(-normalize(light-frag_pos.xyz), frag_normal)),
+    return pow(max(dot(normalize(normalize(camera_pos-frag_pos.xyz)+
+                                 normalize(light-frag_pos.xyz)), frag_normal),
                        0.0), shininess)*specular_strength;
 }
 
