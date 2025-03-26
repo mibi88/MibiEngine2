@@ -35,11 +35,29 @@
 #ifndef GE_SCENE_H
 #define GE_SCENE_H
 
-#include <mibiengine2/base/model.h>
+#include <mibiengine2/renderer/renderable.h>
+#include <mibiengine2/renderer/entity.h>
+
+#define GE_SCENE_ALLOC_STEP 8
 
 typedef struct {
-    GEModel *models;
+    GERenderable *renderable;
+    GEEntity *entities;
+    size_t entity_num;
+    size_t entity_max;
+} GESceneEntityArray;
+
+typedef struct {
+    GESceneEntityArray *entityarray;
+    size_t renderable_num;
+    size_t renderable_max;
+    size_t light_max;
 } GEScene;
+
+int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
+                  size_t light_max);
+
+void ge_scene_free(GEScene *scene);
 
 #endif
 

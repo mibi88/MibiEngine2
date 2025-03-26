@@ -37,18 +37,54 @@
 #include <mibiengine2/renderer/light.h>
 #include <mibiengine2/renderer/entity.h>
 
-int ge_scene_init(GEScene *scene, GEEntity **entities, size_t entity_num,
+#include <stdlib.h>
+
+int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
                   size_t light_max) {
-    (void)scene;
-    (void)entities;
-    (void)entity_num;
-    (void)light_max;
-    /* TODO */
+    size_t i, n;
+    int found;
+    void *new;
+    scene->entityarray = malloc(GE_SCENE_ALLOC_STEP*
+                                sizeof(GESceneEntityArray*));
+    scene->renderable_num = 0;
+    scene->renderable_max = GE_SCENE_ALLOC_STEP;
+    for(i=0;i<entity_num;i++){
+        found = 0;
+        for(n=0;n<scene->renderable_num;n++){
+            if(scene->entityarray[i].renderable == entities[i].data){
+                /* Add an entity */
+                /* TODO */
+            }
+        }
+        if(!found){
+            if(scene->renderable_num >= GE_SCENE_ALLOC_STEP){
+                new = realloc(scene->entityarray, (scene->renderable_max+
+                              GE_SCENE_ALLOC_STEP)*
+                              sizeof(GESceneEntityArray*));
+                if(new == NULL){
+                    ge_scene_free(scene);
+                    return 1;
+                }
+                scene->entityarray = new;
+            }
+            scene->entityarray[scene->renderable_num].entities =
+                                                    malloc(sizeof(GEEntity));
+            if(scene->entityarray[scene->renderable_num].entities == NULL){
+                ge_scene_free(scene);
+                return 2;
+            }
+            *scene->entityarray[scene->renderable_num].entities = entities[i];
+            scene->entityarray[scene->renderable_num].renderable =
+                                                            entities[i].data;
+            scene->renderable_num++;
+        }
+    }
+    scene->light_max = light_max;
     return 0;
 }
 
 void ge_scene_free(GEScene *scene) {
     (void)scene;
-    /* TODO */
+    /* TODO: Free everything */
 }
 
