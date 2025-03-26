@@ -36,6 +36,19 @@
 #define GE_LOADER_H
 
 #include <mibiengine2/base/model.h>
+#include <mibiengine2/base/stdmodel.h>
+#include <mibiengine2/base/texturedmodel.h>
+#include <mibiengine2/base/texture.h>
+#include <mibiengine2/base/shader.h>
+#include <mibiengine2/base/obj.h>
+
+char *ge_loader_load_text(char *file, size_t *size_ptr);
+
+int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
+                       char *file, char **attr_names, char *tex_name);
+
+char *ge_loader_load_shader(GEShader *shader, char *vertex_file,
+                            char *fragment_file);
 
 #endif
 

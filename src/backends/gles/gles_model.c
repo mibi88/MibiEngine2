@@ -157,6 +157,84 @@ void _ge_gles_model_render(GEModel *model) {
     }
 }
 
+void _ge_gles_model_render_multiple(GEModel *model,
+                                    void before_all(void *data),
+                                    void after_all(void *data),
+                                    void before(void *data, size_t i),
+                                    void after(void *data, size_t i),
+                                    size_t count, void *data) {
+    int gl_types[GE_T_AMOUNT] = {
+        0,
+        GL_BYTE,
+        GL_UNSIGNED_BYTE,
+        GL_SHORT,
+        GL_UNSIGNED_SHORT,
+        GL_INT,
+        GL_UNSIGNED_INT,
+        GL_INT,
+        GL_UNSIGNED_INT,
+        GL_FLOAT,
+        GL_FLOAT
+    };
+    size_t i;
+    
+    /* If the rendering attributes are not set, the model cannot be rendered */
+    if(model->attr == NULL) return;
+    
+    for(i=0;i<GE_MODEL_INHERIT_MAX;i++){
+        if(model->calls[i].before_rendering){
+            model->calls[i].before_rendering((void*)model, model->attr,
+                                             model->extra[i]);
+        }
+    }
+    
+    for(i=0;i<model->array_num;i++){
+        if(model->arrays[i] == NULL || model->attr->array_pos[i] == NULL){
+            continue;
+        }
+        ge_modelarray_enable(model->arrays[i], model->attr->array_pos[i]);
+    }
+    
+    /* Bind the index array */
+    if(model->indices.data){
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->indices.vbo);
+    }
+    
+    if(before_all) before_all(data);
+    
+    /* Draw the model multiple times */
+    for(i=0;i<count;i++){
+        if(before) before(data, i);
+        if(model->indices.data){
+            glDrawElements(GL_TRIANGLES, model->indices.num,
+                           gl_types[model->indices.type], 0);
+        }else{
+            glDrawArrays(GL_TRIANGLES, 0, model->indices.num);
+        }
+        if(after) after(data, i);
+    }
+    
+    if(after_all) after_all(data);
+    
+    /* Unbind the index buffer */
+    if(model->indices.data) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    /* Unbind the buffers */
+    for(i=0;i<model->array_num;i++){
+        if(model->arrays[i] == NULL || model->attr->array_pos[i] == NULL){
+            continue;
+        }
+        ge_modelarray_disable(model->arrays[i]);
+    }
+    
+    for(i=0;i<GE_MODEL_INHERIT_MAX;i++){
+        if(model->calls[i].after_rendering){
+            model->calls[i].after_rendering((void*)model, model->attr,
+                                            model->extra[i]);
+        }
+    }
+}
+
 int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
                              GEModelArrayAttr **array_attr, char **names,
                              size_t num) {
@@ -164,7 +242,7 @@ int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
     attr->array_pos = array_attr;
     attr->array_num = num;
     for(i=0;i<num;i++){
-        if(!names[i]) continue;
+        if(!names[i] || !attr->array_pos[i]) continue;
         attr->array_pos[i]->pos = glGetAttribLocation(shader->shader_program,
                                                       names[i]);
     }

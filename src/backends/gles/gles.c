@@ -46,6 +46,7 @@ GEBackend _ge_gles_backend = {
     _ge_gles_model_init,
     _ge_gles_model_set_attr,
     _ge_gles_model_render,
+    _ge_gles_model_render_multiple,
     _ge_gles_model_attr_init,
     _ge_gles_model_free,
     

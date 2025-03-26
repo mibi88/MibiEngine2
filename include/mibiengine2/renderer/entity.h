@@ -41,8 +41,28 @@ typedef struct {
     GEVec3 position;
     GEVec3 velocity;
     GEVec3 rotation;
+    GEVec3 scale;
+    
+    GEMat4 mat;
+    GEMat3 normal_mat;
     void *data;
+    
+    char changed;
 } GEEntity;
+
+int ge_entity_init(GEEntity *entity, void *data);
+
+int ge_entity_set_position(GEEntity *entity, float x, float y, float z);
+
+int ge_entity_set_rotation(GEEntity *entity, float x, float y, float z);
+
+int ge_entity_set_scale(GEEntity *entity, float x, float y, float z);
+
+int ge_entity_set_data(GEEntity *entity, void *data);
+
+int ge_entity_update(GEEntity *entity);
+
+void ge_entity_free(GEEntity *entity);
 
 #endif
 

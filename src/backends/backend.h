@@ -63,6 +63,11 @@ typedef struct {
                       void *extra);
     int (*model_set_attr)(GEModel *model, GEModelAttr *attr);
     void (*model_render)(GEModel *model);
+    void (*model_render_multiple)(GEModel *model, void before_all(void *data),
+                                  void after_all(void *data),
+                                  void before(void *data, size_t i),
+                                  void after(void *data, size_t i),
+                                  size_t count, void *data);
     int (*model_attr_init)(GEModelAttr *attr, GEShader *shader,
                            GEModelArrayAttr **array_attr, char **names,
                            size_t num);

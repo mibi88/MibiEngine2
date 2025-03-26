@@ -53,6 +53,8 @@
 
 #include <mibiengine2/base/framebuffer.h>
 
+#include <mibiengine2/renderer/loader.h>
+
 #define PRINT_MS 1
 
 #define ARRAY_NUM 4
@@ -137,30 +139,6 @@ char *load_text(char *file, size_t *size_ptr) {
     return data;
 }
 
-void load_shader(GEShader *shader, char *vertex_file, char *fragment_file) {
-    char *vertex_shader;
-    char *fragment_shader;
-    char *log;
-    vertex_shader = load_text(vertex_file, NULL);
-    fragment_shader = load_text(fragment_file, NULL);
-    if(vertex_shader == NULL || fragment_shader == NULL){
-        fputs("Shaders not found!\n", stderr);
-        free(vertex_shader);
-        free(fragment_shader);
-        EXIT(EXIT_FAILURE);
-    }
-    
-    if((log = ge_shader_init(shader, vertex_shader, fragment_shader))){
-        fputs("Failed to load shaders:\n", stderr);
-        fputs(log, stderr);
-        free(vertex_shader);
-        free(fragment_shader);
-        EXIT(EXIT_FAILURE);
-    }
-    free(vertex_shader);
-    free(fragment_shader);
-}
-
 void init(void) {
     GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
     GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
@@ -177,9 +155,10 @@ void init(void) {
     };
     last_time = get_ms();
     
-    load_shader(&shader, "shaders/vertex_3d.vert", "shaders/fragment_3d.frag");
-    load_shader(&fb_shader, "shaders/vertex_fb.vert",
-                "shaders/fragment_fb.frag");
+    ge_loader_load_shader(&shader, "shaders/vertex_3d.vert",
+                          "shaders/fragment_3d.frag");
+    ge_loader_load_shader(&fb_shader, "shaders/vertex_fb.vert",
+                          "shaders/fragment_fb.frag");
     projection_mat_pos = ge_shader_get_pos(&shader, "projection_mat");
     view_mat_pos = ge_shader_get_pos(&shader, "view_mat");
     model_mat_pos = ge_shader_get_pos(&shader, "model_mat");
@@ -219,10 +198,6 @@ void load_texture(void) {
 }
 
 void load_model(void) {
-    void *data;
-    float *colors;
-    size_t size;
-    size_t i;
     char *attr_names[ARRAY_NUM] = {
         "vertex",
         "color",
@@ -230,43 +205,11 @@ void load_model(void) {
         "normal"
     };
     
-    data = load_text("spot.obj", &size);
-    if(data == NULL) EXIT(EXIT_FAILURE);
-    
-    ge_obj_init(&obj, data, size);
-    colors = malloc(obj.vertex_num*sizeof(float));
-    for(i=0;i<obj.vertex_num;i++){
-        if((i&3) == 3) colors[i] = 1;
-        else colors[i] = 0.5;
-    }
-    
-    if(ge_texturedmodel_init(&model, &texture, obj.indices, obj.vertices,
-                             GE_T_UINT, GE_T_FLOAT, obj.index_num,
-                             obj.vertex_num, 4, NULL)){
-        fputs("Failed to init model!\n", stderr);
-        free(colors);
-        free(data);
+    if(ge_loader_load_obj(&model, &shader, &texture, "spot.obj", attr_names,
+                          "tex")){
+        fputs("Failed to load model!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if(ge_stdmodel_add_color(&model, colors, GE_T_FLOAT, obj.vertex_num, 4)){
-        fputs("Failed to add colors!\n", stderr);
-    }
-    if(ge_stdmodel_add_uv_coords(&model, obj.uv_coords, GE_T_FLOAT, obj.uv_num,
-                                3)){
-        fputs("Failed to add UV coords!\n", stderr);
-    }
-    if(ge_stdmodel_add_normals(&model, obj.normals, GE_T_FLOAT, obj.normal_num,
-                              3)){
-        fputs("Failed to add normals!\n", stderr);
-    }
-    if(ge_stdmodel_shader_attr(&model, &shader, attr_names)){
-        fputs("Failed to get array shader pos!\n", stderr);
-    }
-    if(ge_texturedmodel_set_texture(&model, &model_tex_pos)){
-        fputs("Failed to set model texture!\n", stderr);
-    }
-    free(colors);
-    free(data);
 }
 
 float x = 0;

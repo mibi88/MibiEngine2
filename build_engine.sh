@@ -41,7 +41,7 @@ CC=cc
 AR=ar
 DEST=build
 CFLAGS=(-ansi -Wall -Wextra -Wpedantic
-        -Isrc/backends -Iinclude)
+        -Isrc/backends -Iinclude -g)
 
 rebuild=false
 clean=false

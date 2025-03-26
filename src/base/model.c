@@ -78,6 +78,15 @@ void ge_model_render(GEModel *model) {
     GE_BACKENDLIST_GET(model_render)(model);
 }
 
+void ge_model_render_multiple(GEModel *model, void before_all(void *data),
+                              void after_all(void *data),
+                              void before(void *data, size_t i),
+                              void after(void *data, size_t i), size_t count,
+                              void *data) {
+    GE_BACKENDLIST_GET(model_render_multiple)(model, before_all, after_all,
+                                              before, after, count, data);
+}
+
 int ge_model_attr_init(GEModelAttr *attr, GEShader *shader,
                        GEModelArrayAttr **array_attr, char **names,
                        size_t num) {

@@ -38,8 +38,8 @@
 
 int _ge_backend = GE_B_GLES;
 
-/* That may not very cache friendly but I didn't find a better solution for
- * now that's still quite flexible. */
+/* That may not be very cache friendly but I didn't find a better solution for
+ * now that is flexible enough. */
 GEBackend *_ge_backend_list[GE_B_AMOUNT] = {
     &_ge_gles_backend
 };

@@ -152,6 +152,23 @@ size_t ge_model_get_callptr(GEModel *model);
  */
 void ge_model_render(GEModel *model);
 
+/* ge_model_render_multiple
+ *
+ * Render a model multiple times.
+ * before and after may not be called in the correct order.
+ *
+ * model:      The model to render.
+ * before_all: Callback called before rendering.
+ * after_all:  Callback called after rendering.
+ * before:     Callback called before rendering an instance of the model.
+ * after:      Callback called after rendering an instance of the model.
+ */
+void ge_model_render_multiple(GEModel *model, void before_all(void *data),
+                              void after_all(void *data),
+                              void before(void *data, size_t i),
+                              void after(void *data, size_t i), size_t count,
+                              void *data);
+
 /* ge_model_attr_init
  *
  * Initialize model attributes (see ge_model_set_attr).

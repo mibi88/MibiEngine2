@@ -141,5 +141,6 @@ int ge_image_init(GEImage *image, char *file) {
 
 void ge_image_free(GEImage *image) {
     free(image->data);
+    image->data = NULL;
 }
 
