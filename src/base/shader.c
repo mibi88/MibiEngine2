@@ -34,43 +34,44 @@
 
 #include <mibiengine2/base/shader.h>
 
-#include <gles.h>
+#include <backendlist.h>
 #include <stddef.h>
 
 char *ge_shader_init(GEShader *shader, char *vertex_source,
                      char *fragment_source) {
-    return _ge_gles_shader_init(shader, vertex_source, fragment_source);
+    return GE_BACKENDLIST_GET(shader_init)(shader, vertex_source,
+                                           fragment_source);
 }
 
 void ge_shader_use(GEShader *shader) {
-    _ge_gles_shader_use(shader);
+    GE_BACKENDLIST_GET(shader_use)(shader);
 }
 
 GEShaderPos ge_shader_get_pos(GEShader *shader, char *name) {
-    return _ge_gles_shader_get_pos(shader, name);
+    return GE_BACKENDLIST_GET(shader_get_pos)(shader, name);
 }
 
 void ge_shader_load_mat4(GEShaderPos *pos, GEMat4 *mat) {
-    _ge_gles_shader_load_mat4(pos, mat);
+    GE_BACKENDLIST_GET(shader_load_mat4)(pos, mat);
 }
 
 void ge_shader_load_mat3(GEShaderPos *pos, GEMat3 *mat) {
-    _ge_gles_shader_load_mat3(pos, mat);
+    GE_BACKENDLIST_GET(shader_load_mat3)(pos, mat);
 }
 
 void ge_shader_load_vec4(GEShaderPos *pos, GEVec4 *vec) {
-    _ge_gles_shader_load_vec4(pos, vec);
+    GE_BACKENDLIST_GET(shader_load_vec4)(pos, vec);
 }
 
 void ge_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec) {
-    _ge_gles_shader_load_vec3(pos, vec);
+    GE_BACKENDLIST_GET(shader_load_vec3)(pos, vec);
 }
 
 void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
-    _ge_gles_shader_load_vec2(pos, vec);
+    GE_BACKENDLIST_GET(shader_load_vec2)(pos, vec);
 }
 
 void ge_shader_free(GEShader *shader) {
-    _ge_gles_shader_free(shader);
+    GE_BACKENDLIST_GET(shader_free)(shader);
 }
 

@@ -32,24 +32,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/texture.h>
+#ifndef GE_BACKENDLIST_H
+#define GE_BACKENDLIST_H
 
-#include <mibiengine2/base/utils.h>
+#include <backend.h>
 
-#include <backendlist.h>
+enum {
+    GE_B_GLES,
+    GE_B_AMOUNT
+};
 
-#include <stdlib.h>
-#include <string.h>
+extern int _ge_backend;
+extern GEBackend *_ge_backend_list[GE_B_AMOUNT];
+extern char *_ge_backend_names[GE_B_AMOUNT];
 
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
-    return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
-}
+/* GE_BACKENDLIST_USE
+ *
+ * Set the backend to use.
+ *
+ * The backend to use.
+ */
+#define GE_BACKENDLIST_USE(backend) (_ge_backend = (backend >= 0 && \
+                                                    backend < GE_B_AMOUNT ? \
+                                                    backend : 0))
+#define GE_BACKENDLIST_GET(fnc) (_ge_backend_list[_ge_backend]->fnc)
 
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
-    GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
-}
-
-void ge_texture_free(GETexture *texture) {
-    GE_BACKENDLIST_GET(texture_free)(texture);
-}
+#endif
 

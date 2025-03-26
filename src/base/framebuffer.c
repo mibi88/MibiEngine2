@@ -36,39 +36,40 @@
 
 #include <mibiengine2/base/utils.h>
 
-#include <gles.h>
+#include <backendlist.h>
 
 int ge_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
                         size_t tex_count, GEColor *formats, GETexType *type,
                         char *linear) {
-    return _ge_gles_framebuffer_init(framebuffer, w, h, tex_count, formats,
-                                     type, linear);
+    return GE_BACKENDLIST_GET(framebuffer_init)(framebuffer, w, h, tex_count,
+                                                formats, type, linear);
 }
 
 int ge_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
-    return _ge_gles_framebuffer_resize(framebuffer, w, h);
+    return GE_BACKENDLIST_GET(framebuffer_resize)(framebuffer, w, h);
 }
 
 int ge_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
                         char **attr_names, char **tex_names,
                         GEShaderPos *size_pos) {
-    return _ge_gles_framebuffer_attr(framebuffer, shader, attr_names,
-                                     tex_names, size_pos);
+    return GE_BACKENDLIST_GET(framebuffer_attr)(framebuffer, shader,
+                                                attr_names, tex_names,
+                                                size_pos);
 }
 
 void ge_framebuffer_render(GEFramebuffer *framebuffer) {
-    _ge_gles_framebuffer_render(framebuffer);
+    GE_BACKENDLIST_GET(framebuffer_render)(framebuffer);
 }
 
 void ge_framebuffer_use(GEFramebuffer *framebuffer) {
-    _ge_gles_framebuffer_use(framebuffer);
+    GE_BACKENDLIST_GET(framebuffer_use)(framebuffer);
 }
 
 void ge_framebuffer_default(void) {
-    _ge_gles_framebuffer_default();
+    GE_BACKENDLIST_GET(framebuffer_default)();
 }
 
 void ge_framebuffer_free(GEFramebuffer *framebuffer) {
-    _ge_gles_framebuffer_free(framebuffer);
+    GE_BACKENDLIST_GET(framebuffer_free)(framebuffer);
 }
 

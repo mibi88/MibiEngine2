@@ -34,19 +34,19 @@
 
 #include <mibiengine2/base/model.h>
 
-#include <gles.h>
+#include <backendlist.h>
 
 #define DEF_CASE(d) case d: return #d;
 
 int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
                   void *indices, GEType index_type, size_t index_num,
                   void *extra) {
-    return _ge_gles_model_init(model, arrays, array_num, indices, index_type,
-                               index_num, extra);
+    return GE_BACKENDLIST_GET(model_init)(model, arrays, array_num, indices,
+                                          index_type, index_num, extra);
 }
 
 int ge_model_set_attr(GEModel *model, GEModelAttr *attr) {
-    return _ge_gles_model_set_attr(model, attr);
+    return GE_BACKENDLIST_GET(model_set_attr)(model, attr);
 }
 
 int ge_model_set_callbacks(GEModel *model,
@@ -75,16 +75,17 @@ size_t ge_model_get_callptr(GEModel *model) {
 }
 
 void ge_model_render(GEModel *model) {
-    _ge_gles_model_render(model);
+    GE_BACKENDLIST_GET(model_render)(model);
 }
 
 int ge_model_attr_init(GEModelAttr *attr, GEShader *shader,
                        GEModelArrayAttr **array_attr, char **names,
                        size_t num) {
-    return _ge_gles_model_attr_init(attr, shader, array_attr, names, num);
+    return GE_BACKENDLIST_GET(model_attr_init)(attr, shader, array_attr, names,
+                                               num);
 }
 
 void ge_model_free(GEModel *model) {
-    _ge_gles_model_free(model);
+    GE_BACKENDLIST_GET(model_free)(model);
 }
 

@@ -34,22 +34,23 @@
 
 #include <mibiengine2/base/modelarray.h>
 
-#include <gles.h>
+#include <backendlist.h>
 
 int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
                        size_t size, size_t item_size) {
-    return _ge_gles_modelarray_init(array, data, type, size, item_size);
+    return GE_BACKENDLIST_GET(modelarray_init)(array, data, type, size,
+                                               item_size);
 }
 
 int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
-    return _ge_gles_modelarray_enable(array, attr);
+    return GE_BACKENDLIST_GET(modelarray_enable)(array, attr);
 }
 
 int ge_modelarray_disable(GEModelArray *array) {
-    return _ge_gles_modelarray_disable(array);
+    return GE_BACKENDLIST_GET(modelarray_disable)(array);
 }
 
 void ge_modelarray_free(GEModelArray *array) {
-    _ge_gles_modelarray_free(array);
+    GE_BACKENDLIST_GET(modelarray_free)(array);
 }
 

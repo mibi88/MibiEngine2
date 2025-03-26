@@ -32,24 +32,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/texture.h>
-
-#include <mibiengine2/base/utils.h>
-
 #include <backendlist.h>
 
-#include <stdlib.h>
-#include <string.h>
+#include <gles.h>
 
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
-    return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
-}
+int _ge_backend = GE_B_GLES;
 
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
-    GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
-}
+/* That may not very cache friendly but I didn't find a better solution for
+ * now that's still quite flexible. */
+GEBackend *_ge_backend_list[GE_B_AMOUNT] = {
+    &_ge_gles_backend
+};
 
-void ge_texture_free(GETexture *texture) {
-    GE_BACKENDLIST_GET(texture_free)(texture);
-}
+char *_ge_backend_names[GE_B_AMOUNT] = {
+    "OpenGL ES 2"
+};
 

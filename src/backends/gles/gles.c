@@ -32,24 +32,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/texture.h>
+#include <gles.h>
 
-#include <mibiengine2/base/utils.h>
-
-#include <backendlist.h>
-
-#include <stdlib.h>
-#include <string.h>
-
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
-    return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
-}
-
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
-    GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
-}
-
-void ge_texture_free(GETexture *texture) {
-    GE_BACKENDLIST_GET(texture_free)(texture);
-}
-
+GEBackend _ge_gles_backend = {
+    _ge_gles_framebuffer_init,
+    _ge_gles_framebuffer_resize,
+    _ge_gles_framebuffer_attr,
+    _ge_gles_framebuffer_render,
+    _ge_gles_framebuffer_use,
+    _ge_gles_framebuffer_default,
+    _ge_gles_framebuffer_free,
+    
+    _ge_gles_model_init,
+    _ge_gles_model_set_attr,
+    _ge_gles_model_render,
+    _ge_gles_model_attr_init,
+    _ge_gles_model_free,
+    
+    _ge_gles_modelarray_init,
+    _ge_gles_modelarray_enable,
+    _ge_gles_modelarray_disable,
+    _ge_gles_modelarray_free,
+    
+    _ge_gles_shader_init,
+    _ge_gles_shader_use,
+    _ge_gles_shader_get_pos,
+    _ge_gles_shader_load_mat4,
+    _ge_gles_shader_load_mat3,
+    _ge_gles_shader_load_vec4,
+    _ge_gles_shader_load_vec3,
+    _ge_gles_shader_load_vec2,
+    _ge_gles_shader_free,
+    
+    _ge_gles_texture_init,
+    _ge_gles_texture_use,
+    _ge_gles_texture_free,
+    
+    _ge_gles_window_init,
+    _ge_gles_window_set_callbacks,
+    _ge_gles_window_set_data,
+    _ge_gles_window_cap_framerate,
+    _ge_gles_window_mainloop,
+    _ge_gles_window_clear,
+    _ge_gles_window_view,
+    _ge_gles_window_free
+};
