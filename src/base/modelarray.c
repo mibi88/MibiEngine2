@@ -36,6 +36,8 @@
 
 #include <backendlist.h>
 
+#include <mibiengine2/errors.h>
+
 int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
                        size_t size, size_t item_size) {
     return GE_BACKENDLIST_GET(modelarray_init)(array, data, type, size,

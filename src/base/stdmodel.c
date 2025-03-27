@@ -34,6 +34,8 @@
 
 #include <mibiengine2/base/stdmodel.h>
 
+#include <mibiengine2/errors.h>
+
 #include <stdlib.h>
 
 #define GE_STDMODEL_ADD_ARRAY(model, array, pos, data, type, num, item_size) \
@@ -55,7 +57,7 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
     
     stdmodel = malloc(sizeof(GEStdModel));
     if(stdmodel == NULL){
-        return 1;
+        return GE_E_OUT_OF_MEM;
     }
     
     for(i=0;i<GE_STDMODEL_ARRAY_NUM;i++){
@@ -66,13 +68,13 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
     if(ge_modelarray_init(&stdmodel->vertex_array, vertices, vertex_type,
                           vertex_num, item_size)){
         free(stdmodel);
-        return 2;
+        return GE_E_MODELARRAY_INIT;
     }
     if(ge_model_init(model, stdmodel->arrays, GE_STDMODEL_ARRAY_NUM,
                      indices, index_type, index_num, stdmodel)){
         ge_modelarray_free(&stdmodel->vertex_array);
         free(stdmodel);
-        return 3;
+        return GE_E_MODEL_INIT;
     }
     
     stdmodel->arrays[0] = &stdmodel->vertex_array;
@@ -80,13 +82,13 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
     if(ge_model_set_attr(model, &stdmodel->attr)){
         ge_model_free(model);
         free(stdmodel);
-        return 4;
+        return GE_E_SET_ATTR;
     }
     if(ge_model_set_callbacks(model, NULL, NULL, NULL, _ge_stdmodel_after_free,
                               1)){
         ge_model_free(model);
         free(stdmodel);
-        return 5;
+        return GE_E_SET_CALLBACKS;
     }
 #if GE_STDMODEL_INHERIT_LEVEL+1 >= GE_MODEL_INHERIT_MAX
     Stop compiling right now!
@@ -97,7 +99,7 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
     stdmodel->array_attrs[1] = NULL;
     stdmodel->array_attrs[2] = NULL;
     stdmodel->array_attrs[3] = NULL;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
@@ -105,9 +107,9 @@ int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
     GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
     if(ge_model_attr_init(&stdmodel->attr, shader, stdmodel->array_attrs,
                           attr_names, GE_STDMODEL_ARRAY_NUM)){
-        return 1;
+        return GE_E_SET_ATTR;
     }
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
@@ -116,7 +118,7 @@ int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->color_array, 1, data, type, num,
                           item_size);
     stdmodel->array_attrs[1] = &stdmodel->color_pos;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
@@ -125,7 +127,7 @@ int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->uv_array, 2, data, type, num,
                           item_size);
     stdmodel->array_attrs[2] = &stdmodel->uv_pos;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
@@ -134,6 +136,6 @@ int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->normal_array, 3, data, type, num,
                           item_size);
     stdmodel->array_attrs[3] = &stdmodel->normal_pos;
-    return 0;
+    return GE_E_SUCCESS;
 }
 

@@ -37,9 +37,11 @@
 #include <GLES2/gl2.h>
 #include <stddef.h>
 
+#include <mibiengine2/errors.h>
+
 char *_ge_gles_shader_init(GEShader *shader, char *vertex_source,
                            char *fragment_source) {
-    static char log[SHADER_LOG_SIZE];
+    static char log[GE_SHADER_LOG_SIZE];
     int success;
     shader->shader_program = glCreateProgram();
     shader->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -49,7 +51,8 @@ char *_ge_gles_shader_init(GEShader *shader, char *vertex_source,
     /* Return the log if required */
     glGetShaderiv(shader->vertex_shader, GL_COMPILE_STATUS, &success);
     if(!success){
-        glGetShaderInfoLog(shader->vertex_shader, SHADER_LOG_SIZE, NULL, log);
+        glGetShaderInfoLog(shader->vertex_shader, GE_SHADER_LOG_SIZE, NULL,
+                           log);
         glDeleteShader(shader->vertex_shader);
         glDeleteProgram(shader->shader_program);
         return log;
@@ -61,7 +64,7 @@ char *_ge_gles_shader_init(GEShader *shader, char *vertex_source,
     /* Return the log if required */
     glGetShaderiv(shader->fragment_shader, GL_COMPILE_STATUS, &success);
     if(!success){
-        glGetShaderInfoLog(shader->fragment_shader, SHADER_LOG_SIZE, NULL,
+        glGetShaderInfoLog(shader->fragment_shader, GE_SHADER_LOG_SIZE, NULL,
                            log);
         glDeleteShader(shader->vertex_shader);
         glDeleteShader(shader->fragment_shader);
@@ -74,7 +77,7 @@ char *_ge_gles_shader_init(GEShader *shader, char *vertex_source,
     glLinkProgram(shader->shader_program);
     glGetProgramiv(shader->shader_program, GL_LINK_STATUS, &success);
     if(!success){
-        glGetProgramInfoLog(shader->shader_program, SHADER_LOG_SIZE, NULL,
+        glGetProgramInfoLog(shader->shader_program, GE_SHADER_LOG_SIZE, NULL,
                             log);
         glDeleteShader(shader->vertex_shader);
         glDeleteShader(shader->fragment_shader);

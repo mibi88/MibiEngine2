@@ -36,6 +36,8 @@
 
 #include <backendlist.h>
 
+#include <mibiengine2/errors.h>
+
 #define DEF_CASE(d) case d: return #d;
 
 int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
@@ -67,7 +69,7 @@ int ge_model_set_callbacks(GEModel *model,
             model->call_ptr = GE_MODEL_INHERIT_MAX-1;
         }
     }
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 size_t ge_model_get_callptr(GEModel *model) {
@@ -78,13 +80,11 @@ void ge_model_render(GEModel *model) {
     GE_BACKENDLIST_GET(model_render)(model);
 }
 
-void ge_model_render_multiple(GEModel *model, void before_all(void *data),
-                              void after_all(void *data),
-                              void before(void *data, size_t i),
-                              void after(void *data, size_t i), size_t count,
-                              void *data) {
-    GE_BACKENDLIST_GET(model_render_multiple)(model, before_all, after_all,
-                                              before, after, count, data);
+void ge_model_render_multiple(GEModel *model, GEShaderPos **pos,
+                              GEUniformType *types, void ***uniforms,
+                              size_t uniform_count, size_t count) {
+    GE_BACKENDLIST_GET(model_render_multiple)(model, pos, types, uniforms,
+                                              uniform_count, count);
 }
 
 int ge_model_attr_init(GEModelAttr *attr, GEShader *shader,

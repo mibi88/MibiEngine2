@@ -157,17 +157,17 @@ void ge_model_render(GEModel *model);
  * Render a model multiple times.
  * before and after may not be called in the correct order.
  *
- * model:      The model to render.
- * before_all: Callback called before rendering.
- * after_all:  Callback called after rendering.
- * before:     Callback called before rendering an instance of the model.
- * after:      Callback called after rendering an instance of the model.
+ * model:         The model to render.
+ * pos:           The position of the uniform variables that should be sent for
+ *                each instance.
+ * types:         The type of the uniforms.
+ * uniforms:      Pointers to the unforms for each model.
+ * uniform_count: The number of uniforms per model.
+ * count:         The number of instances of the model to render.
  */
-void ge_model_render_multiple(GEModel *model, void before_all(void *data),
-                              void after_all(void *data),
-                              void before(void *data, size_t i),
-                              void after(void *data, size_t i), size_t count,
-                              void *data);
+void ge_model_render_multiple(GEModel *model, GEShaderPos **pos,
+                              GEUniformType *types, void ***uniforms,
+                              size_t uniform_count, size_t count);
 
 /* ge_model_attr_init
  *

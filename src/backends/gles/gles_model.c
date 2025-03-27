@@ -36,6 +36,8 @@
 
 #include <GLES2/gl2.h>
 
+#include <mibiengine2/errors.h>
+
 #define DEF_CASE(d) case d: return #d;
 
 char *_ge_gl_error_str(int error) {
@@ -84,12 +86,12 @@ int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
         model->calls[i].after_free = NULL;
     }
     model->call_ptr = 0;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_model_set_attr(GEModel *model, GEModelAttr *attr) {
     model->attr = attr;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void _ge_gles_model_render(GEModel *model) {
@@ -157,12 +159,10 @@ void _ge_gles_model_render(GEModel *model) {
     }
 }
 
-void _ge_gles_model_render_multiple(GEModel *model,
-                                    void before_all(void *data),
-                                    void after_all(void *data),
-                                    void before(void *data, size_t i),
-                                    void after(void *data, size_t i),
-                                    size_t count, void *data) {
+void _ge_gles_model_render_multiple(GEModel *model, GEShaderPos **pos,
+                                    GEUniformType *types, void ***uniforms,
+                                    size_t uniform_count, size_t count) {
+    /* TODO: Use GL_EXT_draw_instanced if possible. */
     int gl_types[GE_T_AMOUNT] = {
         0,
         GL_BYTE,
@@ -176,7 +176,7 @@ void _ge_gles_model_render_multiple(GEModel *model,
         GL_FLOAT,
         GL_FLOAT
     };
-    size_t i;
+    size_t i, n;
     
     /* If the rendering attributes are not set, the model cannot be rendered */
     if(model->attr == NULL) return;
@@ -200,21 +200,19 @@ void _ge_gles_model_render_multiple(GEModel *model,
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->indices.vbo);
     }
     
-    if(before_all) before_all(data);
-    
     /* Draw the model multiple times */
     for(i=0;i<count;i++){
-        if(before) before(data, i);
+        /* Load all the uniform variables */
+        for(n=0;n<uniform_count;n++){
+            ge_shader_load_any(pos[n], types[n], uniforms[n][i]);
+        }
         if(model->indices.data){
             glDrawElements(GL_TRIANGLES, model->indices.num,
                            gl_types[model->indices.type], 0);
         }else{
             glDrawArrays(GL_TRIANGLES, 0, model->indices.num);
         }
-        if(after) after(data, i);
     }
-    
-    if(after_all) after_all(data);
     
     /* Unbind the index buffer */
     if(model->indices.data) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -246,7 +244,7 @@ int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
         attr->array_pos[i]->pos = glGetAttribLocation(shader->shader_program,
                                                       names[i]);
     }
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void _ge_gles_model_free(GEModel *model) {

@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <mibiengine2/errors.h>
+
 typedef struct {
     long vertex;
     long uv;
@@ -348,7 +350,7 @@ int ge_obj_init(GEObj *obj, char *data, size_t size) {
     if(vertices_used == NULL || new_index == NULL){
         _GE_OBJ_FREE();
         _GE_OBJ_FREE_LOCAL();
-        return 2;
+        return GE_E_OUT_OF_MEM;
     }
     for(i=0;i<index_num;i++){
         /* Fix the indices if they are incorrect */
@@ -462,7 +464,7 @@ int ge_obj_init(GEObj *obj, char *data, size_t size) {
 #if GE_OBJ_DEBUG
     puts("-- MODEL LOADED SUCCESSFULLY");
 #endif
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void ge_obj_free(GEObj *obj) {

@@ -34,6 +34,8 @@
 
 #include <mibiengine2/base/shader.h>
 
+#include <mibiengine2/errors.h>
+
 #include <backendlist.h>
 #include <stddef.h>
 
@@ -69,6 +71,28 @@ void ge_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec) {
 
 void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec) {
     GE_BACKENDLIST_GET(shader_load_vec2)(pos, vec);
+}
+
+void ge_shader_load_any(GEShaderPos *pos, GEUniformType type, void *var) {
+    switch(type){
+        case GE_U_MAT4:
+            GE_BACKENDLIST_GET(shader_load_mat4)(pos, var);
+            break;
+        case GE_U_MAT3:
+            GE_BACKENDLIST_GET(shader_load_mat3)(pos, var);
+            break;
+        case GE_U_VEC4:
+            GE_BACKENDLIST_GET(shader_load_vec4)(pos, var);
+            break;
+        case GE_U_VEC3:
+            GE_BACKENDLIST_GET(shader_load_vec3)(pos, var);
+            break;
+        case GE_U_VEC2:
+            GE_BACKENDLIST_GET(shader_load_vec2)(pos, var);
+            break;
+        default:
+            break;
+    }
 }
 
 void ge_shader_free(GEShader *shader) {

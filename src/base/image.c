@@ -38,6 +38,8 @@
 
 #include <png.h>
 
+#include <mibiengine2/errors.h>
+
 #define CHECK_NUM 8
 
 int ge_image_init(GEImage *image, char *file) {
@@ -52,13 +54,13 @@ int ge_image_init(GEImage *image, char *file) {
     /* Check if the file is a png image. */
     FILE *fp = fopen(file, "rb");
     if(fp == NULL){
-        return GE_IMAGE_ERROR_FILE;
+        return GE_E_FILE;
     }
     fread(header, 1, CHECK_NUM, fp);
     is_png = !png_sig_cmp(header, 0, CHECK_NUM);
     if(!is_png){
         fclose(fp);
-        return GE_IMAGE_ERROR_NOT_PNG;
+        return GE_E_NOT_PNG;
     }
 
     /* Allocate memory. */
@@ -66,21 +68,21 @@ int ge_image_init(GEImage *image, char *file) {
                                                  NULL, NULL);
     if(png_ptr == NULL){
         fclose(fp);
-        return GE_IMAGE_ERROR_OUT_OF_MEM;
+        return GE_E_OUT_OF_MEM;
     }
 
     info_ptr = png_create_info_struct(png_ptr);
     if(info_ptr == NULL){
         fclose(fp);
         png_destroy_read_struct(&png_ptr, NULL, NULL);
-        return GE_IMAGE_ERROR_OUT_OF_MEM;
+        return GE_E_OUT_OF_MEM;
     }
 
     /* Initialize everything */
     if(setjmp(png_jmpbuf(png_ptr))){
         fclose(fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-        return GE_IMAGE_ERROR_UNKNOWN;
+        return GE_E_UNKNOWN;
     }
 
     png_init_io(png_ptr, fp);
@@ -109,7 +111,7 @@ int ge_image_init(GEImage *image, char *file) {
     if(image->rows == NULL){
         fclose(fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-        return GE_IMAGE_ERROR_OUT_OF_MEM;
+        return GE_E_OUT_OF_MEM;
     }
 
     image->row_bytes = png_get_rowbytes(png_ptr, info_ptr);
@@ -119,7 +121,7 @@ int ge_image_init(GEImage *image, char *file) {
         fclose(fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         free(image->rows);
-        return GE_IMAGE_ERROR_OUT_OF_MEM;
+        return GE_E_OUT_OF_MEM;
     }
 
     for(i=0;i<image->height;i++){
@@ -136,7 +138,7 @@ int ge_image_init(GEImage *image, char *file) {
 
     fclose(fp);
 
-    return GE_IMAGE_SUCCESS;
+    return GE_E_SUCCESS;
 }
 
 void ge_image_free(GEImage *image) {

@@ -36,6 +36,8 @@
 
 #include <GLES2/gl2.h>
 
+#include <mibiengine2/errors.h>
+
 int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
                              size_t size, size_t item_size) {
     /* TODO: Support updating the buffer */
@@ -50,7 +52,7 @@ int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
     glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[type],
                  data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
@@ -73,18 +75,18 @@ int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
                           GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     array->current_attr = attr;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_modelarray_disable(GEModelArray *array) {
     if(array->current_attr == NULL) return 1;
     glDisableVertexAttribArray(array->current_attr->pos);
     array->current_attr = NULL;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void _ge_gles_modelarray_free(GEModelArray *array) {
     glDeleteBuffers(1, &array->vbo);
-    array->vbo = 0;
+    array->vbo = GE_E_SUCCESS;
 }
 

@@ -35,7 +35,7 @@
 #ifndef GE_SHADER_H
 #define GE_SHADER_H
 
-#define SHADER_LOG_SIZE 512
+#define GE_SHADER_LOG_SIZE 512
 
 #include <mibiengine2/base/mat.h>
 
@@ -47,6 +47,15 @@ typedef struct {
 typedef struct {
     int pos;
 } GEShaderPos;
+
+typedef enum {
+    GE_U_MAT4,
+    GE_U_MAT3,
+    GE_U_VEC4,
+    GE_U_VEC3,
+    GE_U_VEC2,
+    GE_U_AMOUNT
+} GEUniformType;
 
 /* ge_shader_init
  *
@@ -123,6 +132,16 @@ void ge_shader_load_vec3(GEShaderPos *pos, GEVec3 *vec);
  * vec: The vector to load.
  */
 void ge_shader_load_vec2(GEShaderPos *pos, GEVec2 *vec);
+
+/* ge_shader_load_any
+ *
+ * Load a uniform variable to the currently used shader.
+ *
+ * pos:  The position of the uniform variable.
+ * type: The type of the uniform variable.
+ * var:  The uniform to load.
+ */
+void ge_shader_load_any(GEShaderPos *pos, GEUniformType type, void *var);
 
 /* ge_shader_free
  *

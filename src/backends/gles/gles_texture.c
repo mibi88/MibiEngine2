@@ -41,6 +41,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <mibiengine2/errors.h>
+
 int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
                           int flip) {
     size_t x, y;
@@ -56,7 +58,7 @@ int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
     texture->uv_max.y = image->height/(float)texture->size;
     texture->data = malloc(texture->size*texture->size*4);
     if(texture->data == NULL){
-        return 1;
+        return GE_E_OUT_OF_MEM;
     }
     bytes = image->row_bytes/image->width;
     memset(texture->data, 0, texture->size*texture->size*4);
@@ -84,7 +86,7 @@ int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->size, texture->size, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, texture->data);
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void _ge_gles_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {

@@ -47,6 +47,8 @@
 
 #include <mibiengine2/base/config.h>
 
+#include <mibiengine2/errors.h>
+
 #define DEF_CASE(d) case d: return #d;
 
 #if GE_WINDOW_DEBUG
@@ -152,7 +154,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
         window->platform.window = NULL;
         free(window->platform.wm_delete_window);
         window->platform.wm_delete_window = NULL;
-        return 1;
+        return GE_E_OUT_OF_MEM;
     }
     display = window->egl.display;
     surface = window->egl.surface;
@@ -178,11 +180,11 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     *display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if(*display == EGL_NO_DISPLAY){
         fputs("No display found!\n", stderr);
-        return 2;
+        return GE_E_NO_DISPLAY;
     }
     if(eglInitialize(*display, &maj, &min) == EGL_FALSE){
         fputs("Failed to initialize EGL!\n", stderr);
-        return 3;
+        return GE_E_EGL_INIT;
     }
     printf("EGL version: %d.%d\n", maj, min);
     /*if(eglGetConfigs(display, NULL, 0, &config_num) == EGL_FALSE){
@@ -202,27 +204,27 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     
     if(eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE){
         fputs("Failed to bind API!\n", stderr);
-        return 4;
+        return GE_E_API_BIND;
     }
     if(eglChooseConfig(*display, attr, config, 1, &config_num) == EGL_FALSE){
         fputs("Failed to choose config!\n", stderr);
-        return 5;
+        return GE_E_CHOOSE_CONFIG;
     }
     *surface = eglCreateWindowSurface(*display, *config, *win, surface_attr);
     if(eglGetError() != EGL_SUCCESS){
         fputs("Failed to create surface!\n", stderr);
-        return 6;
+        return GE_E_SURFACE;
     }
     
     *context = eglCreateContext(*display, *config, NULL, context_attr);
     if(eglGetError() != EGL_SUCCESS){
         fputs("Failed to create context!\n", stderr);
-        return 7;
+        return GE_E_CONTEXT;
     }
     
     if(eglMakeCurrent(*display, *surface, *surface, *context) == EGL_FALSE){
         fputs("Failed to make context current!\n", stderr);
-        return 8;
+        return GE_E_MAKE_CURRENT;
     }
     
     /* Uncap the framerate */
@@ -237,19 +239,19 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     glEnable(GL_TEXTURE_2D);
     window->draw = NULL;
     window->resize = NULL;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
                                   void (*resize)(void *data, int w, int h)) {
     window->draw = draw;
     window->resize = resize;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_window_set_data(GEWindow *window, void *data) {
     window->data = data;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_window_cap_framerate(GEWindow *window, int cap) {

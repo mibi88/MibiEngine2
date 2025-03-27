@@ -32,26 +32,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/texture.h>
-
-#include <mibiengine2/base/utils.h>
-
-#include <mibiengine2/errors.h>
-
-#include <backendlist.h>
-
-#include <stdlib.h>
-#include <string.h>
-
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
-    return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
-}
-
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
-    GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
-}
-
-void ge_texture_free(GETexture *texture) {
-    GE_BACKENDLIST_GET(texture_free)(texture);
-}
+enum {
+    /* Base */
+    GE_E_SUCCESS,
+    GE_E_OUT_OF_MEM,
+    GE_E_STDMODEL_INIT,
+    GE_E_STDMODEL_ADD,
+    GE_E_FRAMEBUFFER_INCOMPLETE,
+    GE_E_SET_ATTR,
+    GE_E_NO_DISPLAY,
+    GE_E_EGL_INIT,
+    GE_E_API_BIND,
+    GE_E_CHOOSE_CONFIG,
+    GE_E_SURFACE,
+    GE_E_CONTEXT,
+    GE_E_MAKE_CURRENT,
+    GE_E_NOT_PNG,
+    GE_E_FILE,
+    GE_E_MODELARRAY_INIT,
+    GE_E_MODEL_INIT,
+    GE_E_SET_CALLBACKS,
+    GE_E_OBJ_LOADING,
+    GE_E_TEXTUREDMODEL_INIT,
+    GE_E_SET_TEXTURE,
+    /* Renderer */
+    
+    /* Other */
+    GE_E_UNKNOWN,
+    GE_E_AMOUNT
+};
 

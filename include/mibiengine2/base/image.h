@@ -44,22 +44,13 @@ typedef struct {
     long row_bytes;
 } GEImage;
 
-enum {
-    GE_IMAGE_SUCCESS,
-    GE_IMAGE_ERROR_NOT_PNG,
-    GE_IMAGE_ERROR_FILE,
-    GE_IMAGE_ERROR_OUT_OF_MEM,
-    GE_IMAGE_ERROR_UNKNOWN
-};
-
 /* ge_image_init
  *
  * Load an image.
  *
  * image: The image data.
  * file:  The file name of the image.
- * Returns GE_IMAGE_SUCCESS (0) on success or any other of the GE_IMAGE_* error
- * codes on failure.
+ * Returns GE_E_SUCCESS (0) on success or an error code on failure.
  */
 int ge_image_init(GEImage *image, char *file);
 

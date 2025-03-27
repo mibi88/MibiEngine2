@@ -34,6 +34,8 @@
 
 #include <mibiengine2/base/texturedmodel.h>
 
+#include <mibiengine2/errors.h>
+
 #include <stdlib.h>
 
 void _ge_texturedmodel_before_rendering(void *model, GEModelAttr *attr,
@@ -53,18 +55,18 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           size_t vertex_num, size_t item_size, void *extra) {
     GETexturedModel *texturedmodel = malloc(sizeof(GETexturedModel));
     if(texturedmodel == NULL){
-        return 1;
+        return GE_E_OUT_OF_MEM;
     }
     if(ge_stdmodel_init(model, indices, vertices, index_type, vertex_type,
                         index_num, vertex_num, item_size, texturedmodel)){
         free(texturedmodel);
-        return 2;
+        return GE_E_STDMODEL_INIT;
     }
     if(ge_model_set_callbacks(model, _ge_texturedmodel_before_rendering, NULL,
                               NULL, NULL, 1)){
         ge_model_free(model);
         free(texturedmodel);
-        return 3;
+        return GE_E_SET_CALLBACKS;
     }
 #if GE_TEXTUREDMODEL_INHERIT_LEVEL+1 >= GE_MODEL_INHERIT_MAX
     Stop compiling right now!
@@ -72,13 +74,13 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
     model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL+1] = extra;
     texturedmodel->texture = texture;
     texturedmodel->tex_pos = NULL;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos) {
     GETexturedModel *texturedmodel =
                                   model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL];
     texturedmodel->tex_pos = tex_pos;
-    return 0;
+    return GE_E_SUCCESS;
 }
 

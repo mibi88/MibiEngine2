@@ -35,6 +35,7 @@
 #include <mibiengine2/base/framebuffer.h>
 
 #include <mibiengine2/base/utils.h>
+#include <mibiengine2/errors.h>
 
 #include <GLES2/gl2.h>
 
@@ -82,12 +83,12 @@ int _ge_gles_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
     /* Initialize the model used to render the framebuffer */
     if(ge_stdmodel_init(&framebuffer->model, indices, vertices, GE_T_USHORT,
                         GE_T_FLOAT, 6, 4*2, 2, NULL)){
-        return 1;
+        return GE_E_STDMODEL_INIT;
     }
     if(ge_stdmodel_add_uv_coords(&framebuffer->model, uv_coords, GE_T_FLOAT,
                                  4*2, 2)){
         ge_model_free(&framebuffer->model);
-        return 2;
+        return GE_E_STDMODEL_ADD;
     }
     
     /* Create the framebuffer */
@@ -178,13 +179,13 @@ int _ge_gles_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
         glDeleteTextures(1, framebuffer->tex);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        return 3;
+        return GE_E_FRAMEBUFFER_INCOMPLETE;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     framebuffer->tex_size.x = w/(float)framebuffer->size;
     framebuffer->tex_size.y = h/(float)framebuffer->size;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
@@ -210,7 +211,7 @@ int _ge_gles_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
     
     framebuffer->tex_size.x = w/(float)framebuffer->size;
     framebuffer->tex_size.y = h/(float)framebuffer->size;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int _ge_gles_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
@@ -222,10 +223,10 @@ int _ge_gles_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
                                                        tex_names[i]);
     }
     if(ge_stdmodel_shader_attr(&framebuffer->model, shader, attr_names)){
-        return 1;
+        return GE_E_SET_ATTR;
     }
     framebuffer->size_pos = size_pos;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void _ge_gles_framebuffer_render(GEFramebuffer *framebuffer) {

@@ -33,12 +33,13 @@
  */
 
 #include <mibiengine2/renderer/light.h>
+#include <mibiengine2/errors.h>
 
 int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color) {
     light->pos = pos;
     light->color = color;
     light->type = type;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void ge_light_free(GELight *light) {

@@ -37,6 +37,8 @@
 #include <mibiengine2/renderer/light.h>
 #include <mibiengine2/renderer/entity.h>
 
+#include <mibiengine2/errors.h>
+
 #include <stdlib.h>
 
 int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
@@ -44,47 +46,66 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
     size_t i, n;
     int found;
     void *new;
-    scene->entityarray = malloc(GE_SCENE_ALLOC_STEP*
+    scene->entity_array = malloc(GE_SCENE_ALLOC_STEP*
                                 sizeof(GESceneEntityArray*));
     scene->renderable_num = 0;
     scene->renderable_max = GE_SCENE_ALLOC_STEP;
     for(i=0;i<entity_num;i++){
         found = 0;
         for(n=0;n<scene->renderable_num;n++){
-            if(scene->entityarray[i].renderable == entities[i].data){
+            if(scene->entity_array[i].renderable == entities[i].data){
                 /* Add an entity */
-                /* TODO */
+                if(scene->entity_array[i].entity_num >=
+                   scene->entity_array[i].entity_max){
+                    scene->entity_array[i].entity_max += GE_SCENE_ALLOC_STEP;
+                    new = realloc(scene->entity_array[i].entities,
+                                  scene->entity_array[i].entity_max*
+                                  sizeof(GEEntity*));
+                    if(new == NULL){
+                        ge_scene_free(scene);
+                        return GE_E_OUT_OF_MEM;
+                    }
+                    scene->entity_array[i].entities = new;
+                }
+                scene->entity_array[i]
+                    .entities[scene->entity_array[i].entity_num] = entities[i];
+                scene->entity_array[i].entity_num++;
             }
         }
         if(!found){
-            if(scene->renderable_num >= GE_SCENE_ALLOC_STEP){
-                new = realloc(scene->entityarray, (scene->renderable_max+
-                              GE_SCENE_ALLOC_STEP)*
+            if(scene->renderable_num >= scene->renderable_max){
+                scene->renderable_max += GE_SCENE_ALLOC_STEP;
+                new = realloc(scene->entity_array, scene->renderable_max*
                               sizeof(GESceneEntityArray*));
                 if(new == NULL){
                     ge_scene_free(scene);
-                    return 1;
+                    return GE_E_OUT_OF_MEM;
                 }
-                scene->entityarray = new;
+                scene->entity_array = new;
             }
-            scene->entityarray[scene->renderable_num].entities =
+            scene->entity_array[scene->renderable_num].entities =
                                                     malloc(sizeof(GEEntity));
-            if(scene->entityarray[scene->renderable_num].entities == NULL){
+            if(scene->entity_array[scene->renderable_num].entities == NULL){
                 ge_scene_free(scene);
-                return 2;
+                return GE_E_OUT_OF_MEM;
             }
-            *scene->entityarray[scene->renderable_num].entities = entities[i];
-            scene->entityarray[scene->renderable_num].renderable =
+            *scene->entity_array[scene->renderable_num].entities = entities[i];
+            scene->entity_array[scene->renderable_num].renderable =
                                                             entities[i].data;
             scene->renderable_num++;
         }
     }
     scene->light_max = light_max;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void ge_scene_free(GEScene *scene) {
-    (void)scene;
-    /* TODO: Free everything */
+    size_t i;
+    for(i=0;i<scene->renderable_max;i++){
+        free(scene->entity_array[i].entities);
+        scene->entity_array[i].entities = NULL;
+    }
+    free(scene->entity_array);
+    scene->entity_array = NULL;
 }
 

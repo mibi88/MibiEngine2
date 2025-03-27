@@ -33,6 +33,7 @@
  */
 
 #include <mibiengine2/renderer/loader.h>
+#include <mibiengine2/errors.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -73,11 +74,11 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
     GEShaderPos tex_pos;
     
     data = ge_loader_load_text(file, &size);
-    if(data == NULL) return 1;
+    if(data == NULL) return GE_E_FILE;
     
     if(ge_obj_init(&obj, data, size)){
         free(data);
-        return 2;
+        return GE_E_OBJ_LOADING;
     }
     
     if(texture == NULL){
@@ -86,7 +87,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
                             obj.vertex_num, 4, NULL)){
             ge_obj_free(&obj);
             free(data);
-            return 3;
+            return GE_E_STDMODEL_INIT;
         }
     }else{
         if(ge_texturedmodel_init(model, texture, obj.indices, obj.vertices,
@@ -94,7 +95,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
                                  obj.vertex_num, 4, NULL)){
             ge_obj_free(&obj);
             free(data);
-            return 3;
+            return GE_E_TEXTUREDMODEL_INIT;
         }
     }
     if(ge_stdmodel_add_uv_coords(model, obj.uv_coords, GE_T_FLOAT, obj.uv_num,
@@ -102,31 +103,74 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
         ge_model_free(model);
         ge_obj_free(&obj);
         free(data);
-        return 4;
+        return GE_E_STDMODEL_ADD;
     }
     if(ge_stdmodel_add_normals(model, obj.normals, GE_T_FLOAT, obj.normal_num,
                               3)){
         ge_model_free(model);
         ge_obj_free(&obj);
         free(data);
-        return 5;
+        return GE_E_STDMODEL_ADD;
     }
     if(ge_stdmodel_shader_attr(model, shader, attr_names)){
         ge_model_free(model);
         ge_obj_free(&obj);
         free(data);
-        return 6;
+        return GE_E_STDMODEL_ADD;
     }
     tex_pos = ge_shader_get_pos(shader, tex_name);
     if(ge_texturedmodel_set_texture(model, &tex_pos)){
         ge_model_free(model);
         ge_obj_free(&obj);
         free(data);
-        return 7;
+        return GE_E_SET_TEXTURE;
     }
     ge_obj_free(&obj);
     free(data);
-    return 0;
+    return GE_E_SUCCESS;
+}
+
+void _ge_loader_model_render(void *data, GEMat4 *mat, GEMat3 *normal_mat) {
+    GEModelRenderable *model = data;
+    ge_shader_load_mat4(&model->shader->model_mat, mat);
+    ge_shader_load_mat3(&model->shader->normal_mat, normal_mat);
+    ge_model_render(model->model);
+}
+
+void _ge_loader_model_render_multiple(void *data, GEMat4 **mats,
+                                      GEMat3 **normal_mats, size_t count) {
+    GEModelRenderable *model = data;
+    void **uniforms[2];
+    GEShaderPos *pos[2];
+    GEUniformType types[2] = {
+        GE_U_MAT4,
+        GE_U_MAT3
+    };
+    pos[0] = &model->shader->model_mat;
+    pos[1] = &model->shader->normal_mat;
+    uniforms[0] = (void**)mats;
+    uniforms[1] = (void**)normal_mats;
+    ge_model_render_multiple(model->model, pos, types, uniforms, 2, count);
+}
+
+void _ge_loader_model_free(void *data) {
+    GEModelRenderable *model = data;
+    ge_model_free(model->model);
+}
+
+int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
+                               GEStdShader *shader) {
+    GEModelRenderable *data;
+    data = malloc(sizeof(GEModelRenderable));
+    if(data == NULL){
+        return GE_E_OUT_OF_MEM;
+    }
+    data->model = model;
+    data->shader = shader;
+    ge_renderable_init(renderable, data, _ge_loader_model_render,
+                       _ge_loader_model_render_multiple,
+                       _ge_loader_model_free);
+    return GE_E_SUCCESS;
 }
 
 char *ge_loader_load_shader(GEShader *shader, char *vertex_file,

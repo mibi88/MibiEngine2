@@ -32,26 +32,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/texture.h>
+#ifndef GE_STDSHADER_H
+#define GE_STDSHADER_H
 
-#include <mibiengine2/base/utils.h>
+#include <mibiengine2/base/shader.h>
 
-#include <mibiengine2/errors.h>
+#define GE_STDSHADER_VERTEX "ge_vertex"
+#define GE_STDSHADER_COLOR "ge_color"
+#define GE_STDSHADER_UV "ge_uv"
+#define GE_STDSHADER_NORMAL "ge_normal"
 
-#include <backendlist.h>
+#define GE_STDSHADER_PROJECTION_MAT "ge_projection_mat"
+#define GE_STDSHADER_VIEW_MAT "ge_view_mat"
+#define GE_STDSHADER_MODEL_MAT "ge_model_mat"
+#define GE_STDSHADER_NORMAL_MAT "ge_normal_mat"
 
-#include <stdlib.h>
-#include <string.h>
+#define GE_STDSHADER_LIGHT_POS "ge_light_pos"
+#define GE_STDSHADER_LIGHT_COLOR "ge_light_color"
+#define GE_STDSHADER_LIGHT_NUM "ge_light_num"
 
-int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
-    return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
-}
+typedef struct {
+    GEShader *shader;
+    GEShaderPos projection_mat;
+    GEShaderPos view_mat;
+    GEShaderPos model_mat;
+    GEShaderPos normal_mat;
+    
+    GEShaderPos light_pos;
+    GEShaderPos light_color;
+    GEShaderPos light_num;
+} GEStdShader;
 
-void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
-    GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
-}
+int ge_stdshader_init(GEStdShader *stdshader, GEShader *shader);
 
-void ge_texture_free(GETexture *texture) {
-    GE_BACKENDLIST_GET(texture_free)(texture);
-}
+GEShader *ge_stdshader_get_shader(GEStdShader *stdshader);
+
+void ge_stdshader_free(GEStdShader *stdshader);
+
+#endif
 

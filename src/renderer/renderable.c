@@ -33,19 +33,20 @@
  */
 
 #include <mibiengine2/renderer/renderable.h>
+#include <mibiengine2/errors.h>
 
 int ge_renderable_init(GERenderable *renderable, void *data,
-                       void (*render)(void *data, GEMat4 *mat,
-                                      GEMat3 *normal_mat),
-                       void (*render_multiple)(void *data, GEMat4 *mats,
-                                               GEMat3 *normal_mat,
-                                               size_t count),
-                       void (*free)(void *data)) {
+                       void render(void *data, GEMat4 *mat,
+                                   GEMat3 *normal_mat),
+                       void render_multiple(void *data, GEMat4 **mats,
+                                            GEMat3 **normal_mats,
+                                            size_t count),
+                       void free(void *data)) {
     renderable->data = data;
     renderable->calls.render = render;
     renderable->calls.render_multiple = render_multiple;
     renderable->calls.free = free;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void ge_renderable_render(GERenderable *renderable, GEMat4 *mat,
@@ -55,10 +56,10 @@ void ge_renderable_render(GERenderable *renderable, GEMat4 *mat,
     }
 }
 
-void ge_renderable_render_multiple(GERenderable *renderable, GEMat4 *mat,
-                                   GEMat3 *normal_mat, size_t count) {
+void ge_renderable_render_multiple(GERenderable *renderable, GEMat4 **mats,
+                                   GEMat3 **normal_mats, size_t count) {
     if(renderable->calls.render_multiple){
-        renderable->calls.render_multiple(renderable->data, mat, normal_mat,
+        renderable->calls.render_multiple(renderable->data, mats, normal_mats,
                                           count);
     }
 }

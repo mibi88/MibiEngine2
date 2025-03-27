@@ -33,39 +33,40 @@
  */
 
 #include <mibiengine2/renderer/entity.h>
+#include <mibiengine2/errors.h>
 
 int ge_entity_init(GEEntity *entity, void *data) {
     entity->data = data;
     entity->scale.x = 1;
     entity->scale.y = 1;
     entity->scale.z = 1;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_entity_set_position(GEEntity *entity, float x, float y, float z) {
     entity->position.x = x;
     entity->position.y = y;
     entity->position.z = z;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_entity_set_rotation(GEEntity *entity, float x, float y, float z) {
     entity->rotation.x = x;
     entity->rotation.y = y;
     entity->rotation.z = z;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_entity_set_scale(GEEntity *entity, float x, float y, float z) {
     entity->scale.x = x;
     entity->scale.y = y;
     entity->scale.z = z;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_entity_set_data(GEEntity *entity, void *data) {
     entity->data = data;
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 int ge_entity_update(GEEntity *entity) {
@@ -78,7 +79,7 @@ int ge_entity_update(GEEntity *entity) {
                     entity->scale.z);
     /* TODO: Create the normal matrix */
     ge_mat3_mat4(&entity->normal_mat, &entity->mat);
-    return 0;
+    return GE_E_SUCCESS;
 }
 
 void ge_entity_free(GEEntity *entity) {

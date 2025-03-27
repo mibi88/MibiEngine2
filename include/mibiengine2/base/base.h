@@ -63,12 +63,14 @@
  * #if GE_<new type>_INHERIT_LEVEL+1 >= GE_<type>_INHERIT_MAX
  *     Stop compiling right now!
  * #endif
- *     model->extra[GE_<new type>_INHERIT_LEVEL+1] = extra;
+ *     type->extra[GE_<new type>_INHERIT_LEVEL+1] = extra;
  *
  * if the inherit level of the extended type is too high the compiler will
  * crash because of the plain text inside of the code, which will avoid buffer
  * overflows if a type got extended too often.
  */
+
+#include <stddef.h>
 
 /* BASE_DATA
  *

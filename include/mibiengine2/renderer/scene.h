@@ -48,7 +48,7 @@ typedef struct {
 } GESceneEntityArray;
 
 typedef struct {
-    GESceneEntityArray *entityarray;
+    GESceneEntityArray *entity_array;
     size_t renderable_num;
     size_t renderable_max;
     size_t light_max;
