@@ -49,6 +49,15 @@
 
 #include <mibiengine2/errors.h>
 
+/*
+ * Useful links:
+ * https://www.saschawillems.de/blog/2015/04/19/using-opengl-es-on-windows-desk
+ * tops-via-egl/
+ * https://jonmacey.blogspot.com/2012/05/getting-started-with-egl-on-raspberry.
+ * html
+ * https://www.learnopengles.com/android-lesson-one-getting-started/
+ */
+
 #define DEF_CASE(d) case d: return #d;
 
 #if GE_WINDOW_DEBUG

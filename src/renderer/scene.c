@@ -99,6 +99,31 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
     return GE_E_SUCCESS;
 }
 
+void ge_scene_render(GEScene *scene) {
+    size_t i, n, x;
+    size_t count;
+    GEMat4 *model_mats[GE_SCENE_INSTANCING_MAX];
+    GEMat3 *normal_mats[GE_SCENE_INSTANCING_MAX];
+    for(i=0;i<scene->renderable_num;i++){
+        for(n=0;n<scene->entity_array[i].entity_num;
+            n+=GE_SCENE_INSTANCING_MAX){
+            count = scene->entity_array[i]
+                        .entity_num-n > GE_SCENE_INSTANCING_MAX ?
+                    GE_SCENE_INSTANCING_MAX : scene->entity_array[i]
+                        .entity_num-n;
+            for(x=0;x<count;x++){
+                model_mats[x] = &scene->entity_array[i].entities[x].mat;
+            }
+            for(x=0;x<count;x++){
+                normal_mats[x] = &scene->entity_array[i].entities[x]
+                                     .normal_mat;
+            }
+            ge_renderable_render_multiple(scene->entity_array[i].renderable,
+                                          model_mats, normal_mats, count);
+        }
+    }
+}
+
 void ge_scene_free(GEScene *scene) {
     size_t i;
     for(i=0;i<scene->renderable_max;i++){

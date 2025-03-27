@@ -63,15 +63,6 @@
 
 #define EXIT(rc) {free_on_exit(); exit(rc);}
 
-/*
- * Useful links:
- * https://www.saschawillems.de/blog/2015/04/19/using-opengl-es-on-windows-desk
- * tops-via-egl/
- * https://jonmacey.blogspot.com/2012/05/getting-started-with-egl-on-raspberry.
- * html
- * https://www.learnopengles.com/android-lesson-one-getting-started/
- */
-
 unsigned long get_ms(void) {
     struct timespec time;
     clock_gettime(CLOCK_REALTIME, &time);
@@ -112,31 +103,6 @@ void free_on_exit(void) {
     ge_framebuffer_free(&framebuffer);
     ge_window_free(&window);
     puts("Successfully freed everything!");
-}
-
-char *load_text(char *file, size_t *size_ptr) {
-    FILE *fp;
-    char *data;
-    size_t size;
-    
-    fp = fopen(file, "r");
-    if(fp == NULL){
-        return NULL;
-    }
-    fseek(fp, 0, SEEK_END);
-    size = ftell(fp);
-    rewind(fp);
-    data = malloc(size+1);
-    if(data == NULL){
-        fclose(fp);
-        return NULL;
-    }
-    fread(data, 1, size, fp);
-    
-    fclose(fp);
-    data[size] = '\0';
-    if(size_ptr) *size_ptr = size;
-    return data;
 }
 
 void init(void) {

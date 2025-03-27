@@ -40,6 +40,8 @@
 
 #define GE_SCENE_ALLOC_STEP 8
 
+#define GE_SCENE_INSTANCING_MAX 64
+
 typedef struct {
     GERenderable *renderable;
     GEEntity *entities;
