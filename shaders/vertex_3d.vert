@@ -45,16 +45,16 @@ varying vec4 frag_color;
 varying vec3 frag_uv;
 varying vec3 frag_normal;
 
-uniform mat4 projection_mat;
-uniform mat4 view_mat;
-uniform mat4 model_mat;
-uniform mat3 normal_mat;
+uniform mat4 ge_projection_mat;
+uniform mat4 ge_view_mat;
+uniform mat4 ge_model_mat;
+uniform mat3 ge_normal_mat;
 
 void main() {
     frag_color = color;
     frag_uv = uv;
-    frag_normal = normalize(normal_mat*normal);
-    gl_Position = projection_mat*view_mat*model_mat*vertex;
+    frag_normal = normalize(ge_normal_mat*normal);
+    gl_Position = ge_projection_mat*ge_view_mat*ge_model_mat*vertex;
     frag_pos = gl_Position;
 }
 

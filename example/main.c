@@ -54,6 +54,8 @@
 #include <mibiengine2/base/framebuffer.h>
 
 #include <mibiengine2/renderer/loader.h>
+#include <mibiengine2/renderer/scene.h>
+#include <mibiengine2/renderer/stdshader.h>
 
 #define PRINT_MS 1
 
@@ -92,6 +94,12 @@ GETexture texture;
 
 GEFramebuffer framebuffer;
 
+GEStdShader stdshader;
+
+GEScene scene;
+GERenderable renderable;
+GEEntity entity;
+
 void free_on_exit(void) {
     puts("Free everything!");
     ge_model_free(&model);
@@ -100,6 +108,9 @@ void free_on_exit(void) {
     ge_image_free(&image);
     ge_shader_free(&shader);
     ge_shader_free(&fb_shader);
+    ge_stdshader_free(&stdshader);
+    ge_scene_free(&scene);
+    ge_renderable_free(&renderable);
     ge_framebuffer_free(&framebuffer);
     ge_window_free(&window);
     puts("Successfully freed everything!");
@@ -119,16 +130,29 @@ void init(void) {
         "color",
         "depth"
     };
+    char *log;
     last_time = get_ms();
     
-    ge_loader_load_shader(&shader, "shaders/vertex_3d.vert",
-                          "shaders/fragment_3d.frag");
-    ge_loader_load_shader(&fb_shader, "shaders/vertex_fb.vert",
-                          "shaders/fragment_fb.frag");
-    projection_mat_pos = ge_shader_get_pos(&shader, "projection_mat");
-    view_mat_pos = ge_shader_get_pos(&shader, "view_mat");
-    model_mat_pos = ge_shader_get_pos(&shader, "model_mat");
-    normal_mat_pos = ge_shader_get_pos(&shader, "normal_mat");
+    if((log = ge_loader_load_shader(&shader, "shaders/vertex_3d.vert",
+                                    "shaders/fragment_3d.frag")) != NULL){
+        puts(log);
+        fputs("Failed to load shader!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if((log = ge_loader_load_shader(&fb_shader, "shaders/vertex_fb.vert",
+                                    "shaders/fragment_fb.frag")) != NULL){
+        puts(log);
+        fputs("Failed to load shader!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_stdshader_init(&stdshader, &shader)){
+        fputs("Failed to create stdshader!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    projection_mat_pos = ge_shader_get_pos(&shader, "ge_projection_mat");
+    view_mat_pos = ge_shader_get_pos(&shader, "ge_view_mat");
+    model_mat_pos = ge_shader_get_pos(&shader, "ge_model_mat");
+    normal_mat_pos = ge_shader_get_pos(&shader, "ge_normal_mat");
     uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
     model_tex_pos = ge_shader_get_pos(&shader, "tex");
     
@@ -174,6 +198,21 @@ void load_model(void) {
     if(ge_loader_load_obj(&model, &shader, &texture, "spot.obj", attr_names,
                           "tex")){
         fputs("Failed to load model!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    if(ge_loader_model_renderable(&renderable, &model, &stdshader)){
+        fputs("Failed to create renderable!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    if(ge_entity_init(&entity, &renderable)){
+        fputs("Failed to create entity!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    if(ge_scene_init(&scene, &entity, 1, 0)){
+        fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
 }
@@ -226,6 +265,7 @@ void draw(void *data) {
     ge_shader_load_vec2(&uv_max_pos, &texture.uv_max);
     
     ge_model_render(&model);
+    /*ge_scene_render(&scene);*/
     
 #if POSTPROCESSING
     ge_framebuffer_default();

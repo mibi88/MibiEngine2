@@ -126,7 +126,7 @@ void ge_scene_render(GEScene *scene) {
 
 void ge_scene_free(GEScene *scene) {
     size_t i;
-    for(i=0;i<scene->renderable_max;i++){
+    for(i=0;i<scene->renderable_num;i++){
         free(scene->entity_array[i].entities);
         scene->entity_array[i].entities = NULL;
     }

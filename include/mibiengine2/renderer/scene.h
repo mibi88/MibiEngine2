@@ -59,6 +59,8 @@ typedef struct {
 int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
                   size_t light_max);
 
+void ge_scene_render(GEScene *scene);
+
 void ge_scene_free(GEScene *scene);
 
 #endif
