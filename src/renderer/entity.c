@@ -92,13 +92,21 @@ int ge_entity_set_update_callback(GEEntity *entity,
 }
 
 int ge_entity_update(GEEntity *entity) {
+    GEMat4 tmp1, tmp2;
     ge_mat4_translate3d(&entity->model_mat, entity->position.x,
                         entity->position.y, entity->position.z);
-    ge_mat4_rot3d(&entity->model_mat, GE_A_X, entity->rotation.x);
-    ge_mat4_rot3d(&entity->model_mat, GE_A_Y, entity->rotation.y);
-    ge_mat4_rot3d(&entity->model_mat, GE_A_Z, entity->rotation.z);
-    ge_mat4_scale3d(&entity->model_mat, entity->scale.x, entity->scale.y,
-                    entity->scale.z);
+    ge_mat4_rot3d(&tmp1, GE_A_X, entity->rotation.x);
+    tmp2 = entity->model_mat;
+    ge_mat4_mmul(&entity->model_mat, &tmp2, &tmp1);
+    ge_mat4_rot3d(&tmp1, GE_A_Y, entity->rotation.y);
+    tmp2 = entity->model_mat;
+    ge_mat4_mmul(&entity->model_mat, &tmp2, &tmp1);
+    ge_mat4_rot3d(&tmp1, GE_A_Z, entity->rotation.z);
+    tmp2 = entity->model_mat;
+    ge_mat4_mmul(&entity->model_mat, &tmp2, &tmp1);
+    ge_mat4_scale3d(&tmp1, entity->scale.x, entity->scale.y, entity->scale.z);
+    tmp2 = entity->model_mat;
+    ge_mat4_mmul(&entity->model_mat, &tmp2, &tmp1);
     /* TODO: Create the normal matrix */
     ge_mat3_mat4(&entity->normal_mat, &entity->model_mat);
     if(entity->on_update) entity->on_update(entity, entity->call_data);

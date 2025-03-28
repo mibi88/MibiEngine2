@@ -59,8 +59,6 @@
 
 #define PRINT_MS 1
 
-#define ARRAY_NUM 4
-
 #define POSTPROCESSING 1
 
 #define EXIT(rc) {free_on_exit(); exit(rc);}
@@ -100,8 +98,14 @@ GEScene scene;
 GERenderable renderable;
 GEEntity entity;
 
+GEEntity *scene_entity;
+
+/* TODO: Fix memory leaks */
+
 void free_on_exit(void) {
     puts("Free everything!");
+    ge_scene_free(&scene);
+    ge_renderable_free(&renderable);
     ge_model_free(&model);
     ge_obj_free(&obj);
     ge_texture_free(&texture);
@@ -109,8 +113,6 @@ void free_on_exit(void) {
     ge_shader_free(&shader);
     ge_shader_free(&fb_shader);
     ge_stdshader_free(&stdshader);
-    ge_scene_free(&scene);
-    ge_renderable_free(&renderable);
     ge_framebuffer_free(&framebuffer);
     ge_window_free(&window);
     puts("Successfully freed everything!");
@@ -120,7 +122,7 @@ void init(void) {
     GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
     GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
     char linear[2] = {1, 0};
-    char *attr_names[] = {
+    char *fb_attr_names[] = {
         "vertex",
         NULL,
         "uv",
@@ -129,6 +131,12 @@ void init(void) {
     char *tex_names[] = {
         "color",
         "depth"
+    };
+    char *model_attr_names[] = {
+        "vertex",
+        "color",
+        "uv",
+        "normal"
     };
     char *log;
     last_time = get_ms();
@@ -167,16 +175,14 @@ void init(void) {
         fputs("Failed to initialize framebuffer!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if(ge_framebuffer_attr(&framebuffer, &fb_shader, attr_names, tex_names,
+    if(ge_framebuffer_attr(&framebuffer, &fb_shader, fb_attr_names, tex_names,
                            &fb_size_pos)){
         fputs("Failed to initialize framebuffer attr!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
     
     ge_shader_use(&shader);
-}
-
-void load_texture(void) {
+    
     if(ge_image_init(&image, "spot_texture.png")){
         fputs("Failed to read image!\n", stderr);
         EXIT(EXIT_FAILURE);
@@ -185,18 +191,9 @@ void load_texture(void) {
         fputs("Failed to load texture!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-}
-
-void load_model(void) {
-    char *attr_names[ARRAY_NUM] = {
-        "vertex",
-        "color",
-        "uv",
-        "normal"
-    };
     
-    if(ge_loader_load_obj(&model, &shader, &texture, "spot.obj", attr_names,
-                          "tex")){
+    if(ge_loader_load_obj(&model, &shader, &texture, "spot.obj",
+                          model_attr_names, "tex")){
         fputs("Failed to load model!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -215,12 +212,15 @@ void load_model(void) {
         fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
+    if((scene_entity = ge_scene_get_same_entity(&scene, &entity)) == NULL){
+        fputs("Failed to get entity!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
 }
 
 float x = 0;
 
 void draw(void *data) {
-    GEMat4 tmp1, tmp2;
     float delta;
     (void)data;
     
@@ -237,35 +237,15 @@ void draw(void *data) {
     delta = (get_ms()-last_time)*0.001;
     last_time = get_ms();
     
-    ge_mat4_translate3d(&tmp1, 0, 0, -2.2);
-    ge_mat4_scale3d(&tmp2, 1, 1, 1);
-    ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
-    tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, GE_A_Y, x);
-    ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
-    tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, GE_A_X, 0);
-    ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
-    tmp1 = model_mat;
-    ge_mat4_rot3d(&tmp2, GE_A_Z, 0);
-    ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
-    tmp1 = model_mat;
-    ge_mat4_translate3d(&tmp2, 0, 0, 0);
-    ge_mat4_mmul(&model_mat, &tmp1, &tmp2);
-    
-    /* ge_mat4_inverse(&tmp1, &model_mat);
-    ge_mat4_transpose(&normal_mat, &tmp1); */
-    /* TODO: Create the normal matrix */
-    ge_mat3_mat4(&normal_mat, &model_mat);
+    ge_entity_set_position(scene_entity, 0, 0, -2.2);
+    ge_entity_set_rotation(scene_entity, 0, x, 0);
+    ge_entity_update(scene_entity);
     
     ge_shader_load_mat4(&projection_mat_pos, &projection_mat);
     ge_shader_load_mat4(&view_mat_pos, &view_mat);
-    ge_shader_load_mat4(&model_mat_pos, &model_mat);
-    ge_shader_load_mat3(&normal_mat_pos, &normal_mat);
     ge_shader_load_vec2(&uv_max_pos, &texture.uv_max);
     
-    ge_model_render(&model);
-    /*ge_scene_render(&scene);*/
+    ge_scene_render(&scene);
     
 #if POSTPROCESSING
     ge_framebuffer_default();
@@ -275,7 +255,7 @@ void draw(void *data) {
 #endif
     
     x += 2.5*delta;
-    if(x > 360) x -= 360;
+    while(x > 360) x -= 360;
 }
 
 void resize(void *data, int w, int h) {
@@ -298,8 +278,6 @@ int main(int argc, char **argv) {
     }
     
     init();
-    load_texture();
-    load_model();
     
     if(ge_window_set_callbacks(&window, draw, resize)){
         fputs("Failed to set callbacks!\n", stderr);

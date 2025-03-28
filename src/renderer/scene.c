@@ -40,6 +40,7 @@
 #include <mibiengine2/errors.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 void _ge_scene_entity_update(void *_entity, void *_data) {
     size_t i;
@@ -138,6 +139,21 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
     }
     scene->light_max = light_max;
     return GE_E_SUCCESS;
+}
+
+GEEntity *ge_scene_get_same_entity(GEScene *scene, GEEntity *entity) {
+    size_t i, n;
+    GESceneEntityGroup *group;
+    for(i=0;i<scene->entity_group_num;i++){
+        group = ((GESceneEntityGroup*)scene->entity_groups.ptr)+i;
+        for(n=0;n<group->entity_num;n++){
+            if(memcmp(entity, (GEEntity*)group->entities.ptr+n,
+                      sizeof(GEEntity))){
+                return (GEEntity*)group->entities.ptr+n;
+            }
+        }
+    }
+    return NULL;
 }
 
 void ge_scene_render(GEScene *scene) {
