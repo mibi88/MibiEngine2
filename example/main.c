@@ -106,7 +106,6 @@ void free_on_exit(void) {
     puts("Free everything!");
     ge_scene_free(&scene);
     ge_renderable_free(&renderable);
-    ge_model_free(&model);
     ge_obj_free(&obj);
     ge_texture_free(&texture);
     ge_image_free(&image);

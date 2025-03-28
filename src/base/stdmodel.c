@@ -45,8 +45,9 @@
     model->arrays[pos] = &array;
 
 void _ge_stdmodel_after_free(void *_model, void *extra) {
-    (void)_model;
+    GEModel *model = _model;
     free(extra);
+    model->extra[GE_STDMODEL_INHERIT_LEVEL] = NULL;
 }
 
 int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
