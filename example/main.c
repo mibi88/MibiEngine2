@@ -288,7 +288,6 @@ int main(int argc, char **argv) {
         free_on_exit();
         return EXIT_FAILURE;
     }
-    window.data = &window;
     ge_window_mainloop(&window);
     
     free_on_exit();
