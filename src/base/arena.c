@@ -49,10 +49,11 @@ int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max) {
 }
 
 void *ge_arena_alloc(GEArena *arena, size_t size) {
-    size_t added, align;
+    size_t added;
+    size_t align = 0;
     size_t c;
     void *new;
-    align = size-1-(arena->size%size);
+    if(arena->size%size) align = size-(arena->size%size);
     added = size+align;
     if(arena->size+added >= arena->max){
         c = added/arena->alloc_step+(added%arena->alloc_step ? 1 : 0);
@@ -63,9 +64,8 @@ void *ge_arena_alloc(GEArena *arena, size_t size) {
         arena->ptr = new;
         arena->max += c*arena->alloc_step;
     }
-    new = (char*)arena->ptr+align;
+    new = (char*)arena->ptr+arena->size+align;
     arena->size += added;
-    arena->ptr = (char*)arena->ptr+added;
     return new;
 }
 

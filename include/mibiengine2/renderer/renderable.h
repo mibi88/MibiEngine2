@@ -43,16 +43,16 @@ typedef struct {
     void *data;
     struct {
         void (*render)(void *data, GEMat4 *mat, GEMat3 *normal_mat);
-        void (*render_multiple)(void *data, GEMat4 **mats,
-                                GEMat3 **normal_mats, size_t count);
+        void (*render_multiple)(void *data, GEMat4 *mats,
+                                GEMat3 *normal_mats, size_t count);
         void (*free)(void *data);
     } calls;
 } GERenderable;
 int ge_renderable_init(GERenderable *renderable, void *data,
                        void render(void *data, GEMat4 *mat,
                                    GEMat3 *normal_mat),
-                       void render_multiple(void *data, GEMat4 **mats,
-                                            GEMat3 **normal_mats,
+                       void render_multiple(void *data, GEMat4 *mats,
+                                            GEMat3 *normal_mats,
                                             size_t count),
                        void free(void *data));
 
@@ -62,8 +62,8 @@ void ge_renderable_render(GERenderable *renderable, GEMat4 *mat,
 void ge_renderable_render(GERenderable *renderable, GEMat4 *mat,
                           GEMat3 *normal_mat);
 
-void ge_renderable_render_multiple(GERenderable *renderable, GEMat4 **mats,
-                                   GEMat3 **normal_mats, size_t count);
+void ge_renderable_render_multiple(GERenderable *renderable, GEMat4 *mats,
+                                   GEMat3 *normal_mats, size_t count);
 
 void ge_renderable_free(GERenderable *renderable);
 

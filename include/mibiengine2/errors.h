@@ -56,7 +56,8 @@ enum {
     GE_E_TEXTUREDMODEL_INIT,
     GE_E_SET_TEXTURE,
     /* Renderer */
-    
+    GE_E_ARENA_INIT,
+    GE_E_ARENA_ALLOC,
     /* Other */
     GE_E_UNKNOWN,
     GE_E_AMOUNT

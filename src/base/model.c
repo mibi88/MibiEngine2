@@ -81,7 +81,7 @@ void ge_model_render(GEModel *model) {
 }
 
 void ge_model_render_multiple(GEModel *model, GEShaderPos **pos,
-                              GEUniformType *types, void ***uniforms,
+                              GEUniformType *types, void **uniforms,
                               size_t uniform_count, size_t count) {
     GE_BACKENDLIST_GET(model_render_multiple)(model, pos, types, uniforms,
                                               uniform_count, count);

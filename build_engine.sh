@@ -60,6 +60,12 @@ while getopts "rch" flag; do
     esac
 done
 
+# TODO: Do not require to fully rebuild the project
+if ! $rebuild; then
+    echo "-- Warning: Rebuilding on changes isn't properly supported yet!"
+    rebuild=true
+fi
+
 if $clean; then
     echo "-- Removing old build files"
     rm -f $DEST/*.o

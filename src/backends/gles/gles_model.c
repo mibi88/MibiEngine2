@@ -160,9 +160,16 @@ void _ge_gles_model_render(GEModel *model) {
 }
 
 void _ge_gles_model_render_multiple(GEModel *model, GEShaderPos **pos,
-                                    GEUniformType *types, void ***uniforms,
+                                    GEUniformType *types, void **uniforms,
                                     size_t uniform_count, size_t count) {
     /* TODO: Use GL_EXT_draw_instanced if possible. */
+    int uniform_sizes[GE_U_AMOUNT] = {
+        sizeof(GEMat4),
+        sizeof(GEMat3),
+        sizeof(GEVec4),
+        sizeof(GEVec3),
+        sizeof(GEVec2)
+    };
     int gl_types[GE_T_AMOUNT] = {
         0,
         GL_BYTE,
@@ -204,7 +211,8 @@ void _ge_gles_model_render_multiple(GEModel *model, GEShaderPos **pos,
     for(i=0;i<count;i++){
         /* Load all the uniform variables */
         for(n=0;n<uniform_count;n++){
-            ge_shader_load_any(pos[n], types[n], uniforms[n][i]);
+            ge_shader_load_any(pos[n], types[n],
+                               (char*)uniforms[n]+i*uniform_sizes[types[n]]);
         }
         if(model->indices.data){
             glDrawElements(GL_TRIANGLES, model->indices.num,

@@ -35,11 +35,25 @@
 #include <mibiengine2/renderer/entity.h>
 #include <mibiengine2/errors.h>
 
+#include <stddef.h>
+
 int ge_entity_init(GEEntity *entity, void *data) {
     entity->data = data;
     entity->scale.x = 1;
     entity->scale.y = 1;
     entity->scale.z = 1;
+    
+    entity->position.x = 0;
+    entity->position.y = 0;
+    entity->position.z = 0;
+    
+    entity->rotation.x = 0;
+    entity->rotation.y = 0;
+    entity->rotation.z = 0;
+    
+    entity->on_update = NULL;
+    
+    ge_entity_update(entity);
     return GE_E_SUCCESS;
 }
 
@@ -69,16 +83,25 @@ int ge_entity_set_data(GEEntity *entity, void *data) {
     return GE_E_SUCCESS;
 }
 
+int ge_entity_set_update_callback(GEEntity *entity,
+                                  void on_update(void *_entity, void *_data),
+                                  void *data) {
+    entity->on_update = on_update;
+    entity->call_data = data;
+    return GE_E_SUCCESS;
+}
+
 int ge_entity_update(GEEntity *entity) {
-    ge_mat4_translate3d(&entity->mat, entity->position.x, entity->position.y,
-                        entity->position.z);
-    ge_mat4_rot3d(&entity->mat, GE_A_X, entity->rotation.x);
-    ge_mat4_rot3d(&entity->mat, GE_A_Y, entity->rotation.y);
-    ge_mat4_rot3d(&entity->mat, GE_A_Z, entity->rotation.z);
-    ge_mat4_scale3d(&entity->mat, entity->scale.x, entity->scale.y,
+    ge_mat4_translate3d(&entity->model_mat, entity->position.x,
+                        entity->position.y, entity->position.z);
+    ge_mat4_rot3d(&entity->model_mat, GE_A_X, entity->rotation.x);
+    ge_mat4_rot3d(&entity->model_mat, GE_A_Y, entity->rotation.y);
+    ge_mat4_rot3d(&entity->model_mat, GE_A_Z, entity->rotation.z);
+    ge_mat4_scale3d(&entity->model_mat, entity->scale.x, entity->scale.y,
                     entity->scale.z);
     /* TODO: Create the normal matrix */
-    ge_mat3_mat4(&entity->normal_mat, &entity->mat);
+    ge_mat3_mat4(&entity->normal_mat, &entity->model_mat);
+    if(entity->on_update) entity->on_update(entity, entity->call_data);
     return GE_E_SUCCESS;
 }
 

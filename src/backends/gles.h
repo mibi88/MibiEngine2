@@ -55,7 +55,7 @@ int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
 int _ge_gles_model_set_attr(GEModel *model, GEModelAttr *attr);
 void _ge_gles_model_render(GEModel *model);
 void _ge_gles_model_render_multiple(GEModel *model, GEShaderPos **pos,
-                                    GEUniformType *types, void ***uniforms,
+                                    GEUniformType *types, void **uniforms,
                                     size_t uniform_count, size_t count);
 int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
                              GEModelArrayAttr **array_attr, char **names,

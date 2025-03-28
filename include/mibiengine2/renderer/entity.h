@@ -43,11 +43,13 @@ typedef struct {
     GEVec3 rotation;
     GEVec3 scale;
     
-    GEMat4 mat;
+    GEMat4 model_mat;
     GEMat3 normal_mat;
     void *data;
     
     char changed;
+    void (*on_update)(void *_entity, void *_data);
+    void *call_data;
 } GEEntity;
 
 int ge_entity_init(GEEntity *entity, void *data);
@@ -59,6 +61,10 @@ int ge_entity_set_rotation(GEEntity *entity, float x, float y, float z);
 int ge_entity_set_scale(GEEntity *entity, float x, float y, float z);
 
 int ge_entity_set_data(GEEntity *entity, void *data);
+
+int ge_entity_set_update_callback(GEEntity *entity,
+                                  void on_update(void *_entity, void *_data),
+                                  void *data);
 
 int ge_entity_update(GEEntity *entity);
 

@@ -137,10 +137,10 @@ void _ge_loader_model_render(void *data, GEMat4 *mat, GEMat3 *normal_mat) {
     ge_model_render(model->model);
 }
 
-void _ge_loader_model_render_multiple(void *data, GEMat4 **mats,
-                                      GEMat3 **normal_mats, size_t count) {
+void _ge_loader_model_render_multiple(void *data, GEMat4 *mats,
+                                      GEMat3 *normal_mats, size_t count) {
     GEModelRenderable *model = data;
-    void **uniforms[2];
+    void *uniforms[2];
     GEShaderPos *pos[2];
     GEUniformType types[2] = {
         GE_U_MAT4,
@@ -148,8 +148,8 @@ void _ge_loader_model_render_multiple(void *data, GEMat4 **mats,
     };
     pos[0] = &model->shader->model_mat;
     pos[1] = &model->shader->normal_mat;
-    uniforms[0] = (void**)mats;
-    uniforms[1] = (void**)normal_mats;
+    uniforms[0] = (void*)mats;
+    uniforms[1] = (void*)normal_mats;
     ge_model_render_multiple(model->model, pos, types, uniforms, 2, count);
 }
 

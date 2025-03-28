@@ -35,24 +35,24 @@
 #ifndef GE_SCENE_H
 #define GE_SCENE_H
 
+#include <mibiengine2/base/arena.h>
+
 #include <mibiengine2/renderer/renderable.h>
 #include <mibiengine2/renderer/entity.h>
 
-#define GE_SCENE_ALLOC_STEP 8
-
-#define GE_SCENE_INSTANCING_MAX 64
+#define GE_SCENE_ALLOC_STEP 512
 
 typedef struct {
+    GEArena model_mat;
+    GEArena normal_mat;
+    GEArena entities;
     GERenderable *renderable;
-    GEEntity *entities;
     size_t entity_num;
-    size_t entity_max;
-} GESceneEntityArray;
+} GESceneEntityGroup;
 
 typedef struct {
-    GESceneEntityArray *entity_array;
-    size_t renderable_num;
-    size_t renderable_max;
+    GEArena entity_groups;
+    size_t entity_group_num;
     size_t light_max;
 } GEScene;
 

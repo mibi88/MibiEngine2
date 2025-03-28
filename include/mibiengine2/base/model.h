@@ -161,12 +161,12 @@ void ge_model_render(GEModel *model);
  * pos:           The position of the uniform variables that should be sent for
  *                each instance.
  * types:         The type of the uniforms.
- * uniforms:      Pointers to the unforms for each model.
+ * uniforms:      Pointers to a list of unforms for each model.
  * uniform_count: The number of uniforms per model.
  * count:         The number of instances of the model to render.
  */
 void ge_model_render_multiple(GEModel *model, GEShaderPos **pos,
-                              GEUniformType *types, void ***uniforms,
+                              GEUniformType *types, void **uniforms,
                               size_t uniform_count, size_t count);
 
 /* ge_model_attr_init
