@@ -61,7 +61,7 @@
 
 #define POSTPROCESSING 1
 
-#define ENTITIES 100
+#define ENTITIES 1000
 
 #define EXIT(rc) {free_on_exit(); exit(rc);}
 
@@ -222,14 +222,14 @@ void init(void) {
             EXIT(EXIT_FAILURE);
         }
         ge_entity_set_position(entities+i,
-                               (xorshift(&seed)%256)/(float)256*4-2,
-                               (xorshift(&seed)%256)/(float)256*4-2,
-                               -2.2-((xorshift(&seed)%256)/(float)256));
+                               (xorshift(&seed)%1024)/(float)1024*4-2,
+                               (xorshift(&seed)%1024)/(float)1024*2-1,
+                               -2.2-((xorshift(&seed)%256)/(float)256)*16);
         ge_entity_set_scale(entities+i, 0.5, 0.5, 0.5);
         ge_entity_update(entities+i);
     }
     
-    if(ge_scene_init(&scene, entities, 10, scene_shaders, 1, 0)){
+    if(ge_scene_init(&scene, entities, ENTITIES, scene_shaders, 1, 0)){
         fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -301,6 +301,8 @@ int main(int argc, char **argv) {
     if((rc = ge_window_init(&window, "MibiEngine2 demo"))){
         return rc;
     }
+    
+    ge_window_cap_framerate(&window, 1);
     
     init();
     
