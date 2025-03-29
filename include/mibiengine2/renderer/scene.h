@@ -39,6 +39,7 @@
 
 #include <mibiengine2/renderer/renderable.h>
 #include <mibiengine2/renderer/entity.h>
+#include <mibiengine2/renderer/camera.h>
 
 #define GE_SCENE_ALLOC_STEP 512
 
@@ -53,13 +54,34 @@ typedef struct {
 typedef struct {
     GEArena entity_groups;
     size_t entity_group_num;
+    GEStdShader **shaders;
+    size_t shader_num;
+    GECamera *camera;
     size_t light_max;
 } GEScene;
 
 int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
-                  size_t light_max);
+                  GEStdShader **shaders, size_t shader_num, size_t light_max);
+
+int ge_scene_add_entities(GEScene *scene, GEEntity *entites,
+                          size_t entity_num);
+
+void ge_scene_set_shaders(GEScene *scene, GEStdShader **shaders,
+                          size_t shader_num);
+
+void ge_scene_set_camera(GEScene *scene, GECamera *camera);
 
 GEEntity *ge_scene_get_same_entity(GEScene *scene, GEEntity *entity);
+
+void ge_scene_for_entity(GEScene *scene,
+                         void on_entity(GEEntity *entity, void *data),
+                         void *data);
+
+void ge_scene_for_entity_with_renderable(GEScene *scene,
+                                         GERenderable *renderable,
+                                         void on_entity(GEEntity *entity,
+                                                        void *data),
+                                         void *data);
 
 void ge_scene_render(GEScene *scene);
 

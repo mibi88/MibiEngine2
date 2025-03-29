@@ -32,41 +32,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#version 100
-precision lowp float;
+#ifndef GE_CAMERA_H
+#define GE_CAMERA_H
 
-varying vec4 frag_pos;
-varying vec4 frag_color;
-varying vec3 frag_uv;
-varying vec3 frag_normal;
+#include <mibiengine2/base/mat.h>
+#include <mibiengine2/renderer/stdshader.h>
 
-uniform sampler2D tex;
-uniform vec2 ge_uv_max;
+typedef struct {
+    GEVec3 position;
+    GEVec3 rotation;
+    GEMat4 projection_mat;
+    GEMat4 view_mat;
+} GECamera;
 
-vec3 light = vec3(0.0);
-vec3 camera_pos = vec3(0.0);
-float ambient_lighting = 0.3;
-float specular_strength = 1.0;
-float shininess = 32.0;
+typedef enum {
+    GE_P_PERSPECTIVE,
+    GE_P_ORTHOGRAPHIC,
+    GE_P_AMOUNT
+} GECameraType;
 
-float diffuse_lighting(vec3 light) {
-    return max(dot(frag_normal, normalize(light-frag_pos.xyz)), 0.0);
-}
+int ge_camera_init(GECamera *camera);
 
-float specular_lighting(vec3 light) {
-    return pow(max(dot(normalize(normalize(camera_pos-frag_pos.xyz)+
-                                 normalize(light-frag_pos.xyz)), frag_normal),
-                       0.0), shininess)*specular_strength;
-}
+void ge_camera_perspective(GECamera *camera, float fov, float aspect_ratio,
+                           float far, float near);
 
-float lighting(vec3 light) {
-    return diffuse_lighting(light)+specular_lighting(light)+ambient_lighting;
-}
+void ge_camera_orthographic(GECamera *camera, float left, float top,
+                            float right, float bottom, float far, float near);
 
-void main() {
-    vec2 pos = mod((frag_uv.xy*ge_uv_max), ge_uv_max);
-    pos.y = ge_uv_max.y-pos.y;
-    gl_FragColor = texture2D(tex, pos)*
-                   lighting(light);
-}
+void ge_camera_update(GECamera *camera);
+
+void ge_camera_set_position(GECamera *camera, float x, float y, float z);
+
+void ge_camera_set_rotation(GECamera *camera, float x, float y, float z);
+
+#define GE_CAMERA_ORTHO2D(camera, left, top, right, bottom) \
+    ge_camera_orthographic(camera, left, top, right, bottom, 1, -1)
+
+void ge_camera_use(GECamera *camera, GEStdShader *shader);
+
+void ge_camera_free(GECamera *camera);
+
+#endif
 

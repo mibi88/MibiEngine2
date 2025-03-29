@@ -37,9 +37,15 @@ echo "-- Building the engine..."
 
 ./build_engine.sh $1 $2 $3
 
+rc=$?
+
+if [ $rc -ne 0 ]; then
+    exit $rc
+fi
+
 echo "-- Building the example..."
 
-gcc example/*.c \
-    -o main -ansi -Iinclude -lEGL -lm -lX11 -lGL -lpng build/MibiEngine2.a \
-    -Wall -Wextra -Wpedantic -g
+cc example/*.c \
+   -o main -ansi -Iinclude -lEGL -lm -lX11 -lGL -lpng build/MibiEngine2.a \
+   -Wall -Wextra -Wpedantic -g
 

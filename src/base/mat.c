@@ -52,6 +52,7 @@
  * hographic-projection-matrix/opengl-perspective-projection-matrix.html
  * https://en.wikipedia.org/wiki/Transpose
  * https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation
+ * https://learn.microsoft.com/en-us/windows/win32/opengl/glortho
  */
 
 /* 02/03/2025:
@@ -262,6 +263,29 @@ void ge_mat4_projection3d(GEMat4 *mat, float fov, float aspect_ratio,
     mat->mat[3*4+1] = 0;
     mat->mat[3*4+2] = (2*far*near)/(near-far);
     mat->mat[3*4+3] = 0;
+}
+
+void ge_mat4_ortho3d(GEMat4 *mat, float left, float top, float right,
+                     float bottom, float far, float near) {
+    mat->mat[0*4+0] = 2/(right-left);
+    mat->mat[0*4+1] = 0;
+    mat->mat[0*4+2] = 0;
+    mat->mat[0*4+3] = 0;
+    
+    mat->mat[1*4+0] = 0;
+    mat->mat[1*4+1] = 2/(top-bottom);
+    mat->mat[1*4+2] = 0;
+    mat->mat[1*4+3] = 0;
+    
+    mat->mat[2*4+0] = 0;
+    mat->mat[2*4+1] = 0;
+    mat->mat[2*4+2] = -2/(far-near);
+    mat->mat[2*4+3] = 0;
+    
+    mat->mat[3*4+0] = (right+left)/(right-left);
+    mat->mat[3*4+1] = (top+bottom)/(top-bottom);
+    mat->mat[3*4+2] = (far+near)/(far-near);
+    mat->mat[3*4+3] = 1;
 }
 
 void ge_mat3_mat4(GEMat3 *mat3, GEMat4 *mat4) {

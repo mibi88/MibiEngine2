@@ -43,6 +43,8 @@ int ge_stdshader_init(GEStdShader *stdshader, GEShader *shader) {
     stdshader->model_mat = ge_shader_get_pos(shader, GE_STDSHADER_MODEL_MAT);
     stdshader->normal_mat = ge_shader_get_pos(shader, GE_STDSHADER_NORMAL_MAT);
     
+    stdshader->uv_max = ge_shader_get_pos(shader, GE_STDSHADER_UV_MAX);
+    
     stdshader->light_pos = ge_shader_get_pos(shader, GE_STDSHADER_LIGHT_POS);
     stdshader->light_color = ge_shader_get_pos(shader,
                                                GE_STDSHADER_LIGHT_COLOR);

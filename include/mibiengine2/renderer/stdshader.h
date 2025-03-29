@@ -47,6 +47,8 @@
 #define GE_STDSHADER_MODEL_MAT "ge_model_mat"
 #define GE_STDSHADER_NORMAL_MAT "ge_normal_mat"
 
+#define GE_STDSHADER_UV_MAX "ge_uv_max"
+
 #define GE_STDSHADER_LIGHT_POS "ge_light_pos"
 #define GE_STDSHADER_LIGHT_COLOR "ge_light_color"
 #define GE_STDSHADER_LIGHT_NUM "ge_light_num"
@@ -57,6 +59,8 @@ typedef struct {
     GEShaderPos view_mat;
     GEShaderPos model_mat;
     GEShaderPos normal_mat;
+    
+    GEShaderPos uv_max;
     
     GEShaderPos light_pos;
     GEShaderPos light_color;

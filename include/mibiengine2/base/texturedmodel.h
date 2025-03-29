@@ -77,5 +77,14 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
  */
 int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
 
+/* ge_texturedmodel_get_texture
+ *
+ * Get the texture used with a textured model.
+ *
+ * model: The model to get the texture of.
+ * Returns a pointer to the texture data.
+ */
+GETexture *ge_texturedmodel_get_texture(GEModel *model);
+
 #endif
 

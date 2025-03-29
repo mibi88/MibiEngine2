@@ -100,6 +100,12 @@ GEEntity entity;
 
 GEEntity *scene_entity;
 
+GECamera camera;
+
+GEStdShader *scene_shaders[] = {
+    &stdshader
+};
+
 /* TODO: Fix memory leaks */
 
 void free_on_exit(void) {
@@ -113,6 +119,7 @@ void free_on_exit(void) {
     ge_shader_free(&fb_shader);
     ge_stdshader_free(&stdshader);
     ge_framebuffer_free(&framebuffer);
+    ge_camera_free(&camera);
     ge_window_free(&window);
     puts("Successfully freed everything!");
 }
@@ -156,10 +163,6 @@ void init(void) {
         fputs("Failed to create stdshader!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    projection_mat_pos = ge_shader_get_pos(&shader, "ge_projection_mat");
-    view_mat_pos = ge_shader_get_pos(&shader, "ge_view_mat");
-    model_mat_pos = ge_shader_get_pos(&shader, "ge_model_mat");
-    normal_mat_pos = ge_shader_get_pos(&shader, "ge_normal_mat");
     uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
     model_tex_pos = ge_shader_get_pos(&shader, "tex");
     
@@ -197,7 +200,7 @@ void init(void) {
         EXIT(EXIT_FAILURE);
     }
     
-    if(ge_loader_model_renderable(&renderable, &model, &stdshader)){
+    if(ge_loader_model_renderable(&renderable, &model, &stdshader, 1)){
         fputs("Failed to create renderable!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -206,8 +209,7 @@ void init(void) {
         fputs("Failed to create entity!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    
-    if(ge_scene_init(&scene, &entity, 1, 0)){
+    if(ge_scene_init(&scene, &entity, 1, scene_shaders, 1, 0)){
         fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -215,6 +217,12 @@ void init(void) {
         fputs("Failed to get entity!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
+    if(ge_camera_init(&camera)){
+        fputs("Failed to init camera!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    ge_camera_perspective(&camera, 72, 480/(float)360, 1000, 1);
+    ge_scene_set_camera(&scene, &camera);
 }
 
 float x = 0;
@@ -240,10 +248,6 @@ void draw(void *data) {
     ge_entity_set_rotation(scene_entity, 0, x, 0);
     ge_entity_update(scene_entity);
     
-    ge_shader_load_mat4(&projection_mat_pos, &projection_mat);
-    ge_shader_load_mat4(&view_mat_pos, &view_mat);
-    ge_shader_load_vec2(&uv_max_pos, &texture.uv_max);
-    
     ge_scene_render(&scene);
     
 #if POSTPROCESSING
@@ -260,7 +264,7 @@ void draw(void *data) {
 void resize(void *data, int w, int h) {
     (void)data;
     ge_window_view(&window, w, h);
-    ge_mat4_projection3d(&projection_mat, 72, w/(float)h, 1000, 1);
+    ge_camera_perspective(&camera, 72, w/(float)h, 1000, 1);
     if(ge_framebuffer_resize(&framebuffer, w, h)){
         fputs("Failed to resize framebuffer!\n", stderr);
     }

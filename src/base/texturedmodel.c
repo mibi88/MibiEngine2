@@ -84,3 +84,9 @@ int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos) {
     return GE_E_SUCCESS;
 }
 
+GETexture *ge_texturedmodel_get_texture(GEModel *model) {
+    GETexturedModel *texturedmodel =
+                                  model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL];
+    return texturedmodel->texture;
+}
+

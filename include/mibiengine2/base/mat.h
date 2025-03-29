@@ -162,6 +162,19 @@ void ge_mat4_scale3d(GEMat4 *mat, float x, float y, float z);
 void ge_mat4_projection3d(GEMat4 *mat, float fov, float aspect_ratio,
                           float far, float near);
 
+/* ge_mat4_ortho3d
+ *
+ * Create a 3D 4x4 orthographic projection matrix.
+ *
+ * mat:    The destination matrix.
+ * left:   The top left coordinates on the X axis.
+ * top:    The top left coordinates on the Y axis.
+ * right:  The bottom right coordinates on the X axis.
+ * bottom: The bottom right coordinates on the Y axis.
+ */
+void ge_mat4_ortho3d(GEMat4 *mat, float left, float top, float right,
+                     float bottom, float far, float near);
+
 /* ge_mat3_mat4
  *
  * Cast a 4x4 matrix to a 3x3 matrix (the top left half will be kept).

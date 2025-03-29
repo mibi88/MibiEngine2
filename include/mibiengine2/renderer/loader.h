@@ -47,6 +47,7 @@
 typedef struct {
     GEModel *model;
     GEStdShader *shader;
+    char textured;
 } GEModelRenderable;
 
 char *ge_loader_load_text(char *file, size_t *size_ptr);
@@ -55,7 +56,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
                        char *file, char **attr_names, char *tex_name);
 
 int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
-                               GEStdShader *shader);
+                               GEStdShader *shader, int textured);
 
 
 

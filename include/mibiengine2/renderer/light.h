@@ -45,7 +45,6 @@ typedef enum {
 } GELightType;
 
 typedef struct {
-    GEVec3 pos;
     GEVec3 color;
     float strength;
     GELightType type;
@@ -57,11 +56,10 @@ typedef struct {
  *
  * light: The light data.
  * type:  The light type (see GELightType).
- * pos:   The position of the light.
  * color: The color of the light.
  * Returns 0 on success or an error code on failure.
  */
-int ge_light_init(GELight *light, GELightType type, GEVec3 pos, GEVec3 color);
+int ge_light_init(GELight *light, GELightType type, GEVec3 color);
 
 /* ge_light_free
  *

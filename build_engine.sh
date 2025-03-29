@@ -89,7 +89,7 @@ for file in ${SRCFILES[@]}; do
         rc=$?
         if [ $rc -ne 0 ]; then
             echo "-- Build failed with return code $rc!"
-            exit 1
+            exit $rc
         fi
     else
         echo "-- Skipping $file: file already compiled..."

@@ -63,12 +63,7 @@ void _ge_scene_entity_update(void *_entity, void *_data) {
 }
 
 int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
-                  size_t light_max) {
-    size_t i, n;
-    int found;
-    GESceneEntityGroup *group;
-    void *new;
-    /* TODO: Optimize this */
+                  GEStdShader **shaders, size_t shader_num, size_t light_max) {
     scene->entity_group_num = 0;
     /* Initialize the entity group arena */
     if(ge_arena_init(&scene->entity_groups, GE_SCENE_ALLOC_STEP,
@@ -76,6 +71,22 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
         ge_scene_free(scene);
         return GE_E_ARENA_INIT;
     }
+    
+    ge_scene_add_entities(scene, entities, entity_num);
+    
+    scene->shaders = shaders;
+    scene->shader_num = shader_num;
+    scene->light_max = light_max;
+    return GE_E_SUCCESS;
+}
+
+int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
+                          size_t entity_num) {
+    size_t i, n;
+    int found;
+    GESceneEntityGroup *group;
+    void *new;
+    /* TODO: Optimize this */
     /* Add all the entities and renderables. Store the entity matrices
      * separately for faster rendering */
     for(i=0;i<entity_num;i++){
@@ -137,8 +148,17 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
         ge_entity_set_update_callback(new, _ge_scene_entity_update, scene);
         group->entity_num++;
     }
-    scene->light_max = light_max;
     return GE_E_SUCCESS;
+}
+
+void ge_scene_set_shaders(GEScene *scene, GEStdShader **shaders,
+                          size_t shader_num) {
+    scene->shaders = shaders;
+    scene->shader_num = shader_num;
+}
+
+void ge_scene_set_camera(GEScene *scene, GECamera *camera) {
+    scene->camera = camera;
 }
 
 GEEntity *ge_scene_get_same_entity(GEScene *scene, GEEntity *entity) {
@@ -156,9 +176,45 @@ GEEntity *ge_scene_get_same_entity(GEScene *scene, GEEntity *entity) {
     return NULL;
 }
 
+void ge_scene_for_entity(GEScene *scene,
+                         void on_entity(GEEntity *entity, void *data),
+                         void *data) {
+    size_t i, n;
+    GESceneEntityGroup *group;
+    for(i=0;i<scene->entity_group_num;i++){
+        group = ((GESceneEntityGroup*)scene->entity_groups.ptr)+i;
+        for(n=0;n<group->entity_num;n++){
+            on_entity((GEEntity*)group->entities.ptr+n, data);
+        }
+    }
+}
+
+void ge_scene_for_entity_with_renderable(GEScene *scene,
+                                         GERenderable *renderable,
+                                         void on_entity(GEEntity *entity,
+                                                        void *data),
+                                         void *data) {
+    size_t i, n;
+    GESceneEntityGroup *group;
+    for(i=0;i<scene->entity_group_num;i++){
+        group = ((GESceneEntityGroup*)scene->entity_groups.ptr)+i;
+        if(group->renderable == renderable){
+            for(n=0;n<group->entity_num;n++){
+                on_entity((GEEntity*)group->entities.ptr+n, data);
+            }
+            break;
+        }
+    }
+}
+
 void ge_scene_render(GEScene *scene) {
     size_t i;
     GESceneEntityGroup *group;
+    if(scene->camera){
+        for(i=0;i<scene->shader_num;i++){
+            ge_camera_use(scene->camera, scene->shaders[i]);
+        }
+    }
     for(i=0;i<scene->entity_group_num;i++){
         group = ((GESceneEntityGroup*)scene->entity_groups.ptr)+i;
         ge_renderable_render_multiple(group->renderable, group->model_mat.ptr,
