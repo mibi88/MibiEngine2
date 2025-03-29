@@ -61,6 +61,8 @@
 
 #define POSTPROCESSING 1
 
+#define ENTITIES 100
+
 #define EXIT(rc) {free_on_exit(); exit(rc);}
 
 unsigned long get_ms(void) {
@@ -96,9 +98,7 @@ GEStdShader stdshader;
 
 GEScene scene;
 GERenderable renderable;
-GEEntity entity;
-
-GEEntity *scene_entity;
+GEEntity entities[ENTITIES];
 
 GECamera camera;
 
@@ -124,7 +124,18 @@ void free_on_exit(void) {
     puts("Successfully freed everything!");
 }
 
+unsigned int seed = 77;
+
+unsigned int xorshift(unsigned int *seed) {
+    /* Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs" */
+    *seed ^= *seed << 13;
+    *seed ^= *seed >> 17;
+    *seed ^= *seed << 5;
+    return *seed;
+}
+
 void init(void) {
+    size_t i;
     GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
     GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
     char linear[2] = {1, 0};
@@ -205,16 +216,21 @@ void init(void) {
         EXIT(EXIT_FAILURE);
     }
     
-    if(ge_entity_init(&entity, &renderable)){
-        fputs("Failed to create entity!\n", stderr);
-        EXIT(EXIT_FAILURE);
+    for(i=0;i<ENTITIES;i++){
+        if(ge_entity_init(entities+i, &renderable)){
+            fputs("Failed to create entity!\n", stderr);
+            EXIT(EXIT_FAILURE);
+        }
+        ge_entity_set_position(entities+i,
+                               (xorshift(&seed)%256)/(float)256*4-2,
+                               (xorshift(&seed)%256)/(float)256*4-2,
+                               -2.2-((xorshift(&seed)%256)/(float)256));
+        ge_entity_set_scale(entities+i, 0.5, 0.5, 0.5);
+        ge_entity_update(entities+i);
     }
-    if(ge_scene_init(&scene, &entity, 1, scene_shaders, 1, 0)){
+    
+    if(ge_scene_init(&scene, entities, 10, scene_shaders, 1, 0)){
         fputs("Failed to create scene!\n", stderr);
-        EXIT(EXIT_FAILURE);
-    }
-    if((scene_entity = ge_scene_get_same_entity(&scene, &entity)) == NULL){
-        fputs("Failed to get entity!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
     if(ge_camera_init(&camera)){
@@ -226,6 +242,12 @@ void init(void) {
 }
 
 float x = 0;
+
+void rotate_entities(GEEntity *entity, void *data) {
+    (void)data;
+    ge_entity_set_rotation(entity, 0, x, 0);
+    ge_entity_update(entity);
+}
 
 void draw(void *data) {
     float delta;
@@ -244,9 +266,9 @@ void draw(void *data) {
     delta = (get_ms()-last_time)*0.001;
     last_time = get_ms();
     
-    ge_entity_set_position(scene_entity, 0, 0, -2.2);
-    ge_entity_set_rotation(scene_entity, 0, x, 0);
-    ge_entity_update(scene_entity);
+    ge_scene_for_entity(&scene, rotate_entities, NULL);
+    
+    ge_scene_update(&scene);
     
     ge_scene_render(&scene);
     

@@ -83,6 +83,8 @@ void ge_scene_for_entity_with_renderable(GEScene *scene,
                                                         void *data),
                                          void *data);
 
+void ge_scene_update(GEScene *scene);
+
 void ge_scene_render(GEScene *scene);
 
 void ge_scene_free(GEScene *scene);
