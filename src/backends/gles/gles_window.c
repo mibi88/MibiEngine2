@@ -39,11 +39,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <EGL/eglplatform.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include <mibiengine2/base/config.h>
 
@@ -181,7 +183,8 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
                                     "WM_DELETE_WINDOW", False);
     XSetWMProtocols(window->platform.display, *win, wm_delete_window, 1);
     XSelectInput(window->platform.display, *win,
-                 ExposureMask | StructureNotifyMask);
+                 ExposureMask | StructureNotifyMask | KeyPressMask |
+                 KeyReleaseMask);
     XStoreName(window->platform.display, *win, title);
     XMapWindow(window->platform.display, *win);
     XFlush(window->platform.display);
@@ -246,6 +249,9 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_TEXTURE_2D);
+    
+    memset(window->platform.keys_down, 0, GE_K_AMOUNT);
+    
     window->draw = NULL;
     window->resize = NULL;
     return GE_E_SUCCESS;
@@ -268,8 +274,165 @@ int _ge_gles_window_cap_framerate(GEWindow *window, int cap) {
                            cap ? 1 : 0) == GL_TRUE;
 }
 
+void _ge_gles_window_depth_test(GEWindow *window, int depth_test) {
+    (void)window;
+    if(depth_test) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+}
+
+unsigned long _ge_gles_window_ms(GEWindow *window) {
+    struct timespec time;
+    (void)window;
+    clock_gettime(CLOCK_REALTIME, &time);
+    return time.tv_nsec/(1e6)+time.tv_sec*1000;
+}
+
+int _ge_gles_window_key_pressed(GEWindow *window, GEKey key) {
+    if(key >= 0 && key < GE_K_AMOUNT){
+        return window->platform.keys_down[key];
+    }
+    return 0;
+}
+
 void _ge_gles_window_mainloop(GEWindow *window) {
     XEvent event;
+    KeySym xlib_keys[GE_K_AMOUNT] = {
+        XK_VoidSymbol,
+        
+        XK_Escape,
+        XK_F1,
+        XK_F2,
+        XK_F3,
+        XK_F4,
+        XK_F5,
+        XK_F6,
+        XK_F7,
+        XK_F8,
+        XK_F9,
+        XK_F10,
+        XK_F11,
+        XK_F12,
+        XK_Insert,
+        XK_Delete,
+        XK_Tab,
+        XK_Caps_Lock,
+        XK_Shift_L,
+        XK_Control_L,
+        XK_Super_L,
+        XK_Alt_L,
+        XK_Alt_R,
+        XK_Control_R,
+        XK_Return,
+        XK_BackSpace,
+        XK_Up,
+        XK_Down,
+        XK_Left,
+        XK_Right,
+        XK_Page_Up,
+        XK_Page_Down,
+        XK_Home,
+        XK_End,
+        
+        XK_space,
+        XK_exclam,
+        XK_quotedbl,
+        XK_numbersign,
+        XK_dollar,
+        XK_percent,
+        XK_ampersand,
+        XK_apostrophe,
+        XK_parenleft,
+        XK_parenright,
+        XK_asterisk,
+        XK_plus,
+        XK_comma,
+        XK_minus,
+        XK_period,
+        XK_slash,
+        XK_0,
+        XK_1,
+        XK_2,
+        XK_3,
+        XK_4,
+        XK_5,
+        XK_6,
+        XK_7,
+        XK_8,
+        XK_9,
+        XK_colon,
+        XK_semicolon,
+        XK_less,
+        XK_equal,
+        XK_greater,
+        XK_question,
+        XK_at,
+        XK_A,
+        XK_B,
+        XK_C,
+        XK_D,
+        XK_E,
+        XK_F,
+        XK_G,
+        XK_H,
+        XK_I,
+        XK_J,
+        XK_K,
+        XK_L,
+        XK_M,
+        XK_N,
+        XK_O,
+        XK_P,
+        XK_Q,
+        XK_R,
+        XK_S,
+        XK_T,
+        XK_U,
+        XK_V,
+        XK_W,
+        XK_X,
+        XK_Y,
+        XK_Z,
+        XK_bracketleft,
+        XK_backslash,
+        XK_bracketright,
+        XK_asciicircum,
+        XK_underscore,
+        XK_quoteleft,
+        XK_a,
+        XK_b,
+        XK_c,
+        XK_d,
+        XK_e,
+        XK_f,
+        XK_g,
+        XK_h,
+        XK_i,
+        XK_j,
+        XK_k,
+        XK_l,
+        XK_m,
+        XK_n,
+        XK_o,
+        XK_p,
+        XK_q,
+        XK_r,
+        XK_s,
+        XK_t,
+        XK_u,
+        XK_v,
+        XK_w,
+        XK_x,
+        XK_y,
+        XK_z,
+        XK_braceleft,
+        XK_bar,
+        XK_braceright,
+        XK_asciitilde,
+        XK_nobreakspace
+    };
+    size_t i;
+    KeySym keysym;
+    
     while(1){
         if(XPending(window->platform.display)){
             XNextEvent(window->platform.display, &event);
@@ -285,6 +448,24 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     if(window->resize != NULL){
                         window->resize(window->data, event.xconfigure.width,
                                        event.xconfigure.height);
+                    }
+                    break;
+                case KeyPress:
+                    keysym = XLookupKeysym(&event.xkey, 0);
+                    for(i=0;i<GE_K_AMOUNT;i++){
+                        if(keysym == xlib_keys[i]){
+                            window->platform.keys_down[i] = 1;
+                            break;
+                        }
+                    }
+                    break;
+                case KeyRelease:
+                    keysym = XLookupKeysym(&event.xkey, 0);
+                    for(i=0;i<GE_K_AMOUNT;i++){
+                        if(keysym == xlib_keys[i]){
+                            window->platform.keys_down[i] = 0;
+                            break;
+                        }
                     }
                     break;
                 default:

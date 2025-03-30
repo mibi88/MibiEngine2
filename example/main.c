@@ -204,7 +204,7 @@ void init(void) {
         fputs("Failed to init camera!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    ge_camera_perspective(&camera, 72, 480/(float)360, 1000, 1);
+    ge_camera_perspective(&camera, 72, 480/(float)360, 1000, 0.1);
     ge_scene_set_camera(&scene, &camera);
     
 #if POSTPROCESSING
@@ -257,6 +257,20 @@ void draw(void *data) {
     delta = (get_ms()-last_time)*0.001;
     last_time = get_ms();
     
+    if(ge_window_key_pressed(&window, GE_K_UP)){
+        camera.position.z += 2*delta;
+    }
+    if(ge_window_key_pressed(&window, GE_K_DOWN)){
+        camera.position.z -= 2*delta;
+    }
+    /*if(ge_window_key_pressed(&window, GE_K_LEFT)){
+        camera.rotation.y += delta;
+    }
+    if(ge_window_key_pressed(&window, GE_K_RIGHT)){
+        camera.rotation.y -= delta;
+    }*/
+    ge_camera_update(&camera);
+    
     ge_scene_for_entity(&scene, rotate_entities, NULL);
     
     ge_scene_update(&scene);
@@ -277,7 +291,7 @@ void draw(void *data) {
 void resize(void *data, int w, int h) {
     (void)data;
     ge_window_view(&window, w, h);
-    ge_camera_perspective(&camera, 72, w/(float)h, 1000, 1);
+    ge_camera_perspective(&camera, 72, w/(float)h, 1000, 0.1);
 #if POSTPROCESSING
     if(ge_framebuffer_resize(&framebuffer, w, h)){
         fputs("Failed to resize framebuffer!\n", stderr);

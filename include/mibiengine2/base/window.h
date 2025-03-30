@@ -35,6 +35,8 @@
 #ifndef GE_WINDOW_H
 #define GE_WINDOW_H
 
+#include <mibiengine2/base/keys.h>
+
 #define GE_WINDOW_DEBUG 0
 
 typedef struct {
@@ -52,6 +54,7 @@ typedef struct {
         void *display;
         void *window;
         void *wm_delete_window;
+        char keys_down[GE_K_AMOUNT];
     } platform;
     /* Callbacks to handle various events */
     void (*draw)(void *data);
@@ -104,6 +107,35 @@ int ge_window_set_data(GEWindow *window, void *data);
  * Returns 0 on success or an error code on failure.
  */
 int ge_window_cap_framerate(GEWindow *window, int cap);
+
+/* ge_window_depth_test
+ *
+ * Enable or disable depth test.
+ *
+ * window:     The window struct.
+ * depth_test: 0 if depth test should be disabled, a non zero value if it
+ *             should be enabled.
+ */
+void ge_window_depth_test(GEWindow *window, int depth_test);
+
+/* ge_window_ms
+ *
+ * Get the elapsed miliseconds.
+ *
+ * window: The window struct.
+ * Returns the number of elapsed miliseconds.
+ */
+unsigned long ge_window_ms(GEWindow *window);
+
+/* ge_window_key_pressed
+ *
+ * Check if a key is currently pressed.
+ *
+ * window: The window struct.
+ * key:    The key to check if it is pressed.
+ * Returns 0 if the key isn't pressed or a non-zero value if it is pressed.
+ */
+int ge_window_key_pressed(GEWindow *window, GEKey key);
 
 /* ge_window_mainloop
  *

@@ -36,7 +36,7 @@
 NAME=MibiEngine2
 VERSION="v.0.1"
 SRCFILES=(src/backends/*.c src/backends/gles/*.c
-          src/base/*.c src/renderer/*.c)
+          src/base/*.c src/renderer/*.c src/render2d/*.c)
 CC=cc
 AR=ar
 DEST=build

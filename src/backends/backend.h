@@ -98,6 +98,9 @@ typedef struct {
                                 void (*resize)(void *data, int w, int h));
     int (*window_set_data)(GEWindow *window, void *data);
     int (*window_cap_framerate)(GEWindow *window, int cap);
+    void (*window_depth_test)(GEWindow *window, int depth_test);
+    unsigned long (*window_ms)(GEWindow *window);
+    int (*window_key_pressed)(GEWindow *window, GEKey key);
     void (*window_mainloop)(GEWindow *window);
     void (*window_clear)(GEWindow *window, float r, float g, float b, float a);
     void (*window_view)(GEWindow *window, int w, int h);

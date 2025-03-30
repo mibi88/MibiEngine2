@@ -89,6 +89,9 @@ int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
                                   void (*resize)(void *data, int w, int h));
 int _ge_gles_window_set_data(GEWindow *window, void *data);
 int _ge_gles_window_cap_framerate(GEWindow *window, int cap);
+void _ge_gles_window_depth_test(GEWindow *window, int depth_test);
+unsigned long _ge_gles_window_ms(GEWindow *window);
+int _ge_gles_window_key_pressed(GEWindow *window, GEKey key);
 void _ge_gles_window_mainloop(GEWindow *window);
 void _ge_gles_window_clear(GEWindow *window, float r, float g, float b,
                            float a);

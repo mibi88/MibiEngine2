@@ -32,58 +32,5 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/window.h>
-
-#define _POSIX_C_SOURCE 199309L
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <backendlist.h>
-
-#include <mibiengine2/base/config.h>
-
-int ge_window_init(GEWindow *window, char *title) {
-    return GE_BACKENDLIST_GET(window_init)(window, title);
-}
-
-int ge_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
-                            void (*resize)(void *data, int w, int h)){
-    return GE_BACKENDLIST_GET(window_set_callbacks)(window, draw, resize);
-}
-
-int ge_window_set_data(GEWindow *window, void *data) {
-    return GE_BACKENDLIST_GET(window_set_data)(window, data);
-}
-
-int ge_window_cap_framerate(GEWindow *window, int cap) {
-    return GE_BACKENDLIST_GET(window_cap_framerate)(window, cap);
-}
-
-void ge_window_depth_test(GEWindow *window, int depth_test) {
-    GE_BACKENDLIST_GET(window_depth_test)(window, depth_test);
-}
-
-unsigned long ge_window_ms(GEWindow *window) {
-    return GE_BACKENDLIST_GET(window_ms)(window);
-}
-
-int ge_window_key_pressed(GEWindow *window, GEKey key) {
-    return GE_BACKENDLIST_GET(window_key_pressed)(window, key);
-}
-
-void ge_window_mainloop(GEWindow *window) {
-    GE_BACKENDLIST_GET(window_mainloop)(window);
-}
-
-void ge_window_clear(GEWindow *window, float r, float g, float b, float a) {
-    GE_BACKENDLIST_GET(window_clear)(window, r, g, b, a);
-}
-
-void ge_window_view(GEWindow *window, int w, int h) {
-    GE_BACKENDLIST_GET(window_view)(window, w, h);
-}
-
-void ge_window_free(GEWindow *window) {
-    GE_BACKENDLIST_GET(window_free)(window);
-}
+#include <mibiengine2/render2d/sprite.h>
 

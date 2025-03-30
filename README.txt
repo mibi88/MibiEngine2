@@ -65,7 +65,7 @@ All the documentation is in the header files in include/mibiengine2
     before rendering.
 [ ] Use arenas as much as possible when needing to allocate memory when loading
     stuff for cleaner code.
-[ ] Entities and scenes for easier usage.
+[x] Entities and scenes for easier usage.
 [ ] Make correct lighting, support multiple lights and load them to the shader
     as uniforms when rendering a scene.
 [ ] Postprocessing
