@@ -43,6 +43,10 @@ void _ge_texturedmodel_before_rendering(void *model, GEModelAttr *attr,
     GETexturedModel *texturedmodel = extra;
     (void)model;
     (void)attr;
+    if(texturedmodel->uv_max_pos){
+        ge_shader_load_vec2(texturedmodel->uv_max_pos,
+                            &texturedmodel->texture->uv_max);
+    }
     if(texturedmodel->tex_pos){
         /* Use the first texture unit */
         ge_texture_use(texturedmodel->texture, texturedmodel->tex_pos, 0);
@@ -77,10 +81,12 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
     return GE_E_SUCCESS;
 }
 
-int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos) {
+int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos,
+                                 GEShaderPos *uv_max_pos) {
     GETexturedModel *texturedmodel =
                                   model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL];
     texturedmodel->tex_pos = tex_pos;
+    texturedmodel->uv_max_pos = uv_max_pos;
     return GE_E_SUCCESS;
 }
 

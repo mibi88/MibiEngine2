@@ -61,7 +61,7 @@ All the documentation is in the header files in include/mibiengine2
 
     TODO
 
-[ ] Store the position of the uv max uniform in the GETexturedModel to load it
+[x] Store the position of the uv max uniform in the GETexturedModel to load it
     before rendering.
 [ ] Use arenas as much as possible when needing to allocate memory when loading
     stuff for cleaner code.

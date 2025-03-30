@@ -43,6 +43,7 @@
 typedef struct {
     GETexture *texture;
     GEShaderPos *tex_pos;
+    GEShaderPos *uv_max_pos;
 } GETexturedModel;
 
 /* ge_texturedmodel_init
@@ -71,11 +72,16 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
  *
  * Set the position of the texture sampler in the shader used with this model.
  *
- * model:   The model to set the texture position to.
- * tex_pos: The texture sampler position.
+ * model:      The model to set the texture position to.
+ * tex_pos:    The texture sampler position.
+ * uv_max_pos: The position of the UV max. uniform. Textures are square and
+ *             power of two sized. When the image they contain isn't square,
+ *             (or power of two sized) the UV coordinates need to be adapted to
+ *             use the correct part of the texture.
  * Returns 0 on success or an error code on failure.
  */
-int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos);
+int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos,
+                                 GEShaderPos *uv_max_pos);
 
 /* ge_texturedmodel_get_texture
  *
