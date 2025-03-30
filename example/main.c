@@ -32,12 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _POSIX_C_SOURCE 199309L
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include <mibiengine2/base/mat.h>
 #include <mibiengine2/base/window.h>
@@ -65,16 +62,7 @@
 
 #define EXIT(rc) {free_on_exit(); exit(rc);}
 
-unsigned long get_ms(void) {
-    struct timespec time;
-    clock_gettime(CLOCK_REALTIME, &time);
-    return time.tv_nsec/(1e6)+time.tv_sec*1000;
-}
-
 GEShaderPos fb_size_pos;
-
-GEMat4 projection_mat, view_mat, model_mat;
-GEMat3 normal_mat;
 
 unsigned long last_time = 0;
 
@@ -102,8 +90,6 @@ GECamera camera;
 GEStdShader *scene_shaders[] = {
     &stdshader
 };
-
-/* TODO: Fix memory leaks */
 
 void free_on_exit(void) {
     puts("Free everything!");
@@ -150,7 +136,7 @@ void init(void) {
     };
 #endif
     char *log;
-    last_time = get_ms();
+    last_time = ge_window_ms(&window);
     
     if((log = ge_loader_load_shader(&shader, "shaders/vertex_3d.vert",
                                     "shaders/fragment_3d.frag")) != NULL){
@@ -163,8 +149,6 @@ void init(void) {
         fputs("Failed to create stdshader!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    
-    ge_mat4_identity(&view_mat);
     
     ge_shader_use(&shader);
     
@@ -242,6 +226,7 @@ void rotate_entities(GEEntity *entity, void *data) {
 
 void draw(void *data) {
     float delta;
+    unsigned long now, diff;
     (void)data;
     
     /* Render everything */
@@ -251,11 +236,14 @@ void draw(void *data) {
 #endif
     ge_window_clear(&window, 0, 0, 0, 1);
     
+    now = ge_window_ms(&window);
+    diff = now-last_time;
+    delta = diff*0.001;
+    last_time = now;
+    
 #if PRINT_MS
-    printf("%ld      \r", get_ms()-last_time);
+    printf("%lu      \r", diff);
 #endif
-    delta = (get_ms()-last_time)*0.001;
-    last_time = get_ms();
     
     if(ge_window_key_pressed(&window, GE_K_UP)){
         camera.position.z += 2*delta;
