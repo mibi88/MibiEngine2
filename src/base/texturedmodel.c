@@ -53,6 +53,12 @@ void _ge_texturedmodel_before_rendering(void *model, GEModelAttr *attr,
     }
 }
 
+void _ge_textured_after_free(void *_model, void *extra) {
+    GEModel *model = _model;
+    free(extra);
+    model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL] = NULL;
+}
+
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
@@ -67,7 +73,7 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
         return GE_E_STDMODEL_INIT;
     }
     if(ge_model_set_callbacks(model, _ge_texturedmodel_before_rendering, NULL,
-                              NULL, NULL, 1)){
+                              NULL, _ge_textured_after_free, 1)){
         ge_model_free(model);
         free(texturedmodel);
         return GE_E_SET_CALLBACKS;
