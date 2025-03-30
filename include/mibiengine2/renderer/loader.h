@@ -43,6 +43,7 @@
 #include <mibiengine2/base/obj.h>
 #include <mibiengine2/renderer/renderable.h>
 #include <mibiengine2/renderer/stdshader.h>
+#include <mibiengine2/renderer/light.h>
 
 typedef struct {
     GEModel *model;
@@ -52,13 +53,18 @@ typedef struct {
 
 char *ge_loader_load_text(char *file, size_t *size_ptr);
 
-int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
-                       char *file, char **attr_names, char *tex_name);
+int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
+                          GETexture *texture, char *file);
 
 int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
                                GEStdShader *shader, int textured);
 
+int ge_loader_load_obj_as_renderable(GERenderable *renderable,
+                                     GEStdShader *shader, GETexture *texture,
+                                     char *file);
 
+int ge_loader_light_renderable(GERenderable *renderable, GELight *light,
+                               GEStdShader *shader);
 
 char *ge_loader_load_shader(GEShader *shader, char *vertex_file,
                             char *fragment_file);

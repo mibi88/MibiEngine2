@@ -49,6 +49,8 @@ int ge_stdshader_init(GEStdShader *stdshader, GEShader *shader) {
     stdshader->light_color = ge_shader_get_pos(shader,
                                                GE_STDSHADER_LIGHT_COLOR);
     stdshader->light_num = ge_shader_get_pos(shader, GE_STDSHADER_LIGHT_NUM);
+    
+    stdshader->texture = ge_shader_get_pos(shader, GE_STDSHADER_TEXTURE);
     return GE_E_SUCCESS;
 }
 

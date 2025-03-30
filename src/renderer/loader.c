@@ -67,11 +67,10 @@ char *ge_loader_load_text(char *file, size_t *size_ptr) {
 }
 
 int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
-                       char *file, char **attr_names, char *tex_name) {
+                       char *file, char **attr_names, GEShaderPos *tex_pos) {
     void *data;
     size_t size;
     GEObj obj;
-    GEShaderPos tex_pos;
     
     data = ge_loader_load_text(file, &size);
     if(data == NULL) return GE_E_FILE;
@@ -118,8 +117,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
         free(data);
         return GE_E_STDMODEL_ADD;
     }
-    tex_pos = ge_shader_get_pos(shader, tex_name);
-    if(ge_texturedmodel_set_texture(model, &tex_pos)){
+    if(ge_texturedmodel_set_texture(model, tex_pos)){
         ge_model_free(model);
         ge_obj_free(&obj);
         free(data);
@@ -128,6 +126,18 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
     ge_obj_free(&obj);
     free(data);
     return GE_E_SUCCESS;
+}
+
+int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
+                          GETexture *texture, char *file) {
+    char *attr_names[] = {
+        "vertex",
+        "color",
+        "uv",
+        "normal"
+    };
+    return ge_loader_load_obj(model, shader->shader, texture, file, attr_names,
+                              &shader->texture);
 }
 
 void _ge_loader_model_render(void *data, GEMat4 *mat, GEMat3 *normal_mat) {
@@ -168,6 +178,12 @@ void _ge_loader_model_free(void *data) {
     ge_model_free(model->model);
 }
 
+void _ge_loader_model_as_renderable_free(void *data) {
+    GEModelRenderable *model = data;
+    ge_model_free(model->model);
+    free(model->model);
+}
+
 int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
                                GEStdShader *shader, int textured) {
     GEModelRenderable *data;
@@ -178,9 +194,47 @@ int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
     data->model = model;
     data->shader = shader;
     data->textured = textured;
-    ge_renderable_init(renderable, data, _ge_loader_model_render,
+    ge_renderable_init(renderable, data, 0, _ge_loader_model_render,
                        _ge_loader_model_render_multiple,
                        _ge_loader_model_free);
+    return GE_E_SUCCESS;
+}
+
+int ge_loader_load_obj_as_renderable(GERenderable *renderable,
+                                     GEStdShader *shader, GETexture *texture,
+                                     char *file) {
+    GEModel *model;
+    GEModelRenderable *data;
+    int rc;
+    model = malloc(sizeof(GEModel));
+    if(model == NULL){
+        return GE_E_OUT_OF_MEM;
+    }
+    data = malloc(sizeof(GEModelRenderable));
+    if(data == NULL){
+        free(model);
+        return GE_E_OUT_OF_MEM;
+    }
+    if((rc = ge_loader_load_stdobj(model, shader, texture, file))){
+        free(model);
+        free(data);
+        return rc;
+    }
+    data->model = model;
+    data->shader = shader;
+    data->textured = texture != NULL;
+    ge_renderable_init(renderable, data, 0, _ge_loader_model_render,
+                       _ge_loader_model_render_multiple,
+                       _ge_loader_model_as_renderable_free);
+    return GE_E_SUCCESS;
+}
+
+int ge_loader_light_renderable(GERenderable *renderable, GELight *light,
+                               GEStdShader *shader) {
+    (void)renderable;
+    (void)light;
+    (void)shader;
+    /* TODO */
     return GE_E_SUCCESS;
 }
 

@@ -61,7 +61,7 @@
 
 #define POSTPROCESSING 1
 
-#define ENTITIES 1000
+#define ENTITIES 10
 
 #define EXIT(rc) {free_on_exit(); exit(rc);}
 
@@ -71,11 +71,6 @@ unsigned long get_ms(void) {
     return time.tv_nsec/(1e6)+time.tv_sec*1000;
 }
 
-GEShaderPos projection_mat_pos, view_mat_pos, model_mat_pos;
-GEShaderPos normal_mat_pos;
-GEShaderPos uv_max_pos;
-GEShaderPos model_tex_pos;
-
 GEShaderPos fb_size_pos;
 
 GEMat4 projection_mat, view_mat, model_mat;
@@ -84,15 +79,17 @@ GEMat3 normal_mat;
 unsigned long last_time = 0;
 
 GEWindow window;
-GEObj obj;
 GEShader shader;
+#if POSTPROCESSING
 GEShader fb_shader;
-GEModel model;
+#endif
 
 GEImage image;
 GETexture texture;
 
+#if POSTPROCESSING
 GEFramebuffer framebuffer;
+#endif
 
 GEStdShader stdshader;
 
@@ -112,13 +109,14 @@ void free_on_exit(void) {
     puts("Free everything!");
     ge_scene_free(&scene);
     ge_renderable_free(&renderable);
-    ge_obj_free(&obj);
     ge_texture_free(&texture);
     ge_image_free(&image);
     ge_shader_free(&shader);
+#if POSTPROCESSING
     ge_shader_free(&fb_shader);
-    ge_stdshader_free(&stdshader);
     ge_framebuffer_free(&framebuffer);
+#endif
+    ge_stdshader_free(&stdshader);
     ge_camera_free(&camera);
     ge_window_free(&window);
     puts("Successfully freed everything!");
@@ -136,6 +134,7 @@ unsigned int xorshift(unsigned int *seed) {
 
 void init(void) {
     size_t i;
+#if POSTPROCESSING
     GEColor colors[2] = {GE_C_RGBA, GE_C_RGBA};
     GETexType tex_types[2] = {GE_TEX_COLOR, GE_TEX_DEPTH};
     char linear[2] = {1, 0};
@@ -149,12 +148,7 @@ void init(void) {
         "color",
         "depth"
     };
-    char *model_attr_names[] = {
-        "vertex",
-        "color",
-        "uv",
-        "normal"
-    };
+#endif
     char *log;
     last_time = get_ms();
     
@@ -164,35 +158,13 @@ void init(void) {
         fputs("Failed to load shader!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if((log = ge_loader_load_shader(&fb_shader, "shaders/vertex_fb.vert",
-                                    "shaders/fragment_fb.frag")) != NULL){
-        puts(log);
-        fputs("Failed to load shader!\n", stderr);
-        EXIT(EXIT_FAILURE);
-    }
+    
     if(ge_stdshader_init(&stdshader, &shader)){
         fputs("Failed to create stdshader!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    uv_max_pos = ge_shader_get_pos(&shader, "uv_max");
-    model_tex_pos = ge_shader_get_pos(&shader, "tex");
-    
-    fb_size_pos = ge_shader_get_pos(&fb_shader, "size");
     
     ge_mat4_identity(&view_mat);
-    
-    ge_shader_use(&fb_shader);
-    
-    if(ge_framebuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
-                           linear)){
-        fputs("Failed to initialize framebuffer!\n", stderr);
-        EXIT(EXIT_FAILURE);
-    }
-    if(ge_framebuffer_attr(&framebuffer, &fb_shader, fb_attr_names, tex_names,
-                           &fb_size_pos)){
-        fputs("Failed to initialize framebuffer attr!\n", stderr);
-        EXIT(EXIT_FAILURE);
-    }
     
     ge_shader_use(&shader);
     
@@ -205,14 +177,9 @@ void init(void) {
         EXIT(EXIT_FAILURE);
     }
     
-    if(ge_loader_load_obj(&model, &shader, &texture, "spot.obj",
-                          model_attr_names, "tex")){
-        fputs("Failed to load model!\n", stderr);
-        EXIT(EXIT_FAILURE);
-    }
-    
-    if(ge_loader_model_renderable(&renderable, &model, &stdshader, 1)){
-        fputs("Failed to create renderable!\n", stderr);
+    if(ge_loader_load_obj_as_renderable(&renderable, &stdshader, &texture,
+                                        "spot.obj")){
+        fputs("Failed to load model as renderable!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
     
@@ -239,6 +206,30 @@ void init(void) {
     }
     ge_camera_perspective(&camera, 72, 480/(float)360, 1000, 1);
     ge_scene_set_camera(&scene, &camera);
+    
+#if POSTPROCESSING
+    if((log = ge_loader_load_shader(&fb_shader, "shaders/vertex_fb.vert",
+                                    "shaders/fragment_fb.frag")) != NULL){
+        puts(log);
+        fputs("Failed to load shader!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    fb_size_pos = ge_shader_get_pos(&fb_shader, "size");
+    
+    ge_shader_use(&fb_shader);
+    
+    if(ge_framebuffer_init(&framebuffer, 480, 360, 2, colors, tex_types,
+                           linear)){
+        fputs("Failed to initialize framebuffer!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_framebuffer_attr(&framebuffer, &fb_shader, fb_attr_names, tex_names,
+                           &fb_size_pos)){
+        fputs("Failed to initialize framebuffer attr!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+#endif
 }
 
 float x = 0;
@@ -287,9 +278,11 @@ void resize(void *data, int w, int h) {
     (void)data;
     ge_window_view(&window, w, h);
     ge_camera_perspective(&camera, 72, w/(float)h, 1000, 1);
+#if POSTPROCESSING
     if(ge_framebuffer_resize(&framebuffer, w, h)){
         fputs("Failed to resize framebuffer!\n", stderr);
     }
+#endif
     printf("Window resized to %dx%d\n", w, h);
 }
 

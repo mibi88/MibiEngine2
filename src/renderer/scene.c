@@ -60,10 +60,17 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
     return GE_E_SUCCESS;
 }
 
+int _ge_scene_sort_groups(const void *_group1, const void *_group2) {
+    const GESceneEntityGroup *group1 = _group1;
+    const GESceneEntityGroup *group2 = _group2;
+    return group2->renderable->priority-group1->renderable->priority;
+}
+
 int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
                           size_t entity_num) {
     size_t i, n;
     int found;
+    int group_added = 0;
     GESceneEntityGroup *group;
     void *new;
     /* TODO: Optimize this */
@@ -83,6 +90,10 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
             /* Add an entity group */
             group = ge_arena_alloc(&scene->entity_groups,
                                    sizeof(GESceneEntityGroup));
+            if(group == NULL){
+                ge_scene_free(scene);
+                return GE_E_ARENA_ALLOC;
+            }
             group->entity_num = 0;
             group->renderable = entities[i].data;
             if(ge_arena_init(&group->model_mat, GE_SCENE_ALLOC_STEP,
@@ -104,6 +115,7 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
                 return GE_E_ARENA_INIT;
             }
             scene->entity_group_num++;
+            group_added = 1;
         }
         /* Add the entity to the entity group pointed to by group */
         new = ge_arena_alloc(&group->model_mat, sizeof(GEMat4));
@@ -125,6 +137,11 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
         }
         *(GEEntity*)new = entities[i];
         group->entity_num++;
+    }
+    if(group_added){
+        /* Sort the entity groups by renderable priority */
+        qsort(scene->entity_groups.ptr, scene->entity_group_num,
+              sizeof(GESceneEntityGroup), _ge_scene_sort_groups);
     }
     return GE_E_SUCCESS;
 }

@@ -37,6 +37,8 @@
 
 #include <mibiengine2/base/shader.h>
 
+#include <stddef.h>
+
 #define GE_STDSHADER_VERTEX "ge_vertex"
 #define GE_STDSHADER_COLOR "ge_color"
 #define GE_STDSHADER_UV "ge_uv"
@@ -53,6 +55,8 @@
 #define GE_STDSHADER_LIGHT_COLOR "ge_light_color"
 #define GE_STDSHADER_LIGHT_NUM "ge_light_num"
 
+#define GE_STDSHADER_TEXTURE "ge_texture"
+
 typedef struct {
     GEShader *shader;
     GEShaderPos projection_mat;
@@ -65,6 +69,11 @@ typedef struct {
     GEShaderPos light_pos;
     GEShaderPos light_color;
     GEShaderPos light_num;
+    
+    GEShaderPos texture;
+    
+    size_t light_max;
+    size_t lights_loaded;
 } GEStdShader;
 
 int ge_stdshader_init(GEStdShader *stdshader, GEShader *shader);

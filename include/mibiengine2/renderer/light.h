@@ -36,6 +36,7 @@
 #define GE_LIGHT_H
 
 #include <mibiengine2/base/mat.h>
+#include <mibiengine2/renderer/stdshader.h>
 
 typedef enum {
     GE_L_POINT,
@@ -48,6 +49,7 @@ typedef struct {
     GEVec3 color;
     float strength;
     GELightType type;
+    GEStdShader *shader;
 } GELight;
 
 /* ge_light_init
