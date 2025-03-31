@@ -34,7 +34,7 @@
 
 enum {
     /* Base */
-    GE_E_SUCCESS,
+    GE_E_NONE,
     GE_E_OUT_OF_MEM,
     GE_E_STDMODEL_INIT,
     GE_E_STDMODEL_ADD,

@@ -45,7 +45,7 @@ int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max) {
     arena->max = max;
     arena->alloc_step = alloc_step;
     arena->size = 0;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void *ge_arena_alloc(GEArena *arena, size_t size) {

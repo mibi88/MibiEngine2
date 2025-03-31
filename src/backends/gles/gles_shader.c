@@ -38,11 +38,35 @@
 #include <stddef.h>
 
 #include <mibiengine2/errors.h>
+#include <mibiengine2/base/shadertree.h>
+
+#include <stdio.h>
 
 char *_ge_gles_shader_init(GEShader *shader, char *vertex_source,
                            char *fragment_source) {
     static char log[GE_SHADER_LOG_SIZE];
     int success;
+    char *errors[GE_S_E_AMOUNT] = {
+        "No error",
+    };
+    GEShaderTree tree;
+    
+    if(ge_shadertree_init(&tree)){
+        return "Failed to create shader tree";
+    }
+    
+    if(ge_shadertree_load(&tree, vertex_source)){
+        ge_shadertree_free(&tree);
+        sprintf(log, "%lu: %s\n", tree.error_line, errors[tree.error_code]);
+        return log;
+    }
+    
+    /* Generate backend specific shader code from shader tree */
+    /* TODO */
+    
+    ge_shadertree_free(&tree);
+    
+    /* Load the shader */
     shader->shader_program = glCreateProgram();
     shader->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(shader->vertex_shader, 1,

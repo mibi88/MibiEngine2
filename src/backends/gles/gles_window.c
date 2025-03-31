@@ -254,19 +254,19 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     
     window->draw = NULL;
     window->resize = NULL;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
                                   void (*resize)(void *data, int w, int h)) {
     window->draw = draw;
     window->resize = resize;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_window_set_data(GEWindow *window, void *data) {
     window->data = data;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_window_cap_framerate(GEWindow *window, int cap) {

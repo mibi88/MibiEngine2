@@ -84,7 +84,7 @@ int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
     model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL+1] = extra;
     texturedmodel->texture = texture;
     texturedmodel->tex_pos = NULL;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos,
@@ -93,7 +93,7 @@ int ge_texturedmodel_set_texture(GEModel *model, GEShaderPos *tex_pos,
                                   model->extra[GE_TEXTUREDMODEL_INHERIT_LEVEL];
     texturedmodel->tex_pos = tex_pos;
     texturedmodel->uv_max_pos = uv_max_pos;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 GETexture *ge_texturedmodel_get_texture(GEModel *model) {

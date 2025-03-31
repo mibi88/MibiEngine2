@@ -52,7 +52,7 @@ typedef struct {
  * alloc_step: The number of bytes to allocate when extending the array.
  * max:        The numbers of bytes to allocate on initialization for later
  *             use.
- * Returns GE_E_SUCCESS (0) on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max);
 

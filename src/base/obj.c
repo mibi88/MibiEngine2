@@ -464,7 +464,7 @@ int ge_obj_init(GEObj *obj, char *data, size_t size) {
 #if GE_OBJ_DEBUG
     puts("-- MODEL LOADED SUCCESSFULLY");
 #endif
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_obj_free(GEObj *obj) {

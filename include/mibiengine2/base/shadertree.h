@@ -32,61 +32,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/modelarray.h>
+#ifndef GE_SHADERTREE_H
+#define GE_SHADERTREE_H
 
-#include <GLES2/gl2.h>
+#include <mibiengine2/base/arena.h>
 
-#include <mibiengine2/errors.h>
+#define GE_SHADERTREE_ALLOC_STEP 512
 
-int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
-                             size_t size, size_t item_size) {
-    /* TODO: Support updating the buffer */
-    array->data = data;
-    array->type = type;
-    array->size = size;
-    array->item_size = item_size;
-    array->current_attr = NULL;
-    
-    glGenBuffers(1, &array->vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
-    glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[type],
-                 data, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    return GE_E_NONE;
-}
+typedef struct {
+    GEArena tokens;
+    GEArena token_strings;
+    GEArena token_types;
+    GEArena macro_expansions;
+    GEArena comments;
+    size_t token_num;
+    size_t error_line;
+    unsigned char error_code;
+} GEShaderTree;
 
-int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr) {
-    int gl_types[GE_T_AMOUNT] = {
-        0,
-        GL_BYTE,
-        GL_UNSIGNED_BYTE,
-        GL_SHORT,
-        GL_UNSIGNED_SHORT,
-        GL_INT,
-        GL_UNSIGNED_INT,
-        GL_INT,
-        GL_UNSIGNED_INT,
-        GL_FLOAT,
-        GL_FLOAT
-    };
-    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
-    glEnableVertexAttribArray(attr->pos);
-    glVertexAttribPointer(attr->pos, array->item_size, gl_types[array->type],
-                          GL_FALSE, 0, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    array->current_attr = attr;
-    return GE_E_NONE;
-}
+typedef struct {
+    long int changedlines;
+    size_t start_line;
+} GEShaderTreeMacroExpansion;
 
-int _ge_gles_modelarray_disable(GEModelArray *array) {
-    if(array->current_attr == NULL) return 1;
-    glDisableVertexAttribArray(array->current_attr->pos);
-    array->current_attr = NULL;
-    return GE_E_NONE;
-}
+typedef struct {
+    size_t start;
+    size_t end;
+    size_t lines;
+} GEShaderTreeComment;
 
-void _ge_gles_modelarray_free(GEModelArray *array) {
-    glDeleteBuffers(1, &array->vbo);
-    array->vbo = 0;
-}
+/* Shader compilation error codes */
+enum {
+    GE_S_E_NONE,
+    GE_S_E_AMOUNT
+};
+
+int ge_shadertree_init(GEShaderTree *tree);
+
+int ge_shadertree_load(GEShaderTree *tree, char *shader);
+
+int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader);
+
+int ge_shadertree_tokenize(GEShaderTree *tree, char *shader);
+
+int ge_shadertree_generate(GEShaderTree *tree);
+
+void ge_shadertree_free(GEShaderTree *tree);
+
+#endif
 

@@ -38,7 +38,7 @@
 int ge_light_init(GELight *light, GELightType type, GEVec3 color) {
     light->color = color;
     light->type = type;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_light_free(GELight *light) {

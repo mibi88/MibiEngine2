@@ -46,7 +46,7 @@ int ge_camera_init(GECamera *camera) {
     
     ge_camera_update(camera);
     ge_mat4_identity(&camera->projection_mat);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_camera_perspective(GECamera *camera, float fov, float aspect_ratio,

@@ -126,7 +126,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
     }
     ge_obj_free(&obj);
     free(data);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
@@ -187,7 +187,7 @@ int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
     ge_renderable_init(renderable, data, 0, _ge_loader_model_render,
                        _ge_loader_model_render_multiple,
                        _ge_loader_model_free);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_loader_load_obj_as_renderable(GERenderable *renderable,
@@ -215,7 +215,7 @@ int ge_loader_load_obj_as_renderable(GERenderable *renderable,
     ge_renderable_init(renderable, data, 0, _ge_loader_model_render,
                        _ge_loader_model_render_multiple,
                        _ge_loader_model_as_renderable_free);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_loader_light_renderable(GERenderable *renderable, GELight *light,
@@ -224,7 +224,7 @@ int ge_loader_light_renderable(GERenderable *renderable, GELight *light,
     (void)light;
     (void)shader;
     /* TODO */
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 char *ge_loader_load_shader(GEShader *shader, char *vertex_file,

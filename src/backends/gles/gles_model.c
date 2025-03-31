@@ -86,12 +86,12 @@ int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
         model->calls[i].after_free = NULL;
     }
     model->call_ptr = 0;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_model_set_attr(GEModel *model, GEModelAttr *attr) {
     model->attr = attr;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void _ge_gles_model_render(GEModel *model) {
@@ -252,7 +252,7 @@ int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
         attr->array_pos[i]->pos = glGetAttribLocation(shader->shader_program,
                                                       names[i]);
     }
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void _ge_gles_model_free(GEModel *model) {

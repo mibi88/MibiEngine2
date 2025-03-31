@@ -47,7 +47,7 @@ int ge_renderable_init(GERenderable *renderable, void *data, int priority,
     renderable->calls.render = render;
     renderable->calls.render_multiple = render_multiple;
     renderable->calls.free = free;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_renderable_render(GERenderable *renderable, GEMat4 *mat,

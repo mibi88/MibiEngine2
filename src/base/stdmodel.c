@@ -100,7 +100,7 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
     stdmodel->array_attrs[1] = NULL;
     stdmodel->array_attrs[2] = NULL;
     stdmodel->array_attrs[3] = NULL;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
@@ -110,7 +110,7 @@ int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
                           attr_names, GE_STDMODEL_ARRAY_NUM)){
         return GE_E_SET_ATTR;
     }
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
@@ -119,7 +119,7 @@ int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->color_array, 1, data, type, num,
                           item_size);
     stdmodel->array_attrs[1] = &stdmodel->color_pos;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
@@ -128,7 +128,7 @@ int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->uv_array, 2, data, type, num,
                           item_size);
     stdmodel->array_attrs[2] = &stdmodel->uv_pos;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
@@ -137,6 +137,6 @@ int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
     GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->normal_array, 3, data, type, num,
                           item_size);
     stdmodel->array_attrs[3] = &stdmodel->normal_pos;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 

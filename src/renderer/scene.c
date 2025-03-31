@@ -57,7 +57,7 @@ int ge_scene_init(GEScene *scene, GEEntity *entities, size_t entity_num,
     scene->shaders = shaders;
     scene->shader_num = shader_num;
     scene->light_max = light_max;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_scene_sort_groups(const void *_group1, const void *_group2) {
@@ -143,7 +143,7 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
         qsort(scene->entity_groups.ptr, scene->entity_group_num,
               sizeof(GESceneEntityGroup), _ge_scene_sort_groups);
     }
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_scene_set_shaders(GEScene *scene, GEStdShader **shaders,

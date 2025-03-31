@@ -86,7 +86,7 @@ int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->size, texture->size, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, texture->data);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void _ge_gles_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {

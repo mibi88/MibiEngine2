@@ -69,7 +69,7 @@ int ge_model_set_callbacks(GEModel *model,
             model->call_ptr = GE_MODEL_INHERIT_MAX-1;
         }
     }
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 size_t ge_model_get_callptr(GEModel *model) {

@@ -44,6 +44,7 @@
 #include <mibiengine2/base/stdmodel.h>
 #include <mibiengine2/base/texturedmodel.h>
 #include <mibiengine2/base/framebuffer.h>
+#include <mibiengine2/base/shadertree.h>
 
 typedef struct {
     int (*framebuffer_init)(GEFramebuffer *framebuffer, int w, int h,

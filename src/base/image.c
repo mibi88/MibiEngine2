@@ -138,7 +138,7 @@ int ge_image_init(GEImage *image, char *file) {
 
     fclose(fp);
 
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_image_free(GEImage *image) {

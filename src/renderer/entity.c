@@ -54,33 +54,33 @@ int ge_entity_init(GEEntity *entity, void *data) {
     entity->on_update = NULL;
     
     ge_entity_update(entity);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_set_position(GEEntity *entity, float x, float y, float z) {
     entity->position.x = x;
     entity->position.y = y;
     entity->position.z = z;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_set_rotation(GEEntity *entity, float x, float y, float z) {
     entity->rotation.x = x;
     entity->rotation.y = y;
     entity->rotation.z = z;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_set_scale(GEEntity *entity, float x, float y, float z) {
     entity->scale.x = x;
     entity->scale.y = y;
     entity->scale.z = z;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_set_data(GEEntity *entity, void *data) {
     entity->data = data;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_set_update_callback(GEEntity *entity,
@@ -88,7 +88,7 @@ int ge_entity_set_update_callback(GEEntity *entity,
                                   void *data) {
     entity->on_update = on_update;
     entity->call_data = data;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int ge_entity_update(GEEntity *entity) {
@@ -110,7 +110,7 @@ int ge_entity_update(GEEntity *entity) {
     /* TODO: Create the normal matrix */
     ge_mat3_mat4(&entity->normal_mat, &entity->model_mat);
     if(entity->on_update) entity->on_update(entity, entity->call_data);
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void ge_entity_free(GEEntity *entity) {

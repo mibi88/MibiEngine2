@@ -50,7 +50,7 @@ typedef struct {
  *
  * image: The image data.
  * file:  The file name of the image.
- * Returns GE_E_SUCCESS (0) on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_image_init(GEImage *image, char *file);
 

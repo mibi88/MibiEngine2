@@ -185,7 +185,7 @@ int _ge_gles_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
     glBindTexture(GL_TEXTURE_2D, 0);
     framebuffer->tex_size.x = w/(float)framebuffer->size;
     framebuffer->tex_size.y = h/(float)framebuffer->size;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
@@ -211,7 +211,7 @@ int _ge_gles_framebuffer_resize(GEFramebuffer *framebuffer, int w, int h) {
     
     framebuffer->tex_size.x = w/(float)framebuffer->size;
     framebuffer->tex_size.y = h/(float)framebuffer->size;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 int _ge_gles_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
@@ -226,7 +226,7 @@ int _ge_gles_framebuffer_attr(GEFramebuffer *framebuffer, GEShader *shader,
         return GE_E_SET_ATTR;
     }
     framebuffer->size_pos = size_pos;
-    return GE_E_SUCCESS;
+    return GE_E_NONE;
 }
 
 void _ge_gles_framebuffer_render(GEFramebuffer *framebuffer) {
