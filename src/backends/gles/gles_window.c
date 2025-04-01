@@ -267,6 +267,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     window->draw = NULL;
     window->resize = NULL;
     window->keyevent = NULL;
+    window->mouseevent = NULL;
     return GE_E_NONE;
 }
 
