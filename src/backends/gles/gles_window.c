@@ -46,6 +46,7 @@
 #include <EGL/eglplatform.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 
 #include <mibiengine2/base/config.h>
 
@@ -138,6 +139,8 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     };
     EGLint min, maj;
     EGLint config_num = 0;
+    Bool repeat = False;
+    Bool repeat_set;
     
     /* Allocate all the values in the structure */
     window->egl.display = malloc(sizeof(EGLDisplay));
@@ -188,6 +191,14 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     XStoreName(window->platform.display, *win, title);
     XMapWindow(window->platform.display, *win);
     XFlush(window->platform.display);
+    
+    repeat_set = XkbSetDetectableAutoRepeat(window->platform.display, True,
+                                            &repeat);
+    
+    if(!repeat || !repeat_set){
+        fputs("Key presses may behave unexpectedly because "
+              "DetectableAutoRepeat is unsupported!\n", stderr);
+    }
     
     *display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if(*display == EGL_NO_DISPLAY){
@@ -254,13 +265,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     
     window->draw = NULL;
     window->resize = NULL;
-    return GE_E_NONE;
-}
-
-int _ge_gles_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
-                                  void (*resize)(void *data, int w, int h)) {
-    window->draw = draw;
-    window->resize = resize;
+    window->keyevent = NULL;
     return GE_E_NONE;
 }
 
@@ -454,6 +459,10 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     keysym = XLookupKeysym(&event.xkey, 0);
                     for(i=0;i<GE_K_AMOUNT;i++){
                         if(keysym == xlib_keys[i]){
+                            if(window->keyevent &&
+                               !window->platform.keys_down[i]){
+                                window->keyevent(window->data, i, 0);
+                            }
                             window->platform.keys_down[i] = 1;
                             break;
                         }
@@ -463,6 +472,10 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     keysym = XLookupKeysym(&event.xkey, 0);
                     for(i=0;i<GE_K_AMOUNT;i++){
                         if(keysym == xlib_keys[i]){
+                            if(window->keyevent &&
+                               window->platform.keys_down[i]){
+                                window->keyevent(window->data, i, 1);
+                            }
                             window->platform.keys_down[i] = 0;
                             break;
                         }

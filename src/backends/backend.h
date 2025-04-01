@@ -95,8 +95,6 @@ typedef struct {
     void (*texture_free)(GETexture *texture);
 
     int (*window_init)(GEWindow *window, char *title);
-    int (*window_set_callbacks)(GEWindow *window, void (*draw)(void *data),
-                                void (*resize)(void *data, int w, int h));
     int (*window_set_data)(GEWindow *window, void *data);
     int (*window_cap_framerate)(GEWindow *window, int cap);
     void (*window_depth_test)(GEWindow *window, int depth_test);

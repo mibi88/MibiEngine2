@@ -59,6 +59,7 @@ typedef struct {
     /* Callbacks to handle various events */
     void (*draw)(void *data);
     void (*resize)(void *data, int w, int h);
+    void (*keyevent)(void *data, int key, int released);
     /* Data to pass to the callbacks when they are called */
     void *data;
 } GEWindow;
@@ -79,13 +80,15 @@ int ge_window_init(GEWindow *window, char *title);
  * Set the window callbacks. They are called when the window is drawn or when
  * it is resized, for example.
  *
- * window: The window struct.
- * draw:   The callback called when the window's content should be drawn.
- * resize: The callback called when the window is resized.
+ * window:   The window struct.
+ * draw:     The callback called when the window's content should be drawn.
+ * resize:   The callback called when the window is resized.
+ * keyevent: The callback called when a key is pressed or released.
  * Returns 0 on success or an error code on failure.
  */
-int ge_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
-                            void (*resize)(void *data, int w, int h));
+int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
+                            void resize(void *data, int w, int h),
+                            void keyevent(void *data, int key, int released));
 
 /* ge_window_set_data
  *

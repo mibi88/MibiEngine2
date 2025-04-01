@@ -70,7 +70,6 @@ GEBackend _ge_gles_backend = {
     _ge_gles_texture_free,
     
     _ge_gles_window_init,
-    _ge_gles_window_set_callbacks,
     _ge_gles_window_set_data,
     _ge_gles_window_cap_framerate,
     _ge_gles_window_depth_test,

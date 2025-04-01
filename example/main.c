@@ -118,6 +118,15 @@ unsigned int xorshift(unsigned int *seed) {
     return *seed;
 }
 
+void keypress(void *data, int key, int released) {
+    (void)data;
+    if(released){
+        printf("Key %d released\n", key);
+    }else{
+        printf("Key %d pressed\n", key);
+    }
+}
+
 void init(void) {
     size_t i;
 #if POSTPROCESSING
@@ -301,7 +310,7 @@ int main(int argc, char **argv) {
     
     init();
     
-    if(ge_window_set_callbacks(&window, draw, resize)){
+    if(ge_window_set_callbacks(&window, draw, resize, keypress)){
         fputs("Failed to set callbacks!\n", stderr);
         free_on_exit();
         return EXIT_FAILURE;

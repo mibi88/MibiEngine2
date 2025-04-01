@@ -41,14 +41,19 @@
 #include <backendlist.h>
 
 #include <mibiengine2/base/config.h>
+#include <mibiengine2/errors.h>
 
 int ge_window_init(GEWindow *window, char *title) {
     return GE_BACKENDLIST_GET(window_init)(window, title);
 }
 
-int ge_window_set_callbacks(GEWindow *window, void (*draw)(void *data),
-                            void (*resize)(void *data, int w, int h)){
-    return GE_BACKENDLIST_GET(window_set_callbacks)(window, draw, resize);
+int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
+                            void resize(void *data, int w, int h),
+                            void keyevent(void *data, int key, int released)) {
+    window->draw = draw;
+    window->resize = resize;
+    window->keyevent = keyevent;
+    return GE_E_NONE;
 }
 
 int ge_window_set_data(GEWindow *window, void *data) {
