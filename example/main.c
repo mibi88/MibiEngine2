@@ -127,6 +127,11 @@ void keypress(void *data, int key, int released) {
     }
 }
 
+void mouseevent(void *data, int x, int y, GEWindowMouseEvent event) {
+    (void)data;
+    printf("Mouse event: x: %d, y: %d, event: %d\n", x, y, event);
+}
+
 void init(void) {
     size_t i;
 #if POSTPROCESSING
@@ -310,7 +315,7 @@ int main(int argc, char **argv) {
     
     init();
     
-    if(ge_window_set_callbacks(&window, draw, resize, keypress)){
+    if(ge_window_set_callbacks(&window, draw, resize, keypress, mouseevent)){
         fputs("Failed to set callbacks!\n", stderr);
         free_on_exit();
         return EXIT_FAILURE;

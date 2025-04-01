@@ -187,7 +187,8 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     XSetWMProtocols(window->platform.display, *win, wm_delete_window, 1);
     XSelectInput(window->platform.display, *win,
                  ExposureMask | StructureNotifyMask | KeyPressMask |
-                 KeyReleaseMask);
+                 KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
+                 PointerMotionMask);
     XStoreName(window->platform.display, *win, title);
     XMapWindow(window->platform.display, *win);
     XFlush(window->platform.display);
@@ -480,6 +481,12 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                             break;
                         }
                     }
+                    break;
+                case ButtonPress:
+                    break;
+                case ButtonRelease:
+                    break;
+                case MotionNotify:
                     break;
                 default:
                     break;

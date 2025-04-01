@@ -39,6 +39,15 @@
 
 #define GE_WINDOW_DEBUG 0
 
+typedef enum {
+    GE_B_LEFT,
+    GE_B_MIDDLE,
+    GE_B_RIGHT,
+    GE_B_SCROLLUP,
+    GE_B_SCROLLDOWN,
+    GE_B_MOVE
+} GEWindowMouseEvent;
+
 typedef struct {
     /* Not sure if it's a good idea to use a whole bunch of void pointers like
      * this */
@@ -60,6 +69,7 @@ typedef struct {
     void (*draw)(void *data);
     void (*resize)(void *data, int w, int h);
     void (*keyevent)(void *data, int key, int released);
+    void (*mouseevent)(void *data, int x, int y, GEWindowMouseEvent event);
     /* Data to pass to the callbacks when they are called */
     void *data;
 } GEWindow;
@@ -80,15 +90,19 @@ int ge_window_init(GEWindow *window, char *title);
  * Set the window callbacks. They are called when the window is drawn or when
  * it is resized, for example.
  *
- * window:   The window struct.
- * draw:     The callback called when the window's content should be drawn.
- * resize:   The callback called when the window is resized.
- * keyevent: The callback called when a key is pressed or released.
+ * window:     The window struct.
+ * draw:       The callback called when the window's content should be drawn.
+ * resize:     The callback called when the window is resized.
+ * keyevent:   The callback called when a key is pressed or released.
+ * mouseevent: The callback that gets called when the mouse is moving, a button
+ *             is clicked or when scrolling (see GEWindowMouseEvent).
  * Returns 0 on success or an error code on failure.
  */
 int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
                             void resize(void *data, int w, int h),
-                            void keyevent(void *data, int key, int released));
+                            void keyevent(void *data, int key, int released),
+                            void mouseevent(void *data, int x, int y,
+                                            GEWindowMouseEvent event));
 
 /* ge_window_set_data
  *

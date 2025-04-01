@@ -49,10 +49,13 @@ int ge_window_init(GEWindow *window, char *title) {
 
 int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
                             void resize(void *data, int w, int h),
-                            void keyevent(void *data, int key, int released)) {
+                            void keyevent(void *data, int key, int released),
+                            void mouseevent(void *data, int x, int y,
+                                            GEWindowMouseEvent event)) {
     window->draw = draw;
     window->resize = resize;
     window->keyevent = keyevent;
+    window->mouseevent = mouseevent;
     return GE_E_NONE;
 }
 
