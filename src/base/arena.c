@@ -48,13 +48,13 @@ int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max) {
     return GE_E_NONE;
 }
 
-void *ge_arena_alloc(GEArena *arena, size_t size) {
+void *ge_arena_alloc(GEArena *arena, size_t num, size_t size) {
     size_t added;
     size_t align = 0;
     size_t c;
     void *new;
     if(arena->size%size) align = size-(arena->size%size);
-    added = size+align;
+    added = num*size+align;
     if(arena->size+added >= arena->max){
         c = added/arena->alloc_step+(added%arena->alloc_step ? 1 : 0);
         new = realloc(arena->ptr, arena->max+c*arena->alloc_step);

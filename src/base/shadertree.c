@@ -99,6 +99,7 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
     size_t comment_num = 0;
     size_t start_line;
     char spaces[] = " \t";
+    char directive_args[GE_SHADERTREE_DEFINE_ARGS_MAX][GE_SHADERTREE_ARG_SZ];
     GEShaderTreeComment comment;
     GEShaderTreeComment *ptr;
     GEShaderTreeComment *comments;
@@ -107,6 +108,7 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
     len = strlen(shader);
     
     (void)line_started;
+    (void)directive_args;
     
     comments = tree->comments.ptr;
     
@@ -128,7 +130,7 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
                 in_comment = 0;
                 comment.end = i+1;
                 comment.lines = line-start_line;
-                ptr = ge_arena_alloc(&tree->comments,
+                ptr = ge_arena_alloc(&tree->comments, 1,
                                      sizeof(GEShaderTreeComment));
                 if(ptr == NULL){
                     return GE_E_ARENA_ALLOC;

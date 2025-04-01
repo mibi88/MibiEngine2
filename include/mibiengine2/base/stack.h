@@ -32,47 +32,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_ARENA_H
-#define GE_ARENA_H
+#ifndef GE_STACK_H
+#define GE_STACK_H
 
 #include <stddef.h>
 
 typedef struct {
-    void *ptr;
-    size_t max;
+    void *data;
     size_t size;
-    size_t alloc_step;
-} GEArena;
+    size_t num;
+    size_t max;
+} GEStack;
 
-/* ge_arena_init
+/* ge_stack_init
  *
- * Create a new arena allocator.
+ * Create a new LIFO stack.
  *
- * arena:      The arena allocator data.
- * alloc_step: The number of bytes to allocate when extending the array.
- * max:        The numbers of bytes to allocate on initialization for later
- *             use.
- * Returns GE_E_NONE (0) on success or an error code on failure.
+ * stack:     The stack data.
+ * max:       The max. number of items that the stack can contain.
+ * item_size: The size of an item.
+ * Return GE_E_NONE (0) on success or an error code on failure.
  */
-int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max);
+int ge_stack_init(GEStack *stack, size_t max, size_t item_size);
 
-/* ge_arena_alloc
+/* ge_stack_push
  *
- * Allocate some memory.
+ * Push an item on the stack.
  *
- * arena: The arena allocator data.
- * size:  The number of bytes to allocate.
- * Returns a pointer to the allocated data or NULL on failure.
+ * stack: The stack data.
+ * data:  A pointer to the data to push on the stack.
+ * Return GE_E_NONE (0) on success or an error code on failure.
  */
-void *ge_arena_alloc(GEArena *arena, size_t num, size_t size);
+int ge_stack_push(GEStack *stack, void *data);
 
-/* ge_arena_free
+/* ge_stack_pull
  *
- * Free the entire arena.
+ * Pull an item from the stack.
  *
- * arena: The arena allocator data.
+ * stack: The stack data.
+ * data:  A pointer that the pulled element from the stack will be written to.
+ * Return GE_E_NONE (0) on success or an error code on failure.
  */
-void ge_arena_free(GEArena *arena);
+int ge_stack_pull(GEStack *stack, void *data);
+
+/* ge_stack_free
+ *
+ * Free the stack data.
+ *
+ * stack: The stack data.
+ */
+void ge_stack_free(GEStack *stack);
 
 #endif
 

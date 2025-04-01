@@ -36,8 +36,11 @@
 #define GE_SHADERTREE_H
 
 #include <mibiengine2/base/arena.h>
+#include <mibiengine2/base/stack.h>
 
 #define GE_SHADERTREE_ALLOC_STEP 512
+#define GE_SHADERTREE_DEFINE_ARGS_MAX 16
+#define GE_SHADERTREE_ARG_SZ 16
 
 typedef struct {
     GEArena tokens;
@@ -61,9 +64,18 @@ typedef struct {
     size_t lines;
 } GEShaderTreeComment;
 
+typedef struct {
+    GEStack tokens;
+    GEStack operators;
+    /* Output contains the expression in RPN (generated with the Shunting Yard
+     * algorithm). */
+    GEStack output;
+} GEShaderTreeExpression;
+
 /* Shader compilation error codes */
 enum {
     GE_S_E_NONE,
+    GE_S_DEF_TOO_BIG,
     GE_S_E_AMOUNT
 };
 

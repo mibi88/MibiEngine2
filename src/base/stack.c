@@ -32,47 +32,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_ARENA_H
-#define GE_ARENA_H
+#include <mibiengine2/base/stack.h>
+#include <mibiengine2/errors.h>
 
-#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
-typedef struct {
-    void *ptr;
-    size_t max;
-    size_t size;
-    size_t alloc_step;
-} GEArena;
+int ge_stack_init(GEStack *stack, size_t max, size_t item_size) {
+    stack->data = malloc(max*item_size);
+    if(stack->data == NULL){
+        return GE_E_OUT_OF_MEM;
+    }
+    
+    stack->size = item_size;
+    stack->num = 0;
+    stack->max = max;
+    
+    return GE_E_NONE;
+}
 
-/* ge_arena_init
- *
- * Create a new arena allocator.
- *
- * arena:      The arena allocator data.
- * alloc_step: The number of bytes to allocate when extending the array.
- * max:        The numbers of bytes to allocate on initialization for later
- *             use.
- * Returns GE_E_NONE (0) on success or an error code on failure.
- */
-int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max);
+int ge_stack_push(GEStack *stack, void *data) {
+    if(stack->num >= stack->max) return GE_E_STACK_OVERFLOW;
+    memcpy((char*)stack->data+(stack->num++)*stack->size, data, stack->size);
+    return GE_E_NONE;
+}
 
-/* ge_arena_alloc
- *
- * Allocate some memory.
- *
- * arena: The arena allocator data.
- * size:  The number of bytes to allocate.
- * Returns a pointer to the allocated data or NULL on failure.
- */
-void *ge_arena_alloc(GEArena *arena, size_t num, size_t size);
+int ge_stack_pull(GEStack *stack, void *data) {
+    if(!stack->num) return GE_E_STACK_UNDERFLOW;
+    memcpy(data, (char*)stack->data+(--stack->num)*stack->size, stack->size);
+    return GE_E_NONE;
+}
 
-/* ge_arena_free
- *
- * Free the entire arena.
- *
- * arena: The arena allocator data.
- */
-void ge_arena_free(GEArena *arena);
-
-#endif
+void ge_stack_free(GEStack *stack) {
+    free(stack->data);
+    stack->data = NULL;
+}
 

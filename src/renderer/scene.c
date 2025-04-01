@@ -88,7 +88,7 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
         }
         if(!found){
             /* Add an entity group */
-            group = ge_arena_alloc(&scene->entity_groups,
+            group = ge_arena_alloc(&scene->entity_groups, 1,
                                    sizeof(GESceneEntityGroup));
             if(group == NULL){
                 ge_scene_free(scene);
@@ -118,19 +118,19 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
             group_added = 1;
         }
         /* Add the entity to the entity group pointed to by group */
-        new = ge_arena_alloc(&group->model_mat, sizeof(GEMat4));
+        new = ge_arena_alloc(&group->model_mat, 1, sizeof(GEMat4));
         if(new == NULL){
             ge_scene_free(scene);
             return GE_E_ARENA_ALLOC;
         }
         *(GEMat4*)new = entities[i].model_mat;
-        new = ge_arena_alloc(&group->normal_mat, sizeof(GEMat3));
+        new = ge_arena_alloc(&group->normal_mat, 1, sizeof(GEMat3));
         if(new == NULL){
             ge_scene_free(scene);
             return GE_E_ARENA_ALLOC;
         }
         *(GEMat3*)new = entities[i].normal_mat;
-        new = ge_arena_alloc(&group->entities, sizeof(GEEntity));
+        new = ge_arena_alloc(&group->entities, 1, sizeof(GEEntity));
         if(new == NULL){
             ge_scene_free(scene);
             return GE_E_ARENA_ALLOC;
