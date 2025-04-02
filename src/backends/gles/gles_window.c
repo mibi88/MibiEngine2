@@ -63,6 +63,8 @@
 
 #define DEF_CASE(d) case d: return #d;
 
+#define _GE_GLES_WINDOW_BUTTON_NUM 5
+
 #if GE_WINDOW_DEBUG
 void _ge_window_debug_callback(GLenum source, GLenum type, GLuint id,
                                GLenum severity, GLsizei length,
@@ -437,6 +439,13 @@ void _ge_gles_window_mainloop(GEWindow *window) {
         XK_asciitilde,
         XK_nobreakspace
     };
+    unsigned int buttons[_GE_GLES_WINDOW_BUTTON_NUM] = {
+        Button1,
+        Button2,
+        Button3,
+        Button4,
+        Button5
+    };
     size_t i;
     KeySym keysym;
     
@@ -484,10 +493,40 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     }
                     break;
                 case ButtonPress:
+                    window->platform.mouse_y = event.xbutton.x;
+                    window->platform.mouse_x = event.xbutton.y;
+                    if(window->mouseevent){
+                        for(i=0;i<_GE_GLES_WINDOW_BUTTON_NUM;i++){
+                            if(event.xbutton.button == buttons[i]){
+                                window->mouseevent(window->data,
+                                                   window->platform.mouse_y,
+                                                   window->platform.mouse_x,
+                                                   i, 0);
+                            }
+                        }
+                    }
                     break;
                 case ButtonRelease:
+                    window->platform.mouse_y = event.xbutton.x;
+                    window->platform.mouse_x = event.xbutton.y;
+                    if(window->mouseevent){
+                        for(i=0;i<_GE_GLES_WINDOW_BUTTON_NUM;i++){
+                            if(event.xbutton.button == buttons[i]){
+                                window->mouseevent(window->data,
+                                                   window->platform.mouse_y,
+                                                   window->platform.mouse_x,
+                                                   i, 1);
+                            }
+                        }
+                    }
                     break;
                 case MotionNotify:
+                    window->platform.mouse_y = event.xmotion.x;
+                    window->platform.mouse_x = event.xmotion.y;
+                    window->mouseevent(window->data,
+                                       window->platform.mouse_y,
+                                       window->platform.mouse_x,
+                                       GE_B_MOVE, 0);
                     break;
                 default:
                     break;

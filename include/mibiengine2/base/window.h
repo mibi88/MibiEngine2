@@ -64,12 +64,14 @@ typedef struct {
         void *window;
         void *wm_delete_window;
         char keys_down[GE_K_AMOUNT];
+        int mouse_x, mouse_y;
     } platform;
     /* Callbacks to handle various events */
     void (*draw)(void *data);
     void (*resize)(void *data, int w, int h);
     void (*keyevent)(void *data, int key, int released);
-    void (*mouseevent)(void *data, int x, int y, GEWindowMouseEvent event);
+    void (*mouseevent)(void *data, int x, int y, GEWindowMouseEvent event,
+                       int released);
     /* Data to pass to the callbacks when they are called */
     void *data;
 } GEWindow;
@@ -102,7 +104,8 @@ int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
                             void resize(void *data, int w, int h),
                             void keyevent(void *data, int key, int released),
                             void mouseevent(void *data, int x, int y,
-                                            GEWindowMouseEvent event));
+                                            GEWindowMouseEvent event,
+                                            int released));
 
 /* ge_window_set_data
  *

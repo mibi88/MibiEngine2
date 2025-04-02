@@ -51,7 +51,8 @@ int ge_window_set_callbacks(GEWindow *window, void draw(void *data),
                             void resize(void *data, int w, int h),
                             void keyevent(void *data, int key, int released),
                             void mouseevent(void *data, int x, int y,
-                                            GEWindowMouseEvent event)) {
+                                            GEWindowMouseEvent event,
+                                            int released)) {
     window->draw = draw;
     window->resize = resize;
     window->keyevent = keyevent;

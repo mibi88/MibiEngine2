@@ -127,9 +127,11 @@ void keypress(void *data, int key, int released) {
     }
 }
 
-void mouseevent(void *data, int x, int y, GEWindowMouseEvent event) {
+void mouseevent(void *data, int x, int y, GEWindowMouseEvent event,
+                int released) {
     (void)data;
-    printf("Mouse event: x: %d, y: %d, event: %d\n", x, y, event);
+    printf("Mouse event: x: %d, y: %d, event: %d, released: %d\n", x, y,
+           event, released);
 }
 
 void init(void) {
