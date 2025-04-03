@@ -160,9 +160,21 @@ int ge_stdmodel_update_vertices(GEModel *model, void *data, size_t size) {
     return ge_modelarray_update(&stdmodel->vertex_array, data, size);
 }
 
-int ge_stdmodel_update_indices(GEModel *model, void *data, size_t size) {
+int ge_stdmodel_update_color(GEModel *model, void *data, size_t size) {
     GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
-    if(stdmodel->array_attrs[0] == NULL) return GE_E_NOT_ADDED_YET;
-    return ge_modelarray_update(&stdmodel->vertex_array, data, size);
+    if(stdmodel->array_attrs[1] == NULL) return GE_E_NOT_ADDED_YET;
+    return ge_modelarray_update(&stdmodel->color_array, data, size);
+}
+
+int ge_stdmodel_update_uv_coords(GEModel *model, void *data, size_t size) {
+    GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
+    if(stdmodel->array_attrs[2] == NULL) return GE_E_NOT_ADDED_YET;
+    return ge_modelarray_update(&stdmodel->uv_array, data, size);
+}
+
+int ge_stdmodel_update_normals(GEModel *model, void *data, size_t size) {
+    GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
+    if(stdmodel->array_attrs[3] == NULL) return GE_E_NOT_ADDED_YET;
+    return ge_modelarray_update(&stdmodel->normal_array, data, size);
 }
 

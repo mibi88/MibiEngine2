@@ -57,7 +57,7 @@ int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
 
 int _ge_gles_modelarray_update(GEModelArray *array, void *data, size_t size) {
     /* As modelarrays are currently implemented wit OpenGL ES 2 they could be
-     * updated but this making this more restrictive gives more flexibility to
+     * updated but making this more restrictive gives more flexibility to
      * future backends which may be able to improve performance if the array
      * doesn't need to be updated. */
     if(!array->updatable) return GE_E_IMMUTABLE;

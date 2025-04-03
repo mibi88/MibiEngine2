@@ -78,7 +78,7 @@ typedef struct {
  * updatable:   Non-zero if the model arrays can be updated or zero if they
  *              can't.
  * extra:       Extra data (see model.h and base.h).
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
                      GEType index_type, GEType vertex_type, size_t index_num,
@@ -95,7 +95,7 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
  *             order: the vertex position attribute name, followed by the color
  *             attribute name, the UV coordinate attribute name and the normal
  *             attribute name.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
                             char **attr_names);
@@ -108,7 +108,7 @@ int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
  * data:      The color data.
  * num:       The size of the data.
  * item_size: The size of a single color.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
                           size_t item_size);
@@ -121,7 +121,7 @@ int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
  * data:      The UV coordinate data.
  * num:       The size of the data.
  * item_size: The size of a single uv coordinate.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
                               size_t num, size_t item_size);
@@ -134,10 +134,58 @@ int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
  * data:      The normal data.
  * num:       The size of the data.
  * item_size: The size of a single normal.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
                             size_t num, size_t item_size);
+
+/* ge_stdmodel_update_vertices
+ *
+ * Update the vertex position array used with this model.
+ *
+ * model: The model data.
+ * data:  The vertex data. The type and the number of elements per vector is
+ *        kept the same.
+ * size:  The number of elements.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_stdmodel_update_vertices(GEModel *model, void *data, size_t size);
+
+/* ge_stdmodel_update_color
+ *
+ * Update the color array used with this model.
+ *
+ * model: The model data.
+ * data:  The color data. The type and the number of elements per vector is
+ *        kept the same.
+ * size:  The number of elements.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_stdmodel_update_color(GEModel *model, void *data, size_t size);
+
+/* ge_stdmodel_update_uv_coords
+ *
+ * Update the uv coordinates array used with this model.
+ *
+ * model: The model data.
+ * data:  The uv coordinate data. The type and the number of elements per
+ *        vector is kept the same.
+ * size:  The number of elements.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_stdmodel_update_uv_coords(GEModel *model, void *data, size_t size);
+
+/* ge_stdmodel_update_normals
+ *
+ * Update the vertex normal array used with this model.
+ *
+ * model: The model data.
+ * data:  The vertex normal data. The type and the number of elements per
+ *        vector is kept the same.
+ * size:  The number of elements.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_stdmodel_update_normals(GEModel *model, void *data, size_t size);
 
 #endif
 
