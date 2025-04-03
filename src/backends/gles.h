@@ -51,7 +51,8 @@ void _ge_gles_framebuffer_free(GEFramebuffer *framebuffer);
 
 int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
                         size_t array_num, void *indices, GEType index_type,
-                        size_t index_num, void *extra);
+                        size_t index_num, int updatable, void *extra);
+int _ge_gles_model_update_indices(GEModel *model, void *data, size_t size);
 int _ge_gles_model_set_attr(GEModel *model, GEModelAttr *attr);
 void _ge_gles_model_render(GEModel *model);
 void _ge_gles_model_render_multiple(GEModel *model, GEShaderPos **pos,
@@ -63,7 +64,8 @@ int _ge_gles_model_attr_init(GEModelAttr *attr, GEShader *shader,
 void _ge_gles_model_free(GEModel *model);
 
 int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
-                             size_t size, size_t item_size);
+                             size_t size, size_t item_size, int updatable);
+int _ge_gles_modelarray_update(GEModelArray *array, void *data, size_t size);
 int _ge_gles_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr);
 int _ge_gles_modelarray_disable(GEModelArray *array);
 void _ge_gles_modelarray_free(GEModelArray *array);

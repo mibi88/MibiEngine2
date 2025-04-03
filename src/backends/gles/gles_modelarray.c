@@ -39,18 +39,31 @@
 #include <mibiengine2/errors.h>
 
 int _ge_gles_modelarray_init(GEModelArray *array, void *data, GEType type,
-                             size_t size, size_t item_size) {
-    /* TODO: Support updating the buffer */
+                             size_t size, size_t item_size, int updatable) {
     array->data = data;
     array->type = type;
     array->size = size;
     array->item_size = item_size;
     array->current_attr = NULL;
+    array->updatable = 1;
     
     glGenBuffers(1, &array->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
     glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[type],
-                 data, GL_STATIC_DRAW);
+                 data, updatable ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return GE_E_NONE;
+}
+
+int _ge_gles_modelarray_update(GEModelArray *array, void *data, size_t size) {
+    /* As modelarrays are currently implemented wit OpenGL ES 2 they could be
+     * updated but this making this more restrictive gives more flexibility to
+     * future backends which may be able to improve performance if the array
+     * doesn't need to be updated. */
+    if(!array->updatable) return GE_E_IMMUTABLE;
+    glBindBuffer(GL_ARRAY_BUFFER, array->vbo);
+    glBufferData(GL_ARRAY_BUFFER, size*ge_type_size[array->type],
+                 data, array->updatable ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return GE_E_NONE;
 }

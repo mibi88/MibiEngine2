@@ -68,7 +68,7 @@ char *ge_loader_load_text(char *file, size_t *size_ptr) {
 
 int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
                        char *file, char **attr_names, GEShaderPos *tex_pos,
-                       GEShaderPos *uv_max_pos) {
+                       GEShaderPos *uv_max_pos, int updatable) {
     void *data;
     size_t size;
     GEObj obj;
@@ -84,7 +84,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
     if(texture == NULL){
         if(ge_stdmodel_init(model, obj.indices, obj.vertices,
                             GE_T_UINT, GE_T_FLOAT, obj.index_num,
-                            obj.vertex_num, 4, NULL)){
+                            obj.vertex_num, 4, updatable, NULL)){
             ge_obj_free(&obj);
             free(data);
             return GE_E_STDMODEL_INIT;
@@ -92,7 +92,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
     }else{
         if(ge_texturedmodel_init(model, texture, obj.indices, obj.vertices,
                                  GE_T_UINT, GE_T_FLOAT, obj.index_num,
-                                 obj.vertex_num, 4, NULL)){
+                                 obj.vertex_num, 4, updatable, NULL)){
             ge_obj_free(&obj);
             free(data);
             return GE_E_TEXTUREDMODEL_INIT;
@@ -130,7 +130,7 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
 }
 
 int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
-                          GETexture *texture, char *file) {
+                          GETexture *texture, char *file, int updatable) {
     char *attr_names[] = {
         "vertex",
         "color",
@@ -138,7 +138,7 @@ int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
         "normal"
     };
     return ge_loader_load_obj(model, shader->shader, texture, file, attr_names,
-                              &shader->texture, &shader->uv_max);
+                              &shader->texture, &shader->uv_max, updatable);
 }
 
 void _ge_loader_model_render(void *data, GEMat4 *mat, GEMat3 *normal_mat) {
@@ -192,7 +192,7 @@ int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
 
 int ge_loader_load_obj_as_renderable(GERenderable *renderable,
                                      GEStdShader *shader, GETexture *texture,
-                                     char *file) {
+                                     char *file, int updatable) {
     GEModel *model;
     GEModelRenderable *data;
     int rc;
@@ -205,7 +205,7 @@ int ge_loader_load_obj_as_renderable(GERenderable *renderable,
         free(model);
         return GE_E_OUT_OF_MEM;
     }
-    if((rc = ge_loader_load_stdobj(model, shader, texture, file))){
+    if((rc = ge_loader_load_stdobj(model, shader, texture, file, updatable))){
         free(model);
         free(data);
         return rc;

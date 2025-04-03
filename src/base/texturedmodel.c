@@ -62,13 +62,15 @@ void _ge_textured_after_free(void *_model, void *extra) {
 int ge_texturedmodel_init(GEModel *model, GETexture *texture, void *indices,
                           void *vertices, GEType index_type,
                           GEType vertex_type, size_t index_num,
-                          size_t vertex_num, size_t item_size, void *extra) {
+                          size_t vertex_num, size_t item_size, int updatable,
+                          void *extra) {
     GETexturedModel *texturedmodel = malloc(sizeof(GETexturedModel));
     if(texturedmodel == NULL){
         return GE_E_OUT_OF_MEM;
     }
     if(ge_stdmodel_init(model, indices, vertices, index_type, vertex_type,
-                        index_num, vertex_num, item_size, texturedmodel)){
+                        index_num, vertex_num, item_size, updatable,
+                        texturedmodel)){
         free(texturedmodel);
         return GE_E_STDMODEL_INIT;
     }

@@ -54,7 +54,7 @@ char *_ge_gl_error_str(int error) {
 
 int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
                         size_t array_num, void *indices, GEType index_type,
-                        size_t index_num, void *extra) {
+                        size_t index_num, int updatable, void *extra) {
     size_t i;
     
     /* TODO: Support updating the index array */
@@ -66,13 +66,16 @@ int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
     model->arrays = arrays;
     model->array_num = array_num;
     
+    model->updatable = updatable;
+    
     /* Index array */
     if(model->indices.data){
         glGenBuffers(1, &model->indices.vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->indices.vbo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                      index_num*ge_type_size[index_type], indices,
-                     GL_STATIC_DRAW);
+                     model->updatable ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
     
     model->extra[0] = extra;
@@ -86,6 +89,18 @@ int _ge_gles_model_init(GEModel *model, GEModelArray **arrays,
         model->calls[i].after_free = NULL;
     }
     model->call_ptr = 0;
+    return GE_E_NONE;
+}
+
+int _ge_gles_model_update_indices(GEModel *model, void *data, size_t size) {
+    /* See _ge_gles_modelarray_update in modelarray.c to understand why I added
+     * this condition. */
+    if(!model->updatable) return GE_E_IMMUTABLE;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->indices.vbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 size*ge_type_size[model->indices.type], data,
+                 model->updatable ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     return GE_E_NONE;
 }
 

@@ -42,9 +42,10 @@
 
 int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
                   void *indices, GEType index_type, size_t index_num,
-                  void *extra) {
+                  int updatable, void *extra) {
     return GE_BACKENDLIST_GET(model_init)(model, arrays, array_num, indices,
-                                          index_type, index_num, extra);
+                                          index_type, index_num, updatable,
+                                          extra);
 }
 
 int ge_model_set_attr(GEModel *model, GEModelAttr *attr) {

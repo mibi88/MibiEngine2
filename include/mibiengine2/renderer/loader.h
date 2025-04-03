@@ -54,17 +54,17 @@ char *ge_loader_load_text(char *file, size_t *size_ptr);
 
 int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
                        char *file, char **attr_names, GEShaderPos *tex_pos,
-                       GEShaderPos *uv_max_pos);
+                       GEShaderPos *uv_max_pos, int updatable);
 
 int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
-                          GETexture *texture, char *file);
+                          GETexture *texture, char *file, int updatable);
 
 int ge_loader_model_renderable(GERenderable *renderable, GEModel *model,
                                GEStdShader *shader);
 
 int ge_loader_load_obj_as_renderable(GERenderable *renderable,
                                      GEStdShader *shader, GETexture *texture,
-                                     char *file);
+                                     char *file, int updatable);
 
 int ge_loader_light_renderable(GERenderable *renderable, GELight *light,
                                GEStdShader *shader);

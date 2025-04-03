@@ -35,11 +35,16 @@
 #ifndef GE_SPRITE_H
 #define GE_SPRITE_H
 
-#include <mibiengine2/base/model.h>
+#include <mibiengine2/base/texturedmodel.h>
+#include <mibiengine2/base/texture.h>
+#include <mibiengine2/renderer/stdshader.h>
 
 typedef struct {
     GEModel model;
 } GESprite;
+
+int ge_sprite_init(GESprite *sprite, GETexture *texture, GEStdShader *shader,
+                   float w, float h);
 
 #endif
 

@@ -61,7 +61,7 @@ typedef struct {
 
     int (*model_init)(GEModel *model, GEModelArray **arrays, size_t array_num,
                       void *indices, GEType index_type, size_t index_num,
-                      void *extra);
+                      int updatable, void *extra);
     int (*model_set_attr)(GEModel *model, GEModelAttr *attr);
     void (*model_render)(GEModel *model);
     void (*model_render_multiple)(GEModel *model, GEShaderPos **pos,
@@ -73,7 +73,8 @@ typedef struct {
     void (*model_free)(GEModel *model);
 
     int (*modelarray_init)(GEModelArray *array, void *data, GEType type,
-                           size_t size, size_t item_size);
+                           size_t size, size_t item_size, int updatable);
+    int (*modelarray_update)(GEModelArray *array, void *data, size_t size);
     int (*modelarray_enable)(GEModelArray *array, GEModelArrayAttr *attr);
     int (*modelarray_disable)(GEModelArray *array);
     void (*modelarray_free)(GEModelArray *array);

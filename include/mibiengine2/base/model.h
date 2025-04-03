@@ -68,6 +68,7 @@ typedef struct {
         void (*before_free)(void *_model, void *_extra);
         void (*after_free)(void *_model, void *_extra);
     });
+    unsigned char updatable;
 } GEModel;
 
 /* ge_model_init
@@ -82,13 +83,15 @@ typedef struct {
  * indices:    The indices used to get the data in the model arrays.
  * index_type: The type of the indices (see type.h).
  * index_num:  The number of indices.
+ * updatable:  Non-zero if the model arrays can be updated or zero if they
+ *             can't.
  * extra:      Pointer stored in the model struct. Allows creation of higher
  *             level functions to create models (see base.h).
  * Returns 0 on success and a non zero int on failure.
  */
 int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
                   void *indices, GEType index_type, size_t index_num,
-                  void *extra);
+                  int updatable, void *extra);
 
 /* ge_model_set_attr
  *

@@ -36,6 +36,7 @@
 #define GE_IMAGE_H
 
 typedef struct {
+    /* TODO: Only store the width, height, data and maybe the color format. */
     unsigned int width, height;
     int bit_depth;
     int color_type;
@@ -53,6 +54,43 @@ typedef struct {
  * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_image_init(GEImage *image, char *file);
+
+/* ge_image_empty
+ *
+ * Create a new empty image filled with the RGBA color 0, 0, 0, 0.
+ *
+ * image: The image data.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_image_empty(GEImage *image, int width, int height);
+
+/* GE_IMAGE_GET_PIXEL_PTR
+ *
+ * Get a pointer to the pixel at x, y where an RGBA value can be written to.
+ * It is made up of unsigned chars. If ptr is the pointer, ptr[0] is red,
+ * ptr[1] is green, ptr[2] is blue and ptr[3] alpha.
+ *
+ * image: A pointer to the image data.
+ * x:     The position of the pixel on the X axis.
+ * y:     The position of the pixel on the Y axis.
+ */
+#define GE_IMAGE_GET_PIXEL_PTR(image, x, y) (image->data+(y*image->width+x)*4)
+
+/* GE_IMAGE_GET_WIDTH
+ *
+ * Get the width of an image.
+ *
+ * image: A pointer to the image data.
+ */
+#define GE_IMAGE_GET_WIDTH(image) (image->width)
+
+/* GE_IMAGE_GET_HEIGHT
+ *
+ * Get the height of an image.
+ *
+ * image: A pointer to the image data.
+ */
+#define GE_IMAGE_GET_HEIGHT(image) (image->height)
 
 /* ge_image_free
  *

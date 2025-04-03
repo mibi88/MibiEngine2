@@ -141,6 +141,14 @@ int ge_image_init(GEImage *image, char *file) {
     return GE_E_NONE;
 }
 
+int ge_image_empty(GEImage *image, int width, int height) {
+    image->data = calloc(width*height*4, 1);
+    if(image->data == NULL){
+        return GE_E_OUT_OF_MEM;
+    }
+    return GE_E_NONE;
+}
+
 void ge_image_free(GEImage *image) {
     free(image->data);
     image->data = NULL;

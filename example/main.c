@@ -178,7 +178,7 @@ void init(void) {
     }
     
     if(ge_loader_load_obj_as_renderable(&renderable, &stdshader, &texture,
-                                        "spot.obj")){
+                                        "spot.obj", 0)){
         fputs("Failed to load model as renderable!\n", stderr);
         EXIT(EXIT_FAILURE);
     }

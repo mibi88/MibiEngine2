@@ -82,7 +82,7 @@ int _ge_gles_framebuffer_init(GEFramebuffer *framebuffer, int w, int h,
     size_t tex_pos = 0;
     /* Initialize the model used to render the framebuffer */
     if(ge_stdmodel_init(&framebuffer->model, indices, vertices, GE_T_USHORT,
-                        GE_T_FLOAT, 6, 4*2, 2, NULL)){
+                        GE_T_FLOAT, 6, 4*2, 2, 0, NULL)){
         return GE_E_STDMODEL_INIT;
     }
     if(ge_stdmodel_add_uv_coords(&framebuffer->model, uv_coords, GE_T_FLOAT,

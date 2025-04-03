@@ -51,6 +51,7 @@ GEBackend _ge_gles_backend = {
     _ge_gles_model_free,
     
     _ge_gles_modelarray_init,
+    _ge_gles_modelarray_update,
     _ge_gles_modelarray_enable,
     _ge_gles_modelarray_disable,
     _ge_gles_modelarray_free,

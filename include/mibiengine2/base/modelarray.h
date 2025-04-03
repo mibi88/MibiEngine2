@@ -50,6 +50,7 @@ typedef struct {
     size_t size;
     size_t item_size;
     GEModelArrayAttr *current_attr;
+    unsigned char updatable;
 } GEModelArray;
 
 /* ge_modelarray_init
@@ -65,10 +66,23 @@ typedef struct {
  * size:      The size of the data.
  * item_size: The number of elements read at once: 2 for a vec2, 3 for a vec3,
  *            4 for a vec4, etc.
- * Returns 0 on success or an error code on failure.
+ * updatable: Should be zero if it should not be modifiable or non-zero if it
+ *            can be updated.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
-                       size_t size, size_t item_size);
+                       size_t size, size_t item_size, int updatable);
+
+/* ge_modelarray_update
+ *
+ * Update a modelarray's data.
+ *
+ * array: The modelarray.
+ * data:  The data to load.
+ * size:  The number of elements in the data (the type of the data is kept).
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_modelarray_update(GEModelArray *array, void *data, size_t size);
 
 /* ge_modelarray_enable
  *
@@ -78,7 +92,7 @@ int ge_modelarray_init(GEModelArray *array, void *data, GEType type,
  *
  * array: The array to use.
  * attr:  The array attributes.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr);
 
@@ -87,7 +101,7 @@ int ge_modelarray_enable(GEModelArray *array, GEModelArrayAttr *attr);
  * Stop using this array.
  *
  * array: The array to stop using.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_modelarray_disable(GEModelArray *array);
 

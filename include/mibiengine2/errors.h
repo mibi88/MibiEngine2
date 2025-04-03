@@ -57,9 +57,15 @@ enum {
     GE_E_SET_TEXTURE,
     GE_E_STACK_UNDERFLOW,
     GE_E_STACK_OVERFLOW,
+    GE_E_IMMUTABLE,
+    GE_E_ALREADY_ADDED,
+    GE_E_NOT_ADDED_YET,
     /* Renderer */
     GE_E_ARENA_INIT,
     GE_E_ARENA_ALLOC,
+    /* 2D */
+    GE_E_STDMDOEL_SET_ATTR,
+    GE_E_TEXTUREDMODEL_SET_TEX,
     /* Other */
     GE_E_UNKNOWN,
     GE_E_AMOUNT

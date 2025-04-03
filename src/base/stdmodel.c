@@ -39,7 +39,8 @@
 #include <stdlib.h>
 
 #define GE_STDMODEL_ADD_ARRAY(model, array, pos, data, type, num, item_size) \
-    if(ge_modelarray_init(&array, data, type, num, item_size)){ \
+    if(ge_modelarray_init(&array, data, type, num, item_size, \
+                          model->updatable)){ \
         return 1; \
     } \
     model->arrays[pos] = &array;
@@ -52,7 +53,8 @@ void _ge_stdmodel_after_free(void *_model, void *extra) {
 
 int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
                      GEType index_type, GEType vertex_type, size_t index_num,
-                     size_t vertex_num, size_t item_size, void *extra) {
+                     size_t vertex_num, size_t item_size, int updatable,
+                     void *extra) {
     size_t i;
     GEStdModel *stdmodel;
     
@@ -61,18 +63,21 @@ int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
         return GE_E_OUT_OF_MEM;
     }
     
+    /* TODO: Don't store updatable separately from model. */
+    stdmodel->updatable = updatable;
+    
     for(i=0;i<GE_STDMODEL_ARRAY_NUM;i++){
         stdmodel->arrays[i] = NULL;
         stdmodel->array_attrs[i] = NULL;
     }
     
     if(ge_modelarray_init(&stdmodel->vertex_array, vertices, vertex_type,
-                          vertex_num, item_size)){
+                          vertex_num, item_size, updatable)){
         free(stdmodel);
         return GE_E_MODELARRAY_INIT;
     }
     if(ge_model_init(model, stdmodel->arrays, GE_STDMODEL_ARRAY_NUM,
-                     indices, index_type, index_num, stdmodel)){
+                     indices, index_type, index_num, updatable, stdmodel)){
         ge_modelarray_free(&stdmodel->vertex_array);
         free(stdmodel);
         return GE_E_MODEL_INIT;
@@ -116,27 +121,48 @@ int ge_stdmodel_shader_attr(GEModel *model, GEShader *shader,
 int ge_stdmodel_add_color(GEModel *model, void *data, GEType type, size_t num,
                           size_t item_size) {
     GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
-    GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->color_array, 1, data, type, num,
-                          item_size);
-    stdmodel->array_attrs[1] = &stdmodel->color_pos;
-    return GE_E_NONE;
+    if(stdmodel->array_attrs[1] == NULL){
+        GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->color_array, 1, data, type,
+                              num, item_size);
+        stdmodel->array_attrs[1] = &stdmodel->color_pos;
+        return GE_E_NONE;
+    }
+    return GE_E_ALREADY_ADDED;
 }
 
 int ge_stdmodel_add_uv_coords(GEModel *model, void *data, GEType type,
                               size_t num, size_t item_size) {
     GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
-    GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->uv_array, 2, data, type, num,
-                          item_size);
-    stdmodel->array_attrs[2] = &stdmodel->uv_pos;
-    return GE_E_NONE;
+    if(stdmodel->array_attrs[2] == NULL){
+        GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->uv_array, 2, data, type, num,
+                              item_size);
+        stdmodel->array_attrs[2] = &stdmodel->uv_pos;
+        return GE_E_NONE;
+    }
+    return GE_E_ALREADY_ADDED;
 }
 
 int ge_stdmodel_add_normals(GEModel *model, void *data, GEType type,
                             size_t num, size_t item_size) {
     GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
-    GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->normal_array, 3, data, type, num,
-                          item_size);
-    stdmodel->array_attrs[3] = &stdmodel->normal_pos;
-    return GE_E_NONE;
+    if(stdmodel->array_attrs[3] == NULL){
+        GE_STDMODEL_ADD_ARRAY(stdmodel, stdmodel->normal_array, 3, data, type,
+                              num, item_size);
+        stdmodel->array_attrs[3] = &stdmodel->normal_pos;
+        return GE_E_NONE;
+    }
+    return GE_E_ALREADY_ADDED;
+}
+
+int ge_stdmodel_update_vertices(GEModel *model, void *data, size_t size) {
+    GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
+    if(stdmodel->array_attrs[0] == NULL) return GE_E_NOT_ADDED_YET;
+    return ge_modelarray_update(&stdmodel->vertex_array, data, size);
+}
+
+int ge_stdmodel_update_indices(GEModel *model, void *data, size_t size) {
+    GEStdModel *stdmodel = model->extra[GE_STDMODEL_INHERIT_LEVEL];
+    if(stdmodel->array_attrs[0] == NULL) return GE_E_NOT_ADDED_YET;
+    return ge_modelarray_update(&stdmodel->vertex_array, data, size);
 }
 

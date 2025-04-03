@@ -56,6 +56,8 @@ typedef struct {
     GEModelArrayAttr normal_pos;
     GEModelArrayAttr *array_attrs[GE_STDMODEL_ARRAY_NUM];
     GEModelAttr attr;
+    
+    unsigned char updatable;
 } GEStdModel;
 
 /* ge_stdmodel_init
@@ -73,12 +75,15 @@ typedef struct {
  * index_num:   The number of indices.
  * vertex_num:  The number of vertex positions.
  * item_size:   The size of a single vertex position.
+ * updatable:   Non-zero if the model arrays can be updated or zero if they
+ *              can't.
  * extra:       Extra data (see model.h and base.h).
  * Returns 0 on success or an error code on failure.
  */
 int ge_stdmodel_init(GEModel *model, void *indices, void *vertices,
                      GEType index_type, GEType vertex_type, size_t index_num,
-                     size_t vertex_num, size_t item_size, void *extra);
+                     size_t vertex_num, size_t item_size, int updatable,
+                     void *extra);
 
 /* ge_stdmodel_shader_attr
  *
