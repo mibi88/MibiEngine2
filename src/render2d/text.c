@@ -62,6 +62,10 @@ int _ge_text_generate_arrays(GEText *text, GEFont *font, char *str,
     int x, y;
     GEGlyph *glyph;
     
+    free(text->vertices);
+    free(text->uv_coords);
+    free(text->indices);
+    
     text->vertices = malloc(len*4*2*sizeof(float));
     text->uv_coords = malloc(len*4*2*sizeof(float));
     text->indices = malloc(len*6*sizeof(unsigned short int));

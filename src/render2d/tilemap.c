@@ -190,5 +190,6 @@ void ge_tilemap_free(GETilemap *tilemap) {
     tilemap->uv_coords = NULL;
     free(tilemap->indices);
     tilemap->indices = NULL;
+    /* The tilemap model should be freed separately if needed */
 }
 

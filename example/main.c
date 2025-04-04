@@ -150,10 +150,16 @@ void free_on_exit(void) {
     ge_renderable_free(&renderable);
     ge_renderable_free(&sprite_renderable);
     ge_renderable_free(&text_renderable);
+    ge_renderable_free(&tilemap_renderable);
     ge_font_free(&font);
     ge_text_free(&text);
+    ge_tilemap_free(&tilemap);
     ge_texture_free(&texture);
+    ge_texture_free(&font_texture);
+    ge_texture_free(&tileset_texture);
     ge_image_free(&image);
+    ge_image_free(&font_image);
+    ge_image_free(&tileset);
     ge_shader_free(&shader3d);
     ge_shader_free(&shader2d);
 #if POSTPROCESSING
@@ -303,6 +309,11 @@ void init(void) {
     if(ge_tilemap_init(&tilemap, &tileset, &tileset_texture, &stdshader2d,
                        tiles, 16, 16, 4, 1, 32)){
         fputs("Failed to create tilemap!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    tiles[3*16+5] = 3;
+    if(ge_tilemap_update(&tilemap, tiles, 16, 16, 32)){
+        fputs("Failed to update the tilemap!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
     if(ge_loader_model_renderable(&tilemap_renderable,
