@@ -101,6 +101,7 @@ int _ge_gles_model_update_indices(GEModel *model, void *data, size_t size) {
                  size*ge_type_size[model->indices.type], data,
                  model->updatable ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    model->indices.num = size;
     return GE_E_NONE;
 }
 

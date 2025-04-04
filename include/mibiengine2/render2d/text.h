@@ -48,12 +48,14 @@ typedef struct {
     float *uv_coords;
     unsigned short int *indices;
     size_t len;
-    int size;
+    float size;
     int w, h;
 } GEText;
 
 int ge_text_init(GEText *text, GEFont *font, GETexture *texture,
                  GEStdShader *shader, char *str, float size);
+
+int ge_text_update(GEText *text, char *str);
 
 #define GE_TEXT_GET_MODEL(text) ((text)->model)
 

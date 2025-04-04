@@ -126,6 +126,9 @@ int ge_text_init(GEText *text, GEFont *font, GETexture *texture,
         GE_STDSHADER_NORMAL
     };
     
+    text->font = font;
+    text->size = size;
+    
     text->vertices = NULL;
     text->uv_coords = NULL;
     text->indices = NULL;
@@ -154,6 +157,28 @@ int ge_text_init(GEText *text, GEFont *font, GETexture *texture,
         ge_model_free(&text->model);
         return GE_E_STDMDOEL_SET_ATTR;
     }
+    return GE_E_NONE;
+}
+
+int ge_text_update(GEText *text, char *str) {
+    size_t len;
+    int rc;
+    
+    len = strlen(str);
+    
+    rc = _ge_text_generate_arrays(text, text->font, str, len, text->size);
+    if(rc) return rc;
+    
+    if(ge_model_update_indices(&text->model, text->indices, len*6)){
+        return GE_E_MODEL_UPDATE_INDICES;
+    }
+    if(ge_stdmodel_update_vertices(&text->model, text->vertices, len*4*2)){
+        return GE_E_STDMODEL_UPDATE_ARRAY;
+    }
+    if(ge_stdmodel_update_uv_coords(&text->model, text->uv_coords, len*4*2)){
+        return GE_E_STDMODEL_UPDATE_ARRAY;
+    }
+    
     return GE_E_NONE;
 }
 

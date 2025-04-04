@@ -253,6 +253,9 @@ void init(void) {
         fputs("Failed to create text!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
+    if(ge_text_update(&text, "The text got updated!")){
+        fputs("Failed to update text!\n", stderr);
+    }
     if(ge_loader_model_renderable(&text_renderable,
                                   &GE_TEXT_GET_MODEL(&text),
                                   &stdshader2d)){

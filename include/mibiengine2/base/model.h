@@ -87,11 +87,23 @@ typedef struct {
  *             can't.
  * extra:      Pointer stored in the model struct. Allows creation of higher
  *             level functions to create models (see base.h).
- * Returns 0 on success and a non zero int on failure.
+ * Returns GE_E_NONE (0) on success and a non zero int on failure.
  */
 int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
                   void *indices, GEType index_type, size_t index_num,
                   int updatable, void *extra);
+
+/* ge_model_update_indices
+ *
+ * Update the model's indices (only works if it is updatable, see
+ * ge_model_init).
+ *
+ * model: The model to update the indices of.
+ * data:  The index data (the type is kept the same).
+ * size:  The number of indices.
+ * Returns GE_E_NONE (0) or an error code on failure.
+ */
+int ge_model_update_indices(GEModel *model, void *data, size_t size);
 
 /* ge_model_set_attr
  *
@@ -101,7 +113,7 @@ int ge_model_init(GEModel *model, GEModelArray **arrays, size_t array_num,
  *
  * model: The model to set the attributes to.
  * attr:  The model attributes.
- * Returns 0 on success and a non zero int on failure.
+ * Returns GE_E_NONE (0) on success and a non zero int on failure.
  */
 int ge_model_set_attr(GEModel *model, GEModelAttr *attr);
 
@@ -126,7 +138,7 @@ int ge_model_set_attr(GEModel *model, GEModelAttr *attr);
  *                   ge_model_free).
  * inc_ptr:          Zero if the previously set callbacks should be replaced,
  *                   else the callbacks will be added.
- * Returns 0 on success and a non zero int on failure.
+ * Returns GE_E_NONE (0) on success and a non zero int on failure.
  */
 int ge_model_set_callbacks(GEModel *model,
                            void (*before_rendering)(void*, GEModelAttr*,
@@ -182,7 +194,7 @@ void ge_model_render_multiple(GEModel *model, GEShaderPos **pos,
  *             model attributes.
  * names:      The names of the attributes in the shader.
  * num:        The number of model array attributes.
- * Returns 0 on success and a non zero int on failure.
+ * Returns GE_E_NONE (0) on success and a non zero int on failure.
  */
 int ge_model_attr_init(GEModelAttr *attr, GEShader *shader,
                        GEModelArrayAttr **array_attr, char **names,

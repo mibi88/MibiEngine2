@@ -52,6 +52,10 @@ int ge_model_set_attr(GEModel *model, GEModelAttr *attr) {
     return GE_BACKENDLIST_GET(model_set_attr)(model, attr);
 }
 
+int ge_model_update_indices(GEModel *model, void *data, size_t size) {
+    return GE_BACKENDLIST_GET(model_update_indices)(model, data, size);
+}
+
 int ge_model_set_callbacks(GEModel *model,
                            void (*before_rendering)(void*, GEModelAttr*,
                                                     void*),
