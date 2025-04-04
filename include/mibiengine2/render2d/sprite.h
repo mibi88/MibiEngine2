@@ -43,8 +43,12 @@ typedef struct {
     GEModel model;
 } GESprite;
 
+#define GE_SPRITE_MODEL(sprite) ((sprite)->model)
+
 int ge_sprite_init(GESprite *sprite, GETexture *texture, GEStdShader *shader,
                    float w, float h);
+
+void ge_sprite_free(GESprite *sprite);
 
 #endif
 

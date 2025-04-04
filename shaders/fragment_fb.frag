@@ -49,7 +49,7 @@ precision lowp float;
  */
 
 #define STEP (1.0/2000.0)
-#define KERNEL_RADIUS 0
+#define KERNEL_RADIUS 3
 varying vec2 frag_pos;
 varying vec2 frag_uv;
 

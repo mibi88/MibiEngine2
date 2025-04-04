@@ -38,8 +38,6 @@
 
 #include <math.h>
 
-#define PI 3.14159
-
 /*
  * Useful links:
  * https://en.wikipedia.org/wiki/Matrix_multiplication
@@ -136,13 +134,13 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[0*4+3] = 0;
             
             mat->mat[1*4+0] = 0;
-            mat->mat[1*4+1] = cos(angle);
-            mat->mat[1*4+2] = -sin(angle);
+            mat->mat[1*4+1] = cos(angle/180*GE_MAT_PI);
+            mat->mat[1*4+2] = -sin(angle/180*GE_MAT_PI);
             mat->mat[1*4+3] = 0;
             
             mat->mat[2*4+0] = 0;
-            mat->mat[2*4+1] = sin(angle);
-            mat->mat[2*4+2] = cos(angle);
+            mat->mat[2*4+1] = sin(angle/180*GE_MAT_PI);
+            mat->mat[2*4+2] = cos(angle/180*GE_MAT_PI);
             mat->mat[2*4+3] = 0;
             
             mat->mat[3*4+0] = 0;
@@ -151,9 +149,9 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[3*4+3] = 1;
             break;
         case GE_A_Y:
-            mat->mat[0*4+0] = cos(angle);
+            mat->mat[0*4+0] = cos(angle/180*GE_MAT_PI);
             mat->mat[0*4+1] = 0;
-            mat->mat[0*4+2] = sin(angle);
+            mat->mat[0*4+2] = sin(angle/180*GE_MAT_PI);
             mat->mat[0*4+3] = 0;
             
             mat->mat[1*4+0] = 0;
@@ -161,9 +159,9 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[1*4+2] = 0;
             mat->mat[1*4+3] = 0;
             
-            mat->mat[2*4+0] = -sin(angle);
+            mat->mat[2*4+0] = -sin(angle/180*GE_MAT_PI);
             mat->mat[2*4+1] = 0;
-            mat->mat[2*4+2] = cos(angle);
+            mat->mat[2*4+2] = cos(angle/180*GE_MAT_PI);
             mat->mat[2*4+3] = 0;
             
             mat->mat[3*4+0] = 0;
@@ -172,13 +170,13 @@ void ge_mat4_rot3d(GEMat4 *mat, GEAxis axis, float angle) {
             mat->mat[3*4+3] = 1;
             break;
         case GE_A_Z:
-            mat->mat[0*4+0] = cos(angle);
-            mat->mat[0*4+1] = -sin(angle);
+            mat->mat[0*4+0] = cos(angle/180*GE_MAT_PI);
+            mat->mat[0*4+1] = -sin(angle/180*GE_MAT_PI);
             mat->mat[0*4+2] = 0;
             mat->mat[0*4+3] = 0;
             
-            mat->mat[1*4+0] = sin(angle);
-            mat->mat[1*4+1] = cos(angle);
+            mat->mat[1*4+0] = sin(angle/180*GE_MAT_PI);
+            mat->mat[1*4+1] = cos(angle/180*GE_MAT_PI);
             mat->mat[1*4+2] = 0;
             mat->mat[1*4+3] = 0;
             
@@ -243,7 +241,7 @@ void ge_mat4_scale3d(GEMat4 *mat, float x, float y, float z) {
 
 void ge_mat4_projection3d(GEMat4 *mat, float fov, float aspect_ratio,
                           float far, float near) {
-    float f = 1/tan(fov/180*PI/2);
+    float f = 1/tan(fov/180*GE_MAT_PI/2);
     mat->mat[0*4+0] = f/aspect_ratio;
     mat->mat[0*4+1] = 0;
     mat->mat[0*4+2] = 0;
@@ -267,13 +265,13 @@ void ge_mat4_projection3d(GEMat4 *mat, float fov, float aspect_ratio,
 
 void ge_mat4_ortho3d(GEMat4 *mat, float left, float top, float right,
                      float bottom, float far, float near) {
-    mat->mat[0*4+0] = 2/(right-left);
+    mat->mat[0*4+0] = 2/(left-right);
     mat->mat[0*4+1] = 0;
     mat->mat[0*4+2] = 0;
     mat->mat[0*4+3] = 0;
     
     mat->mat[1*4+0] = 0;
-    mat->mat[1*4+1] = 2/(top-bottom);
+    mat->mat[1*4+1] = 2/(bottom-top);
     mat->mat[1*4+2] = 0;
     mat->mat[1*4+3] = 0;
     
@@ -282,8 +280,8 @@ void ge_mat4_ortho3d(GEMat4 *mat, float left, float top, float right,
     mat->mat[2*4+2] = -2/(far-near);
     mat->mat[2*4+3] = 0;
     
-    mat->mat[3*4+0] = (right+left)/(right-left);
-    mat->mat[3*4+1] = (top+bottom)/(top-bottom);
+    mat->mat[3*4+0] = (left+right)/(left-right);
+    mat->mat[3*4+1] = (bottom+top)/(bottom-top);
     mat->mat[3*4+2] = (far+near)/(far-near);
     mat->mat[3*4+3] = 1;
 }

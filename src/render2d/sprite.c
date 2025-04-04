@@ -39,10 +39,10 @@ int ge_sprite_init(GESprite *sprite, GETexture *texture, GEStdShader *shader,
                    float w, float h) {
     /* Model data */
     float vertices[4*2] = {
-        0, 1,
-        0, 0,
-        1, 0,
-        1, 1
+         0.5, -0.5,
+         0.5,  0.5,
+        -0.5,  0.5,
+        -0.5, -0.5
     };
     unsigned short int indices[6] = {
         0, 1, 3,

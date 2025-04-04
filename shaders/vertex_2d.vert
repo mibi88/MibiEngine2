@@ -38,22 +38,18 @@ precision highp float;
 attribute vec4 ge_vertex;
 attribute vec4 ge_color;
 attribute vec3 ge_uv;
-attribute vec3 ge_normal;
 
 varying vec4 frag_pos;
-varying vec4 frag_color;
 varying vec3 frag_uv;
-varying vec3 frag_normal;
+varying vec4 frag_color;
 
 uniform mat4 ge_projection_mat;
 uniform mat4 ge_view_mat;
 uniform mat4 ge_model_mat;
-uniform mat3 ge_normal_mat;
 
 void main() {
     frag_color = ge_color;
     frag_uv = ge_uv;
-    frag_normal = normalize(ge_normal_mat*ge_normal);
     gl_Position = ge_projection_mat*ge_view_mat*ge_model_mat*ge_vertex;
     frag_pos = gl_Position;
 }

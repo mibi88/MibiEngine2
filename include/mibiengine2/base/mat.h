@@ -35,6 +35,8 @@
 #ifndef GE_MAT_H
 #define GE_MAT_H
 
+#define GE_MAT_PI 3.14159
+
 typedef struct {
     float mat[4*4];
 } GEMat4;

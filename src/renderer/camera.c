@@ -63,7 +63,6 @@ void ge_camera_orthographic(GECamera *camera, float left, float top,
 
 void ge_camera_update(GECamera *camera) {
     GEMat4 tmp1, tmp2, tmp3;
-    /* FIXME: Camera rotation seems to be broken */
     ge_mat4_rot3d(&tmp1, GE_A_X, camera->rotation.x);
     ge_mat4_rot3d(&tmp2, GE_A_Y, camera->rotation.y);
     ge_mat4_mmul(&tmp3, &tmp1, &tmp2);
@@ -72,7 +71,7 @@ void ge_camera_update(GECamera *camera) {
     
     ge_mat4_translate3d(&tmp1, camera->position.x, camera->position.y,
                         camera->position.z);
-    ge_mat4_mmul(&camera->view_mat, &tmp1, &tmp2);
+    ge_mat4_mmul(&camera->view_mat, &tmp2, &tmp1);
 }
 
 void ge_camera_use(GECamera *camera, GEStdShader *shader) {

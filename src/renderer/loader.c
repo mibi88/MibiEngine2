@@ -132,10 +132,10 @@ int ge_loader_load_obj(GEModel *model, GEShader *shader, GETexture *texture,
 int ge_loader_load_stdobj(GEModel *model, GEStdShader *shader,
                           GETexture *texture, char *file, int updatable) {
     char *attr_names[] = {
-        "vertex",
-        "color",
-        "uv",
-        "normal"
+        GE_STDSHADER_VERTEX,
+        GE_STDSHADER_COLOR,
+        GE_STDSHADER_UV,
+        GE_STDSHADER_NORMAL
     };
     return ge_loader_load_obj(model, shader->shader, texture, file, attr_names,
                               &shader->texture, &shader->uv_max, updatable);
