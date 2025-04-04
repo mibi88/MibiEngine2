@@ -54,6 +54,7 @@ int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
                                           image->width : image->height);
     texture->width = image->width;
     texture->height = image->height;
+    texture->flip = flip;
     texture->uv_max.x = image->width/(float)texture->size;
     texture->uv_max.y = image->height/(float)texture->size;
     texture->data = malloc(texture->size*texture->size*4);
@@ -83,6 +84,47 @@ int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                     linear ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->size, texture->size, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, texture->data);
+    return GE_E_NONE;
+}
+
+int _ge_gles_texture_update(GETexture *texture, GEImage *image) {
+    size_t x, y;
+    size_t tex_y;
+    int bytes;
+    unsigned char color[4];
+    /* TODO: Do not entirely recreate it if it has the same size as the
+     * previous one. */
+    /* Make a copy of the texture in RGBA color format as a square texture */
+    texture->size = ge_utils_power_of_two(image->width > image->height ?
+                                          image->width : image->height);
+    texture->width = image->width;
+    texture->height = image->height;
+    texture->uv_max.x = image->width/(float)texture->size;
+    texture->uv_max.y = image->height/(float)texture->size;
+    free(texture->data);
+    texture->data = malloc(texture->size*texture->size*4);
+    if(texture->data == NULL){
+        return GE_E_OUT_OF_MEM;
+    }
+    bytes = image->row_bytes/image->width;
+    memset(texture->data, 0, texture->size*texture->size*4);
+    for(y=0;y<image->height;y++){
+        for(x=0;x<image->width;x++){
+            memcpy(color, image->data+(y*image->width+x)*bytes,
+                   bytes <= 4 ? bytes : 4);
+            if(4-bytes > 0) memset(color+bytes, 255, 4-bytes);
+            if(texture->flip) tex_y = (texture->size-y-1);
+            else tex_y = y;
+            memcpy(texture->data+(tex_y*texture->size+x)*4,
+                   color, 4);
+        }
+    }
+    /* Upload the texture to the GPU */
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, texture->id);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->size, texture->size, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, texture->data);

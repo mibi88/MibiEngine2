@@ -67,6 +67,7 @@ GEBackend _ge_gles_backend = {
     _ge_gles_shader_free,
     
     _ge_gles_texture_init,
+    _ge_gles_texture_update,
     _ge_gles_texture_use,
     _ge_gles_texture_free,
     

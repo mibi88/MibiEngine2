@@ -47,6 +47,10 @@ int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip) {
     return GE_BACKENDLIST_GET(texture_init)(texture, image, linear, flip);
 }
 
+int ge_texture_update(GETexture *texture, GEImage *image) {
+    return GE_BACKENDLIST_GET(texture_update)(texture, image);
+}
+
 void ge_texture_use(GETexture *texture, GEShaderPos *pos, size_t n) {
     GE_BACKENDLIST_GET(texture_use)(texture, pos, n);
 }

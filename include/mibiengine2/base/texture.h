@@ -49,6 +49,7 @@ typedef struct {
     unsigned char *data;
     unsigned int id;
     GEVec2 uv_max;
+    unsigned char flip;
 } GETexture;
 
 /* ge_texture_init
@@ -60,9 +61,19 @@ typedef struct {
  * linear:  Use linear filtering instead of nearest neighbour filtering.
  * flip:    Flip the texture (textures are loaded as vertically flipped by
  *          default.
- * Returns 0 on success or an error code on failure.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
  */
 int ge_texture_init(GETexture *texture, GEImage *image, int linear, int flip);
+
+/* ge_texture_update
+ *
+ * Update the contents of a texture.
+ *
+ * texture: The texture to update.
+ * image:   The image data to load into the texture.
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_texture_update(GETexture *texture, GEImage *image);
 
 /* ge_texture_use
  *

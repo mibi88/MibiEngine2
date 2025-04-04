@@ -83,6 +83,7 @@ void _ge_gles_shader_free(GEShader *shader);
 
 int _ge_gles_texture_init(GETexture *texture, GEImage *image, int linear,
                           int flip);
+int _ge_gles_texture_update(GETexture *texture, GEImage *image);
 void _ge_gles_texture_use(GETexture *texture, GEShaderPos *pos, size_t n);
 void _ge_gles_texture_free(GETexture *texture);
 

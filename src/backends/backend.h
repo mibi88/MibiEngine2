@@ -92,6 +92,7 @@ typedef struct {
 
     int (*texture_init)(GETexture *texture, GEImage *image, int linear,
                         int flip);
+    int (*texture_update)(GETexture *texture, GEImage *image);
     void (*texture_use)(GETexture *texture, GEShaderPos *pos, size_t n);
     void (*texture_free)(GETexture *texture);
 
