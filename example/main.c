@@ -58,6 +58,7 @@
 #include <mibiengine2/render2d/sprite.h>
 #include <mibiengine2/render2d/font.h>
 #include <mibiengine2/render2d/text.h>
+#include <mibiengine2/render2d/tilemap.h>
 
 #define PRINT_MS 1
 
@@ -106,10 +107,34 @@ GEFont font;
 GEText text;
 GERenderable text_renderable;
 
-GEEntity entities2d[2];
+GEImage tileset;
+GETexture tileset_texture;
+GETilemap tilemap;
+GERenderable tilemap_renderable;
+unsigned short int tiles[16*16] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1,
+    1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+};
+
+GEEntity entities2d[3];
 
 GEEntity *sprite_entity = entities2d;
-GEEntity *text_entity = entities2d+1;
+GEEntity *text_entity = entities2d+2;
+GEEntity *tilemap_entity = entities2d+1;
 
 GEStdShader *scene3d_shaders[] = {
     &stdshader3d
@@ -263,7 +288,31 @@ void init(void) {
         EXIT(EXIT_FAILURE);
     }
     if(ge_entity_init(text_entity, &text_renderable)){
-        fputs("Failed to create sprite entity!\n", stderr);
+        fputs("Failed to create text entity!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    if(ge_image_init(&tileset, "tiles.png")){
+        fputs("Failed to read image!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_texture_init(&tileset_texture, &tileset, 0, 0)){
+        fputs("Failed to load texture!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_tilemap_init(&tilemap, &tileset, &tileset_texture, &stdshader2d,
+                       tiles, 16, 16, 4, 1, 32)){
+        fputs("Failed to create tilemap!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_loader_model_renderable(&tilemap_renderable,
+                                  &GE_TILEMAP_GET_MODEL(&tilemap),
+                                  &stdshader2d)){
+        fputs("Failed to create tilemap renderable!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_entity_init(tilemap_entity, &tilemap_renderable)){
+        fputs("Failed to create tilemap entity!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
     
@@ -292,7 +341,7 @@ void init(void) {
         fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if(ge_scene_init(&scene2d, entities2d, 2, scene2d_shaders, 1, 0)){
+    if(ge_scene_init(&scene2d, entities2d, 3, scene2d_shaders, 1, 0)){
         fputs("Failed to create 2D scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
