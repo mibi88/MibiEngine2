@@ -289,6 +289,16 @@ void _ge_gles_window_depth_test(GEWindow *window, int depth_test) {
     else glDisable(GL_DEPTH_TEST);
 }
 
+void _ge_gles_window_blending(GEWindow *window, int blend) {
+    (void)window;
+    if(blend){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }else{
+        glDisable(GL_BLEND);
+    }
+}
+
 unsigned long _ge_gles_window_ms(GEWindow *window) {
     struct timespec time;
     (void)window;

@@ -100,6 +100,7 @@ typedef struct {
     int (*window_set_data)(GEWindow *window, void *data);
     int (*window_cap_framerate)(GEWindow *window, int cap);
     void (*window_depth_test)(GEWindow *window, int depth_test);
+    void (*window_blending)(GEWindow *window, int blend);
     unsigned long (*window_ms)(GEWindow *window);
     int (*window_key_pressed)(GEWindow *window, GEKey key);
     void (*window_mainloop)(GEWindow *window);

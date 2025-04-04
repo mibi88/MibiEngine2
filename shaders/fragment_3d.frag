@@ -40,7 +40,7 @@ varying vec4 frag_color;
 varying vec3 frag_uv;
 varying vec3 frag_normal;
 
-uniform sampler2D tex;
+uniform sampler2D ge_texture;
 uniform vec2 ge_uv_max;
 
 vec3 light = vec3(0.0);
@@ -66,7 +66,7 @@ float lighting(vec3 light) {
 void main() {
     vec2 pos = mod((frag_uv.xy*ge_uv_max), ge_uv_max);
     pos.y = ge_uv_max.y-pos.y;
-    gl_FragColor = texture2D(tex, pos)*
+    gl_FragColor = texture2D(ge_texture, pos)*
                    lighting(light);
 }
 

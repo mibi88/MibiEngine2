@@ -138,6 +138,16 @@ int ge_window_cap_framerate(GEWindow *window, int cap);
  */
 void ge_window_depth_test(GEWindow *window, int depth_test);
 
+/* ge_window_blending
+ *
+ * Enable or disable blending.
+ *
+ * window: The window struct.
+ * blend:  0 if blending should be disabled, a non zero value if it should be
+ *         enabled.
+ */
+void ge_window_blending(GEWindow *window, int blend);
+
 /* ge_window_ms
  *
  * Get the elapsed miliseconds.

@@ -49,10 +49,10 @@ int ge_sprite_init(GESprite *sprite, GETexture *texture, GEStdShader *shader,
         3, 1, 2
     };
     float uv_coords[4*2] = {
-        0, 0,
         0, 1,
-        1, 1,
-        1, 0
+        0, 0,
+        1, 0,
+        1, 1
     };
     char *attr_names[] = {
         GE_STDSHADER_VERTEX,
@@ -91,6 +91,7 @@ int ge_sprite_init(GESprite *sprite, GETexture *texture, GEStdShader *shader,
 }
 
 void ge_sprite_free(GESprite *sprite) {
-    ge_model_free(&sprite->model);
+    (void)sprite;
+    /* The model should be freed separately if needed */
 }
 

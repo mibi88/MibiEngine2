@@ -32,19 +32,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#version 100
-precision lowp float;
+#ifndef GE_TEXT_H
+#define GE_TEXT_H
 
-varying vec4 frag_pos;
-varying vec4 frag_color;
-varying vec3 frag_uv;
+#include <mibiengine2/base/model.h>
+#include <mibiengine2/base/texture.h>
+#include <mibiengine2/base/texturedmodel.h>
+#include <mibiengine2/renderer/stdshader.h>
+#include <mibiengine2/render2d/font.h>
 
-uniform sampler2D ge_texture;
-uniform vec2 ge_uv_max;
+typedef struct {
+    GEModel model;
+    GEFont *font;
+    float *vertices;
+    float *uv_coords;
+    unsigned short int *indices;
+    size_t len;
+    int size;
+    int w, h;
+} GEText;
 
-void main() {
-    vec2 pos = mod((frag_uv.xy*ge_uv_max), ge_uv_max);
-    //pos.y = ge_uv_max.y-pos.y;
-    gl_FragColor = texture2D(ge_texture, pos);
-}
+int ge_text_init(GEText *text, GEFont *font, GETexture *texture,
+                 GEStdShader *shader, char *str, float size);
+
+#define GE_TEXT_GET_MODEL(text) ((text)->model)
+
+void ge_text_free(GEText *text);
+
+#endif
 

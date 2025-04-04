@@ -72,6 +72,10 @@ void ge_window_depth_test(GEWindow *window, int depth_test) {
     GE_BACKENDLIST_GET(window_depth_test)(window, depth_test);
 }
 
+void ge_window_blending(GEWindow *window, int blend) {
+    GE_BACKENDLIST_GET(window_blending)(window, blend);
+}
+
 unsigned long ge_window_ms(GEWindow *window) {
     return GE_BACKENDLIST_GET(window_ms)(window);
 }

@@ -75,6 +75,7 @@ GEBackend _ge_gles_backend = {
     _ge_gles_window_set_data,
     _ge_gles_window_cap_framerate,
     _ge_gles_window_depth_test,
+    _ge_gles_window_blending,
     _ge_gles_window_ms,
     _ge_gles_window_key_pressed,
     _ge_gles_window_mainloop,

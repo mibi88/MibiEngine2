@@ -32,19 +32,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#version 100
-precision lowp float;
+#ifndef GE_FONT_H
+#define GE_FONT_H
 
-varying vec4 frag_pos;
-varying vec4 frag_color;
-varying vec3 frag_uv;
+#include <mibiengine2/base/image.h>
+#include <stddef.h>
 
-uniform sampler2D ge_texture;
-uniform vec2 ge_uv_max;
+typedef enum {
+    GE_F_ASCII,
+    GE_F_AMOUNT
+} GECharset;
 
-void main() {
-    vec2 pos = mod((frag_uv.xy*ge_uv_max), ge_uv_max);
-    //pos.y = ge_uv_max.y-pos.y;
-    gl_FragColor = texture2D(ge_texture, pos);
-}
+typedef struct {
+    int x1, y1;
+    int x2, y2;
+    float u1, v1;
+    float u2, v2;
+} GEGlyph;
+
+typedef struct {
+    GEImage *image;
+    GEGlyph *glyphs;
+    size_t glyph_num;
+    unsigned char charset;
+    int char_spacing;
+    int line_spacing;
+    int line_height;
+    
+    size_t (*glyph_pos)(void *font, size_t glyph);
+    void (*glyph_move_cursor)(void *_font, size_t glyph, int *x, int *y);
+} GEFont;
+
+int ge_font_init(GEFont *font, GEImage *image, int variable_width,
+                 int min_char_width, int padding, float char_spacing,
+                 float line_spacing, GECharset charset);
+
+void ge_font_free(GEFont *font);
+
+#endif
 

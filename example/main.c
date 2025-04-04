@@ -56,6 +56,8 @@
 #include <mibiengine2/renderer/stdshader.h>
 
 #include <mibiengine2/render2d/sprite.h>
+#include <mibiengine2/render2d/font.h>
+#include <mibiengine2/render2d/text.h>
 
 #define PRINT_MS 1
 
@@ -86,7 +88,7 @@ GEFramebuffer framebuffer;
 GEStdShader stdshader3d;
 GEStdShader stdshader2d;
 
-GEScene scene;
+GEScene scene3d;
 GERenderable renderable;
 GEEntity entities[ENTITIES];
 
@@ -96,8 +98,18 @@ GECamera camera3d;
 GECamera camera2d;
 
 GESprite sprite;
-GEEntity sprite_entity;
 GERenderable sprite_renderable;
+
+GEImage font_image;
+GETexture font_texture;
+GEFont font;
+GEText text;
+GERenderable text_renderable;
+
+GEEntity entities2d[2];
+
+GEEntity *sprite_entity = entities2d;
+GEEntity *text_entity = entities2d+1;
 
 GEStdShader *scene3d_shaders[] = {
     &stdshader3d
@@ -108,13 +120,17 @@ GEStdShader *scene2d_shaders[] = {
 
 void free_on_exit(void) {
     puts("Free everything!");
-    ge_scene_free(&scene);
+    ge_scene_free(&scene3d);
     ge_scene_free(&scene2d);
     ge_renderable_free(&renderable);
     ge_renderable_free(&sprite_renderable);
+    ge_renderable_free(&text_renderable);
+    ge_font_free(&font);
+    ge_text_free(&text);
     ge_texture_free(&texture);
     ge_image_free(&image);
     ge_shader_free(&shader3d);
+    ge_shader_free(&shader2d);
 #if POSTPROCESSING
     ge_shader_free(&fb_shader);
     ge_framebuffer_free(&framebuffer);
@@ -215,7 +231,35 @@ void init(void) {
         fputs("Failed to create sprite renderable!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if(ge_entity_init(&sprite_entity, &sprite_renderable)){
+    if(ge_entity_init(sprite_entity, &sprite_renderable)){
+        fputs("Failed to create sprite entity!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    
+    if(ge_image_init(&font_image, "font.png")){
+        fputs("Failed to read image!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_texture_init(&font_texture, &font_image, 0, 0)){
+        fputs("Failed to load texture!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_font_init(&font, &font_image, 0, 3, 0, 1, 1, GE_F_ASCII)){
+        fputs("Failed to create font!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_text_init(&text, &font, &font_texture, &stdshader2d, "Hello world!",
+                    6)){
+        fputs("Failed to create text!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_loader_model_renderable(&text_renderable,
+                                  &GE_TEXT_GET_MODEL(&text),
+                                  &stdshader2d)){
+        fputs("Failed to create text renderable!\n", stderr);
+        EXIT(EXIT_FAILURE);
+    }
+    if(ge_entity_init(text_entity, &text_renderable)){
         fputs("Failed to create sprite entity!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -241,11 +285,11 @@ void init(void) {
         ge_entity_update(entities+i);
     }
     
-    if(ge_scene_init(&scene, entities, ENTITIES, scene3d_shaders, 1, 0)){
+    if(ge_scene_init(&scene3d, entities, ENTITIES, scene3d_shaders, 1, 0)){
         fputs("Failed to create scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
-    if(ge_scene_init(&scene2d, &sprite_entity, 1, scene2d_shaders, 1, 0)){
+    if(ge_scene_init(&scene2d, entities2d, 2, scene2d_shaders, 1, 0)){
         fputs("Failed to create 2D scene!\n", stderr);
         EXIT(EXIT_FAILURE);
     }
@@ -254,7 +298,7 @@ void init(void) {
         EXIT(EXIT_FAILURE);
     }
     ge_camera_perspective(&camera3d, 72, 480/(float)360, 1000, 0.1);
-    ge_scene_set_camera(&scene, &camera3d);
+    ge_scene_set_camera(&scene3d, &camera3d);
     if(ge_camera_init(&camera2d)){
         fputs("Failed to init 2D camera!\n", stderr);
         EXIT(EXIT_FAILURE);
@@ -297,8 +341,8 @@ void rotate_entities(GEEntity *entity, void *data) {
 
 void move_sprites(GEEntity *entity, void *data) {
     (void)data;
-    ge_entity_set_rotation(entity, 0, 0, x);
-    ge_entity_set_position(entity, -x*0.5, -x*0.8, 0);
+    /*ge_entity_set_rotation(entity, 0, 0, x);*/
+    ge_entity_set_position(entity, -x*1.5, -x*1.8, 0);
     ge_entity_update(entity);
 }
 
@@ -342,19 +386,23 @@ void draw(void *data) {
     }
     ge_camera_update(&camera3d);
     
-    ge_scene_for_entity(&scene, rotate_entities, NULL);
+    ge_scene_for_entity(&scene3d, rotate_entities, NULL);
     ge_scene_for_entity(&scene2d, move_sprites, NULL);
     
-    ge_scene_update(&scene);
+    ge_scene_update(&scene3d);
     ge_scene_update(&scene2d);
-    
-    ge_shader_use(&shader2d);
-    
-    ge_scene_render(&scene2d);
     
     ge_shader_use(&shader3d);
     
-    ge_scene_render(&scene);
+    ge_scene_render(&scene3d);
+    
+    ge_shader_use(&shader2d);
+    
+    ge_window_blending(&window, 1);
+    ge_window_depth_test(&window, 0);
+    ge_scene_render(&scene2d);
+    ge_window_depth_test(&window, 1);
+    ge_window_blending(&window, 0);
     
 #if POSTPROCESSING
     ge_framebuffer_default();
