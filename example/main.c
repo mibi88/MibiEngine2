@@ -60,8 +60,6 @@
 #include <mibiengine2/render2d/text.h>
 #include <mibiengine2/render2d/tilemap.h>
 
-#define PRINT_MS 1
-
 #define POSTPROCESSING 1
 
 #define ENTITIES 40
@@ -409,6 +407,8 @@ void move_sprites(GEEntity *entity, void *data) {
     ge_entity_update(entity);
 }
 
+char buffer[20];
+
 void draw(void *data) {
     float delta;
     unsigned long now, diff;
@@ -425,9 +425,8 @@ void draw(void *data) {
     delta = diff*0.001;
     last_time = now;
     
-#if PRINT_MS
-    printf("%lu      \r", diff);
-#endif
+    sprintf(buffer, "Miliseconds: %lu\r", diff);
+    ge_text_update(&text, buffer);
     
     if(ge_window_key_pressed(&window, GE_K_UP)){
         camera3d.position.x += 15*cos(-camera3d.rotation.y/180*GE_MAT_PI+

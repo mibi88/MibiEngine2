@@ -83,6 +83,10 @@ int ge_entity_set_data(GEEntity *entity, void *data) {
     return GE_E_NONE;
 }
 
+void ge_entity_set_extra_data(GEEntity *entity, void *extra) {
+    entity->extra = extra;
+}
+
 int ge_entity_set_update_callback(GEEntity *entity,
                                   void on_update(void *_entity, void *_data),
                                   void *data) {
