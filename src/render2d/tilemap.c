@@ -85,7 +85,7 @@ int _ge_tilemap_generate(GETilemap *tilemap, unsigned short int *tiles,
     
     i = 0;
     for(y=0;y<tilemap->h;y++){
-        for(x=0;x<tilemap->h;x++){
+        for(x=0;x<tilemap->w;x++){
             tx = tiles[i]%tilemap->tiles_w;
             ty = tiles[i]/tilemap->tiles_w;
             for(n=0;n<4*2;n++){
