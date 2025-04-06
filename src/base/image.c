@@ -146,6 +146,9 @@ int ge_image_empty(GEImage *image, int width, int height) {
     if(image->data == NULL){
         return GE_E_OUT_OF_MEM;
     }
+    image->width = width;
+    image->height = height;
+    image->row_bytes = width*4;
     return GE_E_NONE;
 }
 
