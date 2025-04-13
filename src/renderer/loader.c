@@ -167,6 +167,7 @@ void _ge_loader_model_render_multiple(void *data, GEMat4 *mats,
 void _ge_loader_model_free(void *data) {
     GEModelRenderable *model = data;
     ge_model_free(model->model);
+    free(data);
 }
 
 void _ge_loader_model_as_renderable_free(void *data) {
