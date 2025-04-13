@@ -102,8 +102,13 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     EGLSurface *surface;
     EGLConfig *config;
     EGLContext *context;
+#ifndef __EMSCRIPTEN__
     Window *win;
     Atom *wm_delete_window;
+    EGLint surface_attr[] = {EGL_NONE};
+    Bool repeat = False;
+    Bool repeat_set;
+#endif
     
     EGLint attr[] = {
         EGL_BUFFER_SIZE, 0,
@@ -131,7 +136,6 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
         EGL_NATIVE_VISUAL_TYPE, EGL_DONT_CARE,
         EGL_NONE
     };
-    EGLint surface_attr[] = {EGL_NONE};
     EGLint context_attr[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
 #if DEBUG_GLES
@@ -141,14 +145,13 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     };
     EGLint min, maj;
     EGLint config_num = 0;
-    Bool repeat = False;
-    Bool repeat_set;
     
     /* Allocate all the values in the structure */
     window->egl.display = malloc(sizeof(EGLDisplay));
     window->egl.surface = malloc(sizeof(EGLSurface));
     window->egl.config = malloc(sizeof(EGLConfig));
     window->egl.context = malloc(sizeof(EGLContext));
+#ifndef __EMSCRIPTEN__
     /* Xlib platform dependant stuff */
     window->platform.window = malloc(sizeof(Window));
     window->platform.wm_delete_window = malloc(sizeof(Atom));
@@ -172,14 +175,18 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
         window->platform.wm_delete_window = NULL;
         return GE_E_OUT_OF_MEM;
     }
+    win = window->platform.window;
+    wm_delete_window = window->platform.wm_delete_window;
+#else
+    (void)title;
+#endif
     display = window->egl.display;
     surface = window->egl.surface;
     config = window->egl.config;
     context = window->egl.context;
-    win = window->platform.window;
-    wm_delete_window = window->platform.wm_delete_window;
     
     /* Create the window and an OpenGL ES context */
+#ifndef __EMSCRIPTEN__
     window->platform.display = XOpenDisplay(NULL);
     *win = XCreateSimpleWindow(window->platform.display,
                                   XDefaultRootWindow(window->platform.display),
@@ -202,6 +209,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
         fputs("Key presses may behave unexpectedly because "
               "DetectableAutoRepeat is unsupported!\n", stderr);
     }
+#endif
     
     *display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if(*display == EGL_NO_DISPLAY){
@@ -236,7 +244,11 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
         fputs("Failed to choose config!\n", stderr);
         return GE_E_CHOOSE_CONFIG;
     }
+#ifndef __EMSCRIPTEN__
     *surface = eglCreateWindowSurface(*display, *config, *win, surface_attr);
+#else
+    *surface = eglCreateWindowSurface(*display, *config, 0, NULL);
+#endif
     if(eglGetError() != EGL_SUCCESS){
         fputs("Failed to create surface!\n", stderr);
         return GE_E_SURFACE;
@@ -254,7 +266,9 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     }
     
     /* Uncap the framerate */
+#ifndef __EMSCRIPTEN__
     eglSwapInterval(*display, 0);
+#endif
 #if GE_WINDOW_DEBUG
     /* Add a debug callback */
     glDebugMessageCallback(_ge_window_debug_callback, NULL);
@@ -279,8 +293,15 @@ int _ge_gles_window_set_data(GEWindow *window, void *data) {
 }
 
 int _ge_gles_window_cap_framerate(GEWindow *window, int cap) {
+#ifndef __EMSCRIPTEN__
     return eglSwapInterval(*(EGLDisplay*)window->platform.display,
                            cap ? 1 : 0) == GL_TRUE;
+#else
+    (void)window;
+    (void)cap;
+    /* TODO */
+    return GE_E_NONE;
+#endif
 }
 
 void _ge_gles_window_depth_test(GEWindow *window, int depth_test) {
@@ -303,7 +324,7 @@ unsigned long _ge_gles_window_ms(GEWindow *window) {
     struct timespec time;
     (void)window;
     clock_gettime(CLOCK_REALTIME, &time);
-    return time.tv_nsec/(1e6)+time.tv_sec*1000;
+    return time.tv_nsec/(unsigned long)(1e6)+time.tv_sec*1000;
 }
 
 int _ge_gles_window_key_pressed(GEWindow *window, GEKey key) {
@@ -313,6 +334,7 @@ int _ge_gles_window_key_pressed(GEWindow *window, GEKey key) {
     return 0;
 }
 
+#ifndef __EMSCRIPTEN__
 void _ge_gles_window_mainloop(GEWindow *window) {
     XEvent event;
     KeySym xlib_keys[GE_K_AMOUNT] = {
@@ -480,7 +502,7 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     keysym = XLookupKeysym(&event.xkey, 0);
                     for(i=0;i<GE_K_AMOUNT;i++){
                         if(keysym == xlib_keys[i]){
-                            if(window->keyevent &&
+                            if(window->keyevent != NULL &&
                                !window->platform.keys_down[i]){
                                 window->keyevent(window->data, i, 0);
                             }
@@ -493,7 +515,7 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                     keysym = XLookupKeysym(&event.xkey, 0);
                     for(i=0;i<GE_K_AMOUNT;i++){
                         if(keysym == xlib_keys[i]){
-                            if(window->keyevent &&
+                            if(window->keyevent != NULL &&
                                window->platform.keys_down[i]){
                                 window->keyevent(window->data, i, 1);
                             }
@@ -505,7 +527,7 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                 case ButtonPress:
                     window->platform.mouse_y = event.xbutton.x;
                     window->platform.mouse_x = event.xbutton.y;
-                    if(window->mouseevent){
+                    if(window->mouseevent != NULL){
                         for(i=0;i<_GE_GLES_WINDOW_BUTTON_NUM;i++){
                             if(event.xbutton.button == buttons[i]){
                                 window->mouseevent(window->data,
@@ -519,7 +541,7 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                 case ButtonRelease:
                     window->platform.mouse_y = event.xbutton.x;
                     window->platform.mouse_x = event.xbutton.y;
-                    if(window->mouseevent){
+                    if(window->mouseevent != NULL){
                         for(i=0;i<_GE_GLES_WINDOW_BUTTON_NUM;i++){
                             if(event.xbutton.button == buttons[i]){
                                 window->mouseevent(window->data,
@@ -533,10 +555,12 @@ void _ge_gles_window_mainloop(GEWindow *window) {
                 case MotionNotify:
                     window->platform.mouse_y = event.xmotion.x;
                     window->platform.mouse_x = event.xmotion.y;
-                    window->mouseevent(window->data,
-                                       window->platform.mouse_y,
-                                       window->platform.mouse_x,
-                                       GE_B_MOVE, 0);
+                    if(window->mouseevent != NULL){
+                        window->mouseevent(window->data,
+                                           window->platform.mouse_y,
+                                           window->platform.mouse_x,
+                                           GE_B_MOVE, 0);
+                    }
                     break;
                 default:
                     break;
@@ -552,6 +576,258 @@ void _ge_gles_window_mainloop(GEWindow *window) {
         }
     }
 }
+#else
+
+#define _Bool char
+
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
+bool _ge_gles_window_emresize(int type, const struct EmscriptenUiEvent *event,
+                              void *data) {
+    GEWindow *window = data;
+    (void)type;
+    if(window->resize != NULL){
+        window->resize(window->data, event->windowInnerWidth,
+                       event->windowInnerHeight);
+    }
+    return 0;
+}
+
+bool _ge_gles_window_emkey(int type,
+                           const struct EmscriptenKeyboardEvent *event,
+                           void *data) {
+    GEWindow *window = data;
+    char *keys[GE_K_AMOUNT] = {
+        "",
+        "Escape",
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+        "Insert",
+        "Delete",
+        "Tab",
+        "CapsLock",
+        "Shift",
+        "Control",
+        "",
+        "Alt",
+        "AltGraph",
+        "Control",
+        "Enter",
+        "Backspace",
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "PageUp",
+        "PageDown",
+        "Home",
+        "End",
+        " ",
+        "!",
+        "\"",
+        "#",
+        "$",
+        "%",
+        "&",
+        "'",
+        "(",
+        ")",
+        "*",
+        "+",
+        ",",
+        "-",
+        ".",
+        "/",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        ":",
+        ";",
+        "<",
+        "=",
+        ">",
+        "?",
+        "@",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+        "Z",
+        "[",
+        "\\",
+        "]",
+        "`",
+        "_",
+        "`",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "{",
+        "|",
+        "}",
+        "~",
+        "\xA0"
+    };
+    size_t i;
+    /* TODO: Use hashes */
+    for(i=0;i<GE_K_AMOUNT;i++){
+        if(!strcmp(keys[i], event->key)){
+            if(window->keyevent != NULL &&
+               window->platform.keys_down[i] !=
+               (type != EMSCRIPTEN_EVENT_KEYUP ? 1 : 0)){
+                window->keyevent(window->data, i,
+                                 type == EMSCRIPTEN_EVENT_KEYUP);
+            }
+            window->platform.keys_down[i] = (type != EMSCRIPTEN_EVENT_KEYUP ?
+                                             1 : 0);
+            break;
+        }
+    }
+    return 1;
+}
+
+bool _ge_gles_window_emmouseclick(int type,
+                                  const struct EmscriptenMouseEvent *event,
+                                  void *data) {
+    GEWindow *window = data;
+    window->platform.mouse_x = event->clientX;
+    window->platform.mouse_y = event->clientY;
+    if(window->mouseevent != NULL){
+        window->mouseevent(window->data, window->platform.mouse_x,
+                           window->platform.mouse_y, event->button,
+                           type != EMSCRIPTEN_EVENT_MOUSEDOWN);
+    }
+    return 1;
+}
+
+bool _ge_gles_window_emmousemove(int type,
+                                  const struct EmscriptenMouseEvent *event,
+                                  void *data) {
+    GEWindow *window = data;
+    window->platform.mouse_x = event->clientX;
+    window->platform.mouse_y = event->clientY;
+    if(window->mouseevent != NULL){
+        window->mouseevent(window->data, window->platform.mouse_x,
+                           window->platform.mouse_y, GE_B_MOVE, 0);
+    }
+    return 1;
+}
+
+bool _ge_gles_window_emmousescroll(int type,
+                                   const struct EmscriptenWheelEvent *event,
+                                   void *data) {
+    GEWindow *window = data;
+    window->platform.mouse_x = event->mouse.clientX;
+    window->platform.mouse_y = event->mouse.clientY;
+    if(window->mouseevent != NULL){
+        window->mouseevent(window->data, window->platform.mouse_x,
+                           window->platform.mouse_y, event->deltaY < 0 ?
+                           GE_B_SCROLLUP : GE_B_SCROLLDOWN, 0);
+        window->mouseevent(window->data, window->platform.mouse_x,
+                           window->platform.mouse_y, event->deltaY < 0 ?
+                           GE_B_SCROLLUP : GE_B_SCROLLDOWN, 1);
+    }
+    return 0;
+}
+
+void _ge_gles_window_emloop(void *data) {
+    GEWindow *window = data;
+    if(window->draw != NULL){
+        window->draw(window->data);
+        glFlush();
+        if(eglSwapBuffers(*(EGLDisplay*)window->egl.display,
+                          *(EGLSurface*)window->egl.surface) == EGL_FALSE){
+            fprintf(stderr, "Failed to swap buffers!\n    Error: %s\n",
+                    _ge_window_egl_error_str(eglGetError()));
+        }
+    }
+}
+
+EM_JS(void, _ge_gles_window_emtrigger_resize, (void), {
+    window.dispatchEvent(new Event("resize"));
+})
+
+void _ge_gles_window_mainloop(GEWindow *window) {
+    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window, 0,
+                                   _ge_gles_window_emresize);
+    emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window, 1,
+                                    _ge_gles_window_emkey);
+    emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window, 1,
+                                  _ge_gles_window_emkey);
+    emscripten_set_mousedown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window,
+                                      1, _ge_gles_window_emmouseclick);
+    emscripten_set_mouseup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window, 1,
+                                    _ge_gles_window_emmouseclick);
+    emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window,
+                                      1, _ge_gles_window_emmousemove);
+    emscripten_set_wheel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, window, 1,
+                                  _ge_gles_window_emmousescroll);
+    _ge_gles_window_emtrigger_resize();
+    emscripten_set_main_loop_arg(_ge_gles_window_emloop, window, 0, 1);
+}
+#endif
 
 void _ge_gles_window_clear(GEWindow *window, float r, float g, float b,
                            float a) {
@@ -580,12 +856,14 @@ void _ge_gles_window_free(GEWindow *window) {
                          *(EGLContext*)window->egl.context) == EGL_FALSE){
         fputs("Failed to destroy context!\n", stderr);
     }
+#ifndef __EMSCRIPTEN__
     XDestroyWindow(window->platform.display,
                    *(Window*)window->platform.window);
     XCloseDisplay(window->platform.display);
     if(eglTerminate(*(EGLDisplay*)window->egl.display) == EGL_FALSE){
         fputs("Failed to terminate EGL!\n", stderr);
     }
+#endif
     /* Free all the allocated variables */
     free(window->egl.display);
     window->egl.display = NULL;

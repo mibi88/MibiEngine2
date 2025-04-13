@@ -45,20 +45,29 @@ CFLAGS=(-ansi -Wall -Wextra -Wpedantic
 
 rebuild=false
 clean=false
+emscripten=false
 
 usage() {
-    echo "Usage: $0 -rch"
+    echo "Usage: $0 -rche"
     exit 0
 }
 
-while getopts "rch" flag; do
+while getopts "rche" flag; do
     case "${flag}" in
         r) rebuild=true ;;
         c) clean=true ;;
+        e) emscripten=true ;;
         h) usage ;;
         *) usage ;;
     esac
 done
+
+if $clean; then
+    echo "-- Removing old build files"
+    rm -f $DEST/*.o
+    rm -f $DEST/*.a
+    exit 0
+fi
 
 # TODO: Do not require to fully rebuild the project
 if ! $rebuild; then
@@ -66,11 +75,10 @@ if ! $rebuild; then
     rebuild=true
 fi
 
-if $clean; then
-    echo "-- Removing old build files"
-    rm -f $DEST/*.o
-    rm -f $DEST/*.a
-    exit 0
+if $emscripten; then
+    CC=emcc
+    AR=emar
+    CFLAGS=$CFLAGS" -sUSE_LIBPNG=1 -sUSE_ZLIB=1"
 fi
 
 echo "-- Creating build folder..."

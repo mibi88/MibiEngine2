@@ -42,10 +42,43 @@ rc=$?
 if [ $rc -ne 0 ]; then
     exit $rc
 fi
+clean=false
+emscripten=false
+
+while getopts "rche" flag; do
+    case "${flag}" in
+        c) clean=true ;;
+        e) emscripten=true ;;
+    esac
+done
+
+if $clean; then
+    rm build/*.html
+    rm build/*.js
+    rm build/*.wasm
+    rm -rf build/assets
+    exit $rc
+fi
 
 echo "-- Building the example..."
 
-cc example/*.c \
-   -o main -ansi -Iinclude -lEGL -lm -lX11 -lGL -lpng build/MibiEngine2.a \
-   -Wall -Wextra -Wpedantic -g
+CC=gcc
+BIN=main
+
+CFLAGS=(-ansi -Iinclude -lEGL -lm -lX11 -lGL -lpng build/MibiEngine2.a -Wall \
+        -Wextra -Wpedantic -g)
+
+if $emscripten; then
+    echo "-- Using emscripten!"
+    CC=emcc
+    CFLAGS=$CFLAGS" -sUSE_ZLIB=1 --embed-file build/assets@/"
+    BIN=build/index.js
+    mkdir -p build/assets
+    cp -r shaders build/assets/shaders
+    cp *.png build/assets
+    cp *.obj build/assets
+    cp data/index.html build
+fi
+
+$CC example/*.c -o $BIN ${CFLAGS[@]}
 
