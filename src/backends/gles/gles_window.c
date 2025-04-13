@@ -587,6 +587,7 @@ bool _ge_gles_window_emresize(int type, const struct EmscriptenUiEvent *event,
                               void *data) {
     GEWindow *window = data;
     (void)type;
+    
     if(window->resize != NULL){
         window->resize(window->data, event->windowInnerWidth,
                        event->windowInnerHeight);
@@ -731,6 +732,7 @@ bool _ge_gles_window_emkey(int type,
         "\xA0"
     };
     size_t i;
+    
     /* TODO: Use hashes */
     for(i=0;i<GE_K_AMOUNT;i++){
         if(!strcmp(keys[i], event->key)){
@@ -752,6 +754,7 @@ bool _ge_gles_window_emmouseclick(int type,
                                   const struct EmscriptenMouseEvent *event,
                                   void *data) {
     GEWindow *window = data;
+    
     window->platform.mouse_x = event->clientX;
     window->platform.mouse_y = event->clientY;
     if(window->mouseevent != NULL){
@@ -766,6 +769,8 @@ bool _ge_gles_window_emmousemove(int type,
                                   const struct EmscriptenMouseEvent *event,
                                   void *data) {
     GEWindow *window = data;
+    (void)type;
+    
     window->platform.mouse_x = event->clientX;
     window->platform.mouse_y = event->clientY;
     if(window->mouseevent != NULL){
@@ -779,6 +784,8 @@ bool _ge_gles_window_emmousescroll(int type,
                                    const struct EmscriptenWheelEvent *event,
                                    void *data) {
     GEWindow *window = data;
+    (void)type;
+    
     window->platform.mouse_x = event->mouse.clientX;
     window->platform.mouse_y = event->mouse.clientY;
     if(window->mouseevent != NULL){
@@ -794,6 +801,7 @@ bool _ge_gles_window_emmousescroll(int type,
 
 void _ge_gles_window_emloop(void *data) {
     GEWindow *window = data;
+    
     if(window->draw != NULL){
         window->draw(window->data);
         glFlush();
