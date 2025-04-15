@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <backendlist.h>
 
-#include <mibiengine2/base/config.h>
+#include <mibiengine2/config.h>
 #include <mibiengine2/errors.h>
 
 int ge_window_init(GEWindow *window, char *title) {

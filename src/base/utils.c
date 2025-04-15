@@ -33,15 +33,33 @@
  */
 
 #include <mibiengine2/base/utils.h>
+#include <mibiengine2/config.h>
 
-int ge_utils_power_of_two(int size) {
+#include <stddef.h>
+
+int ge_utils_power_of_two(int num) {
     /* Find the closest power of two */
     int c;
-    if(!(size&(size-1))){
+    if(!(num&(num-1))){
         /* It already is a power of two */
-        return size;
+        return num;
     }
-    for(c=1;size>>=1;c++);
+    for(c=1;num>>=1;c++);
     return 1<<c;
+}
+
+/* longs are at least 32bits, ints can be smaller */
+unsigned long int ge_utils_adler32(unsigned char *data, size_t size) {
+    unsigned short int s1 = 1;
+    unsigned short int s2 = 0;
+    size_t i;
+    
+    for(i=0;i<size;i++){
+        s1 += data[i];
+        s2 += s1;
+        s1 &= 0xFFFF;
+        s2 &= 0xFFFF;
+    }
+    return (s2<<16)|s1;
 }
 

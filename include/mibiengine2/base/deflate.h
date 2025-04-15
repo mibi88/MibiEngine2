@@ -32,29 +32,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_UTILS_H
-#define GE_UTILS_H
+#ifndef GE_DEFLATE_H
+#define GE_DEFLATE_H
+
+/* deflate.h
+ *
+ * Functions to decompress DEFLATE (see RFC 1951) compressed data. It should
+ * follow the ZLIB format (see RFC 1950).
+ */
 
 #include <stddef.h>
 
-/* ge_utils_power_of_two
- *
- * Get the closest power of two to num.
- *
- * num: The number to get the closest power of two to.
- * Returns the closest power of two to num.
- */
-int ge_utils_power_of_two(int num);
+typedef struct {
+    void *output;
+    size_t output_size;
+    size_t cur;
+    size_t window_size;
+    /* ZLIB header */
+    struct {
+        unsigned char method;
+        unsigned char info;
+        unsigned char level;
+    } compression;
+    unsigned char cmf;
+    unsigned char has_dict;
+    unsigned long int dict_check;
+    /* Non-zero if the ZLIB header has been read */
+    unsigned char header_found;
+    unsigned char adler32_found;
+} GEDeflate;
 
-/* ge_utils_adler32
- *
- * Get the Adler-32 checksum of data.
- *
- * data: The data to get the Adler-32 checksum of.
- * size: The size of the data.
- * Returns the Adler-32 checksum.
- */
-unsigned long int ge_utils_adler32(unsigned char *data, size_t size);
+int ge_deflate_init(GEDeflate *deflate);
+
+int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data, int size);
+
+void ge_deflate_free(GEDeflate *deflate);
 
 #endif
 

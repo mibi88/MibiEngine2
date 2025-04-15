@@ -42,7 +42,7 @@
 #include <mibiengine2/base/texturedmodel.h>
 
 #include <mibiengine2/base/shader.h>
-#include <mibiengine2/base/config.h>
+#include <mibiengine2/config.h>
 
 #include <mibiengine2/base/image.h>
 #include <mibiengine2/base/texture.h>

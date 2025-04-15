@@ -48,7 +48,7 @@
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
 
-#include <mibiengine2/base/config.h>
+#include <mibiengine2/config.h>
 
 #include <mibiengine2/errors.h>
 
@@ -70,6 +70,7 @@ void _ge_window_debug_callback(GLenum source, GLenum type, GLuint id,
                                GLenum severity, GLsizei length,
                                const GLchar *message,
                                const void *userParam) {
+    (void)userParam;
     printf("source: %d, type: %d, id: %d, severity: %d, length: %d, "
            "message: %s\n", source, type, id, severity, length, message);
 }
@@ -138,7 +139,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     };
     EGLint context_attr[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
-#if DEBUG_GLES
+#if GE_WINDOW_DEBUG
         EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
 #endif
         EGL_NONE
@@ -276,7 +277,7 @@ int _ge_gles_window_init(GEWindow *window, char *title) {
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    glEnable(GL_TEXTURE_2D);
+    /*glEnable(GL_TEXTURE_2D);*/
     
     memset(window->platform.keys_down, 0, GE_K_AMOUNT);
     

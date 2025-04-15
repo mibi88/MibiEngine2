@@ -40,7 +40,7 @@
  * Contains the features of the engine that will be included in this build.
  */
 
-#define DEBUG_GLES 0
+#define GE_IMAGE_USE_LIBPNG 1
 
 #endif
 
