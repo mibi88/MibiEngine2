@@ -48,6 +48,7 @@ typedef struct {
     size_t output_size;
     size_t cur;
     size_t window_size;
+    
     /* ZLIB header */
     struct {
         unsigned char method;
@@ -57,14 +58,31 @@ typedef struct {
     unsigned char cmf;
     unsigned char has_dict;
     unsigned long int dict_check;
+    
     /* Non-zero if the ZLIB header has been read */
     unsigned char header_found;
     unsigned char adler32_found;
+    
+    /* Used for decoding */
+    unsigned char bits_left;
+    unsigned int bits;
+    
+    unsigned char new_block;
+    unsigned char last_block;
+    unsigned char block_type;
+    
+    unsigned char blocks_finished;
+    
+    size_t read;
+    /* Used when decoding blocks with no compression */
+    unsigned int data_size;
+    unsigned int ndata_size;
 } GEDeflate;
 
 int ge_deflate_init(GEDeflate *deflate);
 
-int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data, int size);
+int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data,
+                          size_t size);
 
 void ge_deflate_free(GEDeflate *deflate);
 

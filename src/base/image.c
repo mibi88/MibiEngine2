@@ -289,6 +289,7 @@ int ge_image_init(GEImage *image, char *file) {
                 fputs("Image too small!\n", stderr);
                 _GE_IMAGE_ERROR(GE_E_PNG_TOO_SMALL);
             }
+            printf("i: %d\n", i);
             if(ge_deflate_decompress(&deflate, data+i, chunk_len)){
                 fputs("Decompression failed!\n", stderr);
                 _GE_IMAGE_ERROR(GE_E_DECOMPRESSION_FAILED);

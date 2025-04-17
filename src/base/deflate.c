@@ -43,10 +43,22 @@ int ge_deflate_init(GEDeflate *deflate) {
     deflate->cur = 0;
     deflate->header_found = 0;
     deflate->adler32_found = 0;
+    deflate->bits_left = 0;
+    deflate->new_block = 1;
+    deflate->last_block = 0;
+    deflate->blocks_finished = 0;
     return GE_E_NONE;
 }
 
-int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data, int size) {
+#define _GE_DEFLATE_READ_BITS(out, num) \
+    { \
+        out = deflate->bits&((1<<num)-1); \
+        deflate->bits >>= num; \
+        deflate->bits_left -= num; \
+    }
+
+int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data,
+                          size_t size) {
     size_t i = 0;
     if(!deflate->cur){
         /* The data is too small */
@@ -95,10 +107,68 @@ int ge_deflate_decompress(GEDeflate *deflate, unsigned char *data, int size) {
     /* Decompress the data */
     if((deflate->cur >= 2 && !deflate->has_dict) ||
        (deflate->cur >= 6 && deflate->has_dict)){
-        /*  */
+        /* Read the data */
+        while(i < size){
+            while(deflate->bits_left < 8){
+                if(size-i < 1) return GE_E_NONE;
+                deflate->bits |= data[i]<<deflate->bits_left;
+                i++;
+                deflate->cur++;
+                deflate->bits_left += 8;
+            }
+#if 0
+            /* Only for testing */
+            if(deflate->bits&1) fputs("1", stdout);
+            else fputs("0", stdout);
+            deflate->bits >>= 1;
+            deflate->bits_left--;
+#endif
+            if(deflate->new_block){
+                if(deflate->last_block){
+                    /* The data was entirely decoded */
+                    deflate->blocks_finished = 1;
+                    break;
+                }
+                /* See if it is the last block and get its type */
+                _GE_DEFLATE_READ_BITS(deflate->last_block, 1);
+                _GE_DEFLATE_READ_BITS(deflate->block_type, 2);
+                printf("Block found: last block = %u, block type = %u\n",
+                       deflate->last_block, deflate->block_type);
+                deflate->new_block = 0;
+                deflate->read = 0;
+            }else{
+                switch(deflate->block_type){
+                    case 0:
+                        /* No compression */
+                        /* Read the length of the data to be read */
+                        i--;
+                        /* The bits should be reloaded once the end of the data
+                         * has been reached */
+                        /**/
+                        break;
+                    case 1:
+                        /* Compression with fixed huffman codes */
+                        break;
+                    case 2:
+                        /* Compression with dynamic huffman codes */
+                        break;
+                    default:
+                        /* block_type 3 is reserved */
+                        fputs("Invalid block type!\n", stderr);
+                        return GE_E_INVALID_BLOCK_TYPE;
+                }
+            }
+        }
     }
+#if 0
+    /* Only for testing */
+    puts("");
+#endif
     
-    /* Check the integrity of the data with the Adler-32 checksum. */
+    if(deflate->blocks_finished){
+        /* Check the integrity of the data with the Adler-32 checksum. */
+        /* TODO */
+    }
     return GE_E_NONE;
 }
 
