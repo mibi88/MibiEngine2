@@ -83,6 +83,7 @@ int ge_utils_sort(void *data, size_t size, size_t item_size,
                 (unsigned char*)data+n*item_size, (i-n)*item_size);
         memcpy((unsigned char*)data+n*item_size, tmp, item_size);
     }
+    free(tmp);
     return GE_E_NONE;
 }
 
