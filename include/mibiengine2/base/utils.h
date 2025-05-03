@@ -56,5 +56,23 @@ int ge_utils_power_of_two(int num);
  */
 unsigned long int ge_utils_adler32(unsigned char *data, size_t size);
 
+/* ge_utils_sort
+ *
+ * Sort the data in data in the ascending order.
+ *
+ * ge_utils_sort uses a stable sorting algorithm.
+ *
+ * data:      The data to sort.
+ * size:      The number of elements in the data to sort.
+ * item_size: The size of an item in the data.
+ * cmp:       A function that compares two items. It should return a positive
+ *            number if item1 > item2, 0 if the two items are equal or a
+ *            negative number if item1 < item2.
+ *
+ * Returns GE_E_NONE (0) on success or an error code on failure.
+ */
+int ge_utils_sort(void *data, size_t size, size_t item_size,
+                  int cmp(const void *item1, const void *item2));
+
 #endif
 

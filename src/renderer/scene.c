@@ -34,7 +34,8 @@
 
 #include <mibiengine2/renderer/scene.h>
 
-#include <mibiengine2/renderer/light.h>
+#include <mibiengine2/base/utils.h>
+
 #include <mibiengine2/renderer/entity.h>
 
 #include <mibiengine2/errors.h>
@@ -140,8 +141,10 @@ int ge_scene_add_entities(GEScene *scene, GEEntity *entities,
     }
     if(group_added){
         /* Sort the entity groups by renderable priority */
-        qsort(scene->entity_groups.ptr, scene->entity_group_num,
-              sizeof(GESceneEntityGroup), _ge_scene_sort_groups);
+        if(ge_utils_sort(scene->entity_groups.ptr, scene->entity_group_num,
+                         sizeof(GESceneEntityGroup), _ge_scene_sort_groups)){
+            return GE_E_SORT;
+        }
     }
     return GE_E_NONE;
 }

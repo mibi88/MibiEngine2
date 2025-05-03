@@ -47,6 +47,8 @@
 #include <mibiengine2/base/image.h>
 #include <mibiengine2/base/texture.h>
 
+#include <mibiengine2/base/utils.h>
+
 #include <mibiengine2/base/obj.h>
 
 #include <mibiengine2/base/framebuffer.h>
@@ -490,10 +492,26 @@ void resize(void *data, int w, int h) {
     printf("Window resized to %dx%d\n", w, h);
 }
 
+int cmp(const void *a, const void *b){
+    return *(const char*)b-*(const char*)a;
+}
+
+void sort_test(void) {
+    char str[] = "thequickbrownfoxjumpsoverthelazydog";
+    printf("Unsorted: %s\n", str);
+    if(ge_utils_sort(str, strlen(str), 1, cmp)){
+        puts("sort failed");
+        return;
+    }
+    printf("Sorted:   %s\n", str);
+}
+
 int main(int argc, char **argv) {
     int rc;
     (void)argc;
     (void)argv;
+    
+    sort_test();
     
     if((rc = ge_window_init(&window, "MibiEngine2 demo"))){
         return rc;

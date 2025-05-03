@@ -34,8 +34,10 @@
 
 #include <mibiengine2/base/utils.h>
 #include <mibiengine2/config.h>
+#include <mibiengine2/errors.h>
 
-#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 int ge_utils_power_of_two(int num) {
     /* Find the closest power of two */
@@ -61,5 +63,26 @@ unsigned long int ge_utils_adler32(unsigned char *data, size_t size) {
         s2 &= 0xFFFF;
     }
     return (s2<<16)|s1;
+}
+
+int ge_utils_sort(void *data, size_t size, size_t item_size,
+                  int cmp(const void *item1, const void *item2)) {
+    size_t i, n;
+    void *tmp = malloc(item_size);
+    if(tmp == NULL) return 1;
+    for(i=1;i<size;i++){
+        for(n=i;n ? n-- : n;){
+            if(cmp((unsigned char*)data+i*item_size,
+                   (unsigned char*)data+n*item_size) <= 0){
+                n++;
+                break;
+            }
+        }
+        memcpy(tmp, (unsigned char*)data+i*item_size, item_size);
+        memmove((unsigned char*)data+n*item_size+item_size,
+                (unsigned char*)data+n*item_size, (i-n)*item_size);
+        memcpy((unsigned char*)data+n*item_size, tmp, item_size);
+    }
+    return GE_E_NONE;
 }
 

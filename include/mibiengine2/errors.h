@@ -59,6 +59,7 @@ enum {
     GE_E_IMMUTABLE,
     GE_E_ALREADY_ADDED,
     GE_E_NOT_ADDED_YET,
+    GE_E_SORT,
     /* Base - PNG image loading */
     GE_E_NOT_PNG,
     GE_E_IHDR_NOT_FOUND,
