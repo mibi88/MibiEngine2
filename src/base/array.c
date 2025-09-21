@@ -32,79 +32,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mibiengine2/base/arena.h>
+#include <mibiengine2/base/array.h>
 #include <mibiengine2/errors.h>
-
 #include <stdlib.h>
+#include <string.h>
 
-int ge_arena_init(GEArena *arena, size_t chunk_min) {
-    arena->chunk = 0;
+int ge_array_init(GEArray *array, size_t count, size_t item_size,
+                  void *items) {
+    if(!count || items == NULL){
+        array->ptr = NULL;
+        count = 0;
+    }else{
+        array->ptr = malloc(count*item_size);
+        if(array->ptr == NULL){
+            return GE_E_OUT_OF_MEM;
+        }
+        memcpy(array->ptr, items, count*item_size);
+    }
 
-    arena->chunks = malloc(sizeof(void*));
-    if(arena->chunks == NULL){
+    array->count = count;
+    array->item_size = item_size;
+    return GE_E_NONE;
+}
+
+int ge_array_add(GEArray *array, void *items, size_t count) {
+    void *new;
+
+    new = realloc(array->ptr, (array->count+count)*array->item_size);
+    if(new == NULL){
         return GE_E_OUT_OF_MEM;
     }
-    *arena->chunks = malloc(chunk_min);
-    if(*arena->chunks == NULL){
-        return GE_E_OUT_OF_MEM;
-    }
 
-    arena->chunk_min = chunk_min;
-    arena->chunk_size = chunk_min;
+    array->ptr = new;
 
-    arena->size = 0;
+    memcpy((char*)array->ptr+array->count*array->item_size, items,
+           count*array->item_size);
+
+    array->count += count;
 
     return GE_E_NONE;
 }
 
-void *ge_arena_alloc(GEArena *arena, size_t num, size_t size) {
-    size_t align = arena->size%size ? size-(arena->size%size) : 0;
-    size_t new_size = arena->size+align+size*num;
-
-    void *new;
-
-    if(new_size > arena->chunk_size){
-        size_t chunk_size = size*num > arena->chunk_min ?
-                            size*num : arena->chunk_min;
-
-        new = realloc(arena->chunks, (arena->chunk+2)*sizeof(void*));
-        if(new == NULL){
-            return NULL;
-        }
-
-        arena->chunks = new;
-
-        arena->chunks[arena->chunk+1] = malloc(chunk_size);
-        if(arena->chunks[arena->chunk+1] == NULL){
-            return NULL;
-        }
-
-        arena->chunk++;
-        arena->chunk_size = chunk_size;
-
-        arena->size = 0;
-
-        new_size = size*num;
-    }
-    new = (char*)arena->chunks[arena->chunk]+align;
-    arena->size = new_size;
-    return new;
+void ge_array_free(GEArray *array) {
+    free(array->ptr);
+    array->ptr = NULL;
 }
-
-void ge_arena_free(GEArena *arena) {
-    size_t i;
-
-    if(arena->chunks == NULL) return;
-
-    for(i=0;i<=arena->chunk;i++){
-        free(arena->chunks[i]);
-        arena->chunks[i] = NULL;
-    }
-
-    free(arena->chunks);
-    arena->chunks = NULL;
-    arena->chunk_min = 0;
-    arena->chunk = 0;
-    arena->size = 0;
-}
-

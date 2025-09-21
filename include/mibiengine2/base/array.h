@@ -32,65 +32,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GE_SHADERTREE_H
-#define GE_SHADERTREE_H
+#ifndef GE_ARRAY_H
+#define GE_ARRAY_H
 
-#include <mibiengine2/base/arena.h>
-#include <mibiengine2/base/array.h>
-#include <mibiengine2/base/stack.h>
+/* TODO: Add some documentation. */
 
-#define GE_SHADERTREE_ALLOC_STEP 512
-#define GE_SHADERTREE_DEFINE_ARGS_MAX 16
-#define GE_SHADERTREE_ARG_SZ 16
+#include <stddef.h>
 
 typedef struct {
-    GEArena tokens;
-    GEArena token_strings;
-    GEArena token_types;
-    GEArena macro_expansions;
-    GEArray comments;
-    size_t token_num;
-    size_t error_line;
-    unsigned char error_code;
-} GEShaderTree;
+    void *ptr;
+    size_t count;
+    size_t item_size;
+} GEArray;
 
-typedef struct {
-    long int changedlines;
-    size_t start_line;
-} GEShaderTreeMacroExpansion;
-
-typedef struct {
-    size_t start;
-    size_t end;
-    size_t lines;
-} GEShaderTreeComment;
-
-typedef struct {
-    GEStack tokens;
-    GEStack operators;
-    /* Output contains the expression in RPN (generated with the Shunting Yard
-     * algorithm). */
-    GEStack output;
-} GEShaderTreeExpression;
-
-/* Shader compilation error codes */
-enum {
-    GE_S_E_NONE,
-    GE_S_DEF_TOO_BIG,
-    GE_S_E_AMOUNT
-};
-
-int ge_shadertree_init(GEShaderTree *tree);
-
-int ge_shadertree_load(GEShaderTree *tree, char *shader);
-
-int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader);
-
-int ge_shadertree_tokenize(GEShaderTree *tree, char *shader);
-
-int ge_shadertree_generate(GEShaderTree *tree);
-
-void ge_shadertree_free(GEShaderTree *tree);
+int ge_array_init(GEArray *array, size_t count, size_t item_size, void *items);
+int ge_array_add(GEArray *array, void *items, size_t count);
+void ge_array_free(GEArray *array);
 
 #endif
-

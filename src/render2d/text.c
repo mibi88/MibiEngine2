@@ -87,6 +87,10 @@ int _ge_text_generate_arrays(GEText *text, GEFont *font, char *str,
     y = 0;
     for(i=0;i<len;i++){
         glyph = font->glyphs+font->glyph_pos(font, str[i]);
+        if(glyph < font->glyphs || glyph >= font->glyphs+font->glyph_num){
+            /* TODO: Show a default glyph */
+            glyph = font->glyphs;
+        }
         for(n=0;n<4*2;n++){
             if(n&1){
                 /* It's the position on the Y axis */

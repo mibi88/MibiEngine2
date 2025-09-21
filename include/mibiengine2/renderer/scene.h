@@ -36,6 +36,7 @@
 #define GE_SCENE_H
 
 #include <mibiengine2/base/arena.h>
+#include <mibiengine2/base/array.h>
 
 #include <mibiengine2/renderer/renderable.h>
 #include <mibiengine2/renderer/entity.h>
@@ -44,15 +45,15 @@
 #define GE_SCENE_ALLOC_STEP 512
 
 typedef struct {
-    GEArena model_mat;
-    GEArena normal_mat;
-    GEArena entities;
+    GEArray model_mat;
+    GEArray normal_mat;
+    GEArray entities;
     GERenderable *renderable;
     size_t entity_num;
 } GESceneEntityGroup;
 
 typedef struct {
-    GEArena entity_groups;
+    GEArray entity_groups;
     size_t entity_group_num;
     GEStdShader **shaders;
     size_t shader_num;

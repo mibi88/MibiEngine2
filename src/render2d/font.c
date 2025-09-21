@@ -86,6 +86,7 @@ int ge_font_init(GEFont *font, GEImage *image, int variable_width,
     if(font->glyphs == NULL){
         return GE_E_OUT_OF_MEM;
     }
+    font->glyph_num = charset_glyph_num[charset];
     
     if(variable_width){
         /* TODO: Support variable width fonts */

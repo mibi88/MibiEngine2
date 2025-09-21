@@ -41,30 +41,25 @@
 #include <stdio.h>
 
 int ge_shadertree_init(GEShaderTree *tree) {
-    if(ge_arena_init(&tree->tokens, GE_SHADERTREE_ALLOC_STEP,
-                     GE_SHADERTREE_ALLOC_STEP)){
+    if(ge_arena_init(&tree->tokens, GE_SHADERTREE_ALLOC_STEP)){
         return GE_E_ARENA_INIT;
     }
-    if(ge_arena_init(&tree->token_strings, GE_SHADERTREE_ALLOC_STEP,
-                     GE_SHADERTREE_ALLOC_STEP)){
+    if(ge_arena_init(&tree->token_strings, GE_SHADERTREE_ALLOC_STEP)){
         ge_arena_free(&tree->tokens);
         return GE_E_ARENA_INIT;
     }
-    if(ge_arena_init(&tree->token_types, GE_SHADERTREE_ALLOC_STEP,
-                     GE_SHADERTREE_ALLOC_STEP)){
+    if(ge_arena_init(&tree->token_types, GE_SHADERTREE_ALLOC_STEP)){
         ge_arena_free(&tree->tokens);
         ge_arena_free(&tree->token_strings);
         return GE_E_ARENA_INIT;
     }
-    if(ge_arena_init(&tree->macro_expansions, GE_SHADERTREE_ALLOC_STEP,
-                     GE_SHADERTREE_ALLOC_STEP)){
+    if(ge_arena_init(&tree->macro_expansions, GE_SHADERTREE_ALLOC_STEP)){
         ge_arena_free(&tree->tokens);
         ge_arena_free(&tree->token_strings);
         ge_arena_free(&tree->token_types);
         return GE_E_ARENA_INIT;
     }
-    if(ge_arena_init(&tree->comments, GE_SHADERTREE_ALLOC_STEP,
-                     GE_SHADERTREE_ALLOC_STEP)){
+    if(ge_array_init(&tree->comments, 0, sizeof(GEShaderTreeComment), NULL)){
         ge_arena_free(&tree->tokens);
         ge_arena_free(&tree->token_strings);
         ge_arena_free(&tree->token_types);
@@ -85,6 +80,8 @@ int ge_shadertree_load(GEShaderTree *tree, char *shader) {
 
 #define LAST_CHAR_NUM 8
 
+#define _GE_SHADERTREE_COMMENTS ((GEShaderTreeComment*)tree->comments.ptr)
+
 int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
     size_t i;
     size_t len;
@@ -101,17 +98,13 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
     char spaces[] = " \t";
     char directive_args[GE_SHADERTREE_DEFINE_ARGS_MAX][GE_SHADERTREE_ARG_SZ];
     GEShaderTreeComment comment;
-    GEShaderTreeComment *ptr;
-    GEShaderTreeComment *comments;
     crlf = strchr(shader, '\r') != NULL;
     printf("CRLF: %d\n", crlf);
     len = strlen(shader);
-    
+
     (void)line_started;
     (void)directive_args;
-    
-    comments = tree->comments.ptr;
-    
+
     /* Search all the comments. */
     for(i=0;i<len;i++){
         /* Load the current char */
@@ -123,19 +116,16 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
         }
         /*fwrite(last_chars, last_char_num, 1, stdout);
         puts("");*/
-        
+
         /* Check if we are in a comment, or if we exit one */
         if(last_char_num >= 2){
             if(in_comment && !memcmp(last_chars+last_char_num-2, "*/", 2)){
                 in_comment = 0;
                 comment.end = i+1;
                 comment.lines = line-start_line;
-                ptr = ge_arena_alloc(&tree->comments, 1,
-                                     sizeof(GEShaderTreeComment));
-                if(ptr == NULL){
-                    return GE_E_ARENA_ALLOC;
+                if(ge_array_add(&tree->comments, &comment, 1)){
+                    return GE_E_OUT_OF_MEM;
                 }
-                *ptr = comment;
                 comment_num++;
             }else if(!in_comment && !memcmp(last_chars+last_char_num-2, "/*",
                                             2)){
@@ -144,7 +134,7 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
                 start_line = line;
             }
         }
-        
+
         /* Increment the line number */
         if(crlf && !memcmp(last_chars+last_char_num-2, "\r\n", 2)){
             line++;
@@ -152,18 +142,18 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
             line++;
         }
     }
-    
+
     line = 1;
     line_started = 0;
-    
+
     printf("Comment num: %lu\n", comment_num);
-    
+
     for(i=0;i<len;i++){
         /* Skip comments */
         if(comment_idx < comment_num){
-            if(i == comments[comment_idx].start){
-                i = comments[comment_idx].end;
-                line += comments[comment_idx].lines;
+            if(i == _GE_SHADERTREE_COMMENTS[comment_idx].start){
+                i = _GE_SHADERTREE_COMMENTS[comment_idx].end;
+                line += _GE_SHADERTREE_COMMENTS[comment_idx].lines;
                 comment_idx++;
             }
         }
@@ -174,9 +164,9 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
             memmove(last_chars, last_chars+1, LAST_CHAR_NUM-1);
             last_chars[LAST_CHAR_NUM-1] = shader[i];
         }
-        
+
         /*putc(shader[i], stdout);*/
-        
+
         /* Search for preprocessor directives */
         if(in_directive){
             /* Load the directive */
@@ -188,7 +178,7 @@ int ge_shadertree_preprocessor(GEShaderTree *tree, char *shader) {
                 in_directive = 1;
             }
         }
-        
+
         /* Increment the line number */
         if(crlf && !memcmp(last_chars+last_char_num-2, "\r\n", 2)){
             line++;
@@ -218,6 +208,6 @@ void ge_shadertree_free(GEShaderTree *tree) {
     ge_arena_free(&tree->token_strings);
     ge_arena_free(&tree->token_types);
     ge_arena_free(&tree->macro_expansions);
-    ge_arena_free(&tree->comments);
+    ge_array_free(&tree->comments);
 }
 

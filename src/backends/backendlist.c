@@ -47,4 +47,3 @@ GEBackend *_ge_backend_list[GE_B_AMOUNT] = {
 char *_ge_backend_names[GE_B_AMOUNT] = {
     "OpenGL ES 2"
 };
-

@@ -38,10 +38,11 @@
 #include <stddef.h>
 
 typedef struct {
-    void *ptr;
-    size_t max;
+    void **chunks;
+    size_t chunk;
+    size_t chunk_min;
+    size_t chunk_size;
     size_t size;
-    size_t alloc_step;
 } GEArena;
 
 /* ge_arena_init
@@ -54,7 +55,7 @@ typedef struct {
  *             use.
  * Returns GE_E_NONE (0) on success or an error code on failure.
  */
-int ge_arena_init(GEArena *arena, size_t alloc_step, size_t max);
+int ge_arena_init(GEArena *arena, size_t chunk_min);
 
 /* ge_arena_alloc
  *
